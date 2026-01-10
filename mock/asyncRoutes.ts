@@ -109,6 +109,117 @@ const articleRouter = {
   ]
 };
 
+const noticeRouter = {
+  path: "/notice",
+  meta: {
+    title: "公告管理",
+    icon: "ep:bell",
+    rank: 13
+  },
+  children: [
+    {
+      path: "/notice/index",
+      component: "notice/index",
+      name: "NoticeManage",
+      meta: {
+        title: "公告管理"
+      }
+    }
+  ]
+};
+
+const activityRouter = {
+  path: "/activity",
+  meta: {
+    title: "活动管理",
+    icon: "ep:calendar",
+    rank: 14
+  },
+  children: [
+    {
+      path: "/activity/index",
+      component: "activity/index",
+      name: "ActivityManage",
+      meta: {
+        title: "活动管理"
+      }
+    }
+  ]
+};
+
+const otaRouter = {
+  path: "/ota",
+  meta: {
+    title: "OTA管理",
+    icon: "ep:cpu",
+    rank: 15
+  },
+  children: [
+    {
+      path: "/ota/type/index",
+      component: "ota/type/index",
+      name: "OtaType",
+      meta: {
+        title: "类型管理"
+      }
+    },
+    {
+      path: "/ota/content/index",
+      component: "ota/content/index",
+      name: "OtaContent",
+      meta: {
+        title: "内容管理"
+      }
+    }
+  ]
+};
+
+const vehicleRouter = {
+  path: "/vehicle",
+  meta: {
+    title: "车型管理",
+    icon: "ep:van",
+    rank: 16
+  },
+  children: [
+    {
+      path: "/vehicle/index",
+      component: "vehicle/index",
+      name: "VehicleManage",
+      meta: {
+        title: "车型管理"
+      }
+    }
+  ]
+};
+
+const medalRouter = {
+  path: "/medal",
+  meta: {
+    title: "勋章管理",
+    icon: "ep:trophy",
+    rank: 17
+  },
+  children: [
+    {
+      path: "/medal/type/index",
+      component: "medal/type/index",
+      name: "MedalTypeManage",
+      meta: {
+        title: "类型管理"
+      }
+    },
+    {
+      path: "/medal/item/index",
+      component: "medal/item/index",
+      name: "MedalItemManage",
+      meta: {
+        title: "勋章管理"
+      }
+    }
+  ]
+};
+
 export default defineFakeRoute([
   {
     url: "/get-async-routes",
@@ -116,7 +227,16 @@ export default defineFakeRoute([
     response: () => {
       return {
         success: true,
-        data: [permissionRouter, systemRouter, articleRouter]
+        data: [
+          permissionRouter,
+          systemRouter,
+          articleRouter,
+          noticeRouter,
+          activityRouter,
+          otaRouter,
+          vehicleRouter,
+          medalRouter
+        ]
       };
     }
   }
