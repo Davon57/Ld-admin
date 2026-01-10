@@ -55,6 +55,60 @@ const permissionRouter = {
   ]
 };
 
+const systemRouter = {
+  path: "/system",
+  meta: {
+    title: "系统管理",
+    icon: "ep:setting",
+    rank: 11
+  },
+  children: [
+    {
+      path: "/system/user/index",
+      component: "system/user/index",
+      name: "SystemUser",
+      meta: {
+        title: "用户管理"
+      }
+    }
+  ]
+};
+
+const articleRouter = {
+  path: "/article",
+  meta: {
+    title: "文章管理",
+    icon: "ep:document",
+    rank: 12
+  },
+  children: [
+    {
+      path: "/article/category/index",
+      component: "article/category/index",
+      name: "ArticleCategory",
+      meta: {
+        title: "分类管理"
+      }
+    },
+    {
+      path: "/article/tag/index",
+      component: "article/tag/index",
+      name: "ArticleTag",
+      meta: {
+        title: "标签管理"
+      }
+    },
+    {
+      path: "/article/post/index",
+      component: "article/post/index",
+      name: "ArticlePost",
+      meta: {
+        title: "文章管理"
+      }
+    }
+  ]
+};
+
 export default defineFakeRoute([
   {
     url: "/get-async-routes",
@@ -62,7 +116,7 @@ export default defineFakeRoute([
     response: () => {
       return {
         success: true,
-        data: [permissionRouter]
+        data: [permissionRouter, systemRouter, articleRouter]
       };
     }
   }
