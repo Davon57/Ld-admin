@@ -7,7 +7,6 @@ export type UserResult = {
     username: string;
     nickname: string;
     avatar: string;
-    carModel: string;
     city: string;
     email: string;
     phone: string | null;
@@ -51,7 +50,6 @@ export type CurrentUser = {
   username: string;
   nickname: string;
   avatar: string;
-  carModel: string;
   city: string;
   email: string;
   phone: string | null;
@@ -67,7 +65,6 @@ export type UserItem = {
   username: string;
   nickname: string;
   avatar: string;
-  carModel: string;
   city: string;
   email: string;
   phone: string | null;
@@ -146,8 +143,7 @@ function matchKeyword(user: UserItem, keyword: string): boolean {
     user.nickname,
     user.email,
     user.phone ?? "",
-    user.city,
-    user.carModel
+    user.city
   ];
   return values.some(v => normalizeText(String(v)).includes(k));
 }
@@ -182,7 +178,6 @@ export type CreateUserPayload = {
   email?: string | null;
   avatar?: string;
   nickname?: string;
-  carModel?: string;
   city?: string;
   phone?: string | null;
   role?: UserRole;
@@ -200,7 +195,6 @@ export type UpdateUserPayload = {
   id?: string;
   avatar?: string;
   nickname?: string;
-  carModel?: string;
   city?: string;
   email?: string | null;
   phone?: string | null;

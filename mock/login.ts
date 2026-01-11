@@ -34,7 +34,6 @@ export default defineFakeRoute([
           avatar: isAdmin
             ? "https://avatars.githubusercontent.com/u/44761321"
             : "https://avatars.githubusercontent.com/u/52823142",
-          carModel: "",
           city: "",
           email: isAdmin ? "admin@example.com" : "user@example.com",
           phone: null,

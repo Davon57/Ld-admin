@@ -16,7 +16,6 @@ import {
   deleteUser,
   batchDeleteUsers
 } from "@/api/user";
-import { getVehicleList } from "@/api/vehicle";
 
 defineOptions({
   name: "SystemUser"
@@ -63,7 +62,6 @@ const exportColumns: CsvColumn<UserItem>[] = [
   { label: "用户名", key: "username" },
   { label: "昵称", key: "nickname" },
   { label: "城市", key: "city" },
-  { label: "车型", key: "carModel" },
   {
     label: "角色",
     key: "role",
@@ -184,7 +182,6 @@ type UserFormModel = {
   username: string;
   nickname: string;
   avatar: string;
-  carModel: string;
   city: string;
   role: UserRole;
   status: UserStatus;
@@ -314,33 +311,6 @@ function getCascaderLabelsByPath(
   return labels;
 }
 
-const carModelOptions = ref<string[]>([]);
-const carModelLoading = ref(false);
-const carModelLoaded = ref(false);
-
-async function ensureCarModelOptions(): Promise<void> {
-  if (carModelLoaded.value || carModelLoading.value) return;
-  carModelLoading.value = true;
-  try {
-    const res = await getVehicleList({ page: 1, pageSize: 3000 });
-    if (!res.success) {
-      message(res.message || "获取车型列表失败", { type: "error" });
-      return;
-    }
-    const models = res.data.list
-      .map(v => (v.model ?? "").trim())
-      .filter(Boolean);
-    const unique = Array.from(new Set(models));
-    unique.sort((a, b) => a.localeCompare(b, "zh-Hans-CN"));
-    carModelOptions.value = unique;
-    carModelLoaded.value = true;
-  } catch {
-    message("网络异常，请稍后重试", { type: "error" });
-  } finally {
-    carModelLoading.value = false;
-  }
-}
-
 function openUserDialog(mode: UserFormMode, row?: UserItem): void {
   const formRef = ref<FormInstance>();
   const cityOptions = ref<CascaderOption[]>([]);
@@ -370,7 +340,6 @@ function openUserDialog(mode: UserFormMode, row?: UserItem): void {
     username: mode === "edit" ? (row?.username ?? "") : "",
     nickname: mode === "edit" ? (row?.nickname ?? "") : "",
     avatar: mode === "edit" ? (row?.avatar ?? "") : "",
-    carModel: mode === "edit" ? (row?.carModel ?? "") : "",
     city: mode === "edit" ? (row?.city ?? "") : "",
     role: mode === "edit" ? (row?.role ?? "user") : "user",
     status: mode === "edit" ? (row?.status ?? "active") : "active",
@@ -412,8 +381,6 @@ function openUserDialog(mode: UserFormMode, row?: UserItem): void {
         const found = findCascaderPathByLabels(cityOptions.value, labelPath);
         if (found) cityCodePath.value = found;
       });
-
-      void ensureCarModelOptions();
 
       return () => (
         <el-form
@@ -503,20 +470,6 @@ function openUserDialog(mode: UserFormMode, row?: UserItem): void {
               }}
             />
           </el-form-item>
-          <el-form-item label="车型" prop="carModel">
-            <el-select
-              v-model={model.carModel}
-              filterable
-              clearable
-              class="w-full"
-              placeholder="请选择车型"
-              loading={carModelLoading.value}
-            >
-              {carModelOptions.value.map(m => (
-                <el-option label={m} value={m} key={m} />
-              ))}
-            </el-select>
-          </el-form-item>
           {isEdit.value ? null : (
             <el-form-item label="密码" prop="password">
               <el-input
@@ -549,13 +502,11 @@ function openUserDialog(mode: UserFormMode, row?: UserItem): void {
           const avatar = model.avatar.trim();
           const nickname = model.nickname.trim();
           const city = model.city.trim();
-          const carModel = model.carModel.trim();
           const res = await createUser({
             username: model.username.trim(),
             nickname: nickname ? nickname : undefined,
             avatar: avatar ? avatar : undefined,
             city: city ? city : undefined,
-            carModel: carModel ? carModel : undefined,
             role: model.role,
             status: model.status,
             phone: model.phone.trim() ? model.phone.trim() : null,
@@ -585,7 +536,6 @@ function openUserDialog(mode: UserFormMode, row?: UserItem): void {
           nickname: model.nickname.trim(),
           avatar: model.avatar.trim() ? model.avatar.trim() : undefined,
           city: model.city.trim(),
-          carModel: model.carModel.trim(),
           role: model.role,
           status: model.status,
           phone: model.phone.trim() ? model.phone.trim() : null,
@@ -683,7 +633,7 @@ fetchUsers();
         <el-form-item label="关键词">
           <el-input
             v-model="queryState.keyword"
-            placeholder="用户名/昵称/手机号/邮箱/城市/车型"
+            placeholder="用户名/昵称/手机号/邮箱/城市"
             clearable
             class="w-[240px]!"
             @keyup.enter="onSearch"
@@ -765,7 +715,6 @@ fetchUsers();
         <el-table-column prop="username" label="用户名" min-width="140" />
         <el-table-column prop="nickname" label="昵称" min-width="140" />
         <el-table-column prop="city" label="城市" min-width="120" />
-        <el-table-column prop="carModel" label="车型" min-width="140" />
         <el-table-column prop="role" label="角色" width="110">
           <template #default="{ row }">
             <el-tag v-if="row.role === 'admin'" type="warning">管理员</el-tag>
