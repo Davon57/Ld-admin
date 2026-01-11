@@ -4,6 +4,7 @@ import type { FormInstance, FormRules } from "element-plus";
 import { addDialog } from "@/components/ReDialog";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { message } from "@/utils/message";
+import { DEFAULT_PAGE_SIZES, exportToCsv, type CsvColumn } from "@/utils/table";
 import {
   type UserItem,
   type UserRole,
@@ -51,6 +52,26 @@ const loading = ref(false);
 const tableData = ref<UserItem[]>([]);
 const total = ref(0);
 const selectionIds = ref<number[]>([]);
+
+const exporting = ref(false);
+
+const exportColumns: CsvColumn<UserItem>[] = [
+  { label: "用户名", key: "username" },
+  { label: "昵称", key: "nickname" },
+  {
+    label: "角色",
+    key: "role",
+    format: (_value, row) => (row.role === "admin" ? "管理员" : "普通用户")
+  },
+  {
+    label: "状态",
+    key: "status",
+    format: (_value, row) => (row.status === 1 ? "启用" : "禁用")
+  },
+  { label: "手机号", key: "phone" },
+  { label: "邮箱", key: "email" },
+  { label: "创建时间", key: "createdAt" }
+];
 
 const listParams = computed((): UserListParams => {
   const params: UserListParams = {
@@ -110,6 +131,33 @@ function onCurrentChange(page: number): void {
 
 function onSelectionChange(rows: UserItem[]): void {
   selectionIds.value = rows.map(r => r.id);
+}
+
+async function onExportList(): Promise<void> {
+  if (total.value === 0) {
+    message("暂无可导出数据", { type: "warning" });
+    return;
+  }
+  exporting.value = true;
+  try {
+    const res = await getUserList({
+      ...listParams.value,
+      page: 1,
+      pageSize: 3000
+    });
+    if (!res.success) {
+      message(res.message || "导出失败", { type: "error" });
+      return;
+    }
+    if (total.value > res.data.list.length) {
+      message("仅导出前 3000 条", { type: "warning" });
+    }
+    exportToCsv(res.data.list, exportColumns, "用户列表");
+  } catch {
+    message("网络异常，请稍后重试", { type: "error" });
+  } finally {
+    exporting.value = false;
+  }
 }
 
 type UserFormMode = "create" | "edit";
@@ -451,6 +499,14 @@ fetchUsers();
           <el-button type="primary" @click="openUserDialog('create')">
             新增用户
           </el-button>
+          <el-button
+            type="success"
+            plain
+            :loading="exporting"
+            @click="onExportList"
+          >
+            导出列表
+          </el-button>
           <el-button type="danger" plain @click="onBatchDelete">
             批量删除
           </el-button>
@@ -515,7 +571,7 @@ fetchUsers();
           :total="total"
           :current-page="queryState.page"
           :page-size="queryState.pageSize"
-          :page-sizes="[10, 20, 50]"
+          :page-sizes="DEFAULT_PAGE_SIZES"
           @size-change="onSizeChange"
           @current-change="onCurrentChange"
         />

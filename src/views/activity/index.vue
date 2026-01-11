@@ -4,6 +4,7 @@ import type { FormInstance, FormRules } from "element-plus";
 import { addDialog } from "@/components/ReDialog";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { message } from "@/utils/message";
+import { DEFAULT_PAGE_SIZES, exportToCsv, type CsvColumn } from "@/utils/table";
 import {
   type ActivityItem,
   type Status,
@@ -41,6 +42,20 @@ const loading = ref(false);
 const tableData = ref<ActivityItem[]>([]);
 const total = ref(0);
 const selectionIds = ref<number[]>([]);
+
+const exporting = ref(false);
+
+const exportColumns: CsvColumn<ActivityItem>[] = [
+  { label: "名称", key: "name" },
+  { label: "开始时间", key: "startAt" },
+  { label: "结束时间", key: "endAt" },
+  {
+    label: "状态",
+    key: "status",
+    format: (_value, row) => (row.status === 1 ? "启用" : "禁用")
+  },
+  { label: "创建时间", key: "createdAt" }
+];
 
 const listParams = computed((): ActivityListParams => {
   const params: ActivityListParams = {
@@ -98,6 +113,33 @@ function onCurrentChange(page: number): void {
 
 function onSelectionChange(rows: ActivityItem[]): void {
   selectionIds.value = rows.map(r => r.id);
+}
+
+async function onExportList(): Promise<void> {
+  if (total.value === 0) {
+    message("暂无可导出数据", { type: "warning" });
+    return;
+  }
+  exporting.value = true;
+  try {
+    const res = await getActivityList({
+      ...listParams.value,
+      page: 1,
+      pageSize: 3000
+    });
+    if (!res.success) {
+      message(res.message || "导出失败", { type: "error" });
+      return;
+    }
+    if (total.value > res.data.list.length) {
+      message("仅导出前 3000 条", { type: "warning" });
+    }
+    exportToCsv(res.data.list, exportColumns, "活动列表");
+  } catch {
+    message("网络异常，请稍后重试", { type: "error" });
+  } finally {
+    exporting.value = false;
+  }
 }
 
 type ActivityFormMode = "create" | "edit";
@@ -379,6 +421,14 @@ fetchActivities();
           <el-button type="primary" @click="openActivityDialog('create')">
             新增活动
           </el-button>
+          <el-button
+            type="success"
+            plain
+            :loading="exporting"
+            @click="onExportList"
+          >
+            导出列表
+          </el-button>
           <el-button type="danger" plain @click="onBatchDelete">
             批量删除
           </el-button>
@@ -436,7 +486,7 @@ fetchActivities();
           :total="total"
           :current-page="queryState.page"
           :page-size="queryState.pageSize"
-          :page-sizes="[10, 20, 50]"
+          :page-sizes="DEFAULT_PAGE_SIZES"
           @size-change="onSizeChange"
           @current-change="onCurrentChange"
         />

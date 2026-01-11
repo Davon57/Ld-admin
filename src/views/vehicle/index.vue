@@ -4,6 +4,7 @@ import type { FormInstance, FormRules } from "element-plus";
 import { addDialog } from "@/components/ReDialog";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { message } from "@/utils/message";
+import { DEFAULT_PAGE_SIZES, exportToCsv, type CsvColumn } from "@/utils/table";
 import {
   type VehicleItem,
   type Status,
@@ -41,6 +42,18 @@ const loading = ref(false);
 const tableData = ref<VehicleItem[]>([]);
 const total = ref(0);
 const selectionIds = ref<number[]>([]);
+
+const exportColumns: CsvColumn<VehicleItem>[] = [
+  { label: "年份", key: "year" },
+  { label: "车型", key: "model" },
+  { label: "版本", key: "version" },
+  {
+    label: "状态",
+    key: "status",
+    format: (_value, row) => (row.status === 1 ? "启用" : "禁用")
+  },
+  { label: "创建时间", key: "createdAt" }
+];
 
 const listParams = computed((): VehicleListParams => {
   const params: VehicleListParams = {
@@ -98,6 +111,14 @@ function onCurrentChange(page: number): void {
 
 function onSelectionChange(rows: VehicleItem[]): void {
   selectionIds.value = rows.map(r => r.id);
+}
+
+function onExportList(): void {
+  if (tableData.value.length === 0) {
+    message("暂无可导出数据", { type: "warning" });
+    return;
+  }
+  exportToCsv(tableData.value, exportColumns, "车型列表");
 }
 
 type VehicleFormMode = "create" | "edit";
@@ -354,6 +375,9 @@ fetchVehicles();
           <el-button type="primary" @click="openVehicleDialog('create')">
             新增车型
           </el-button>
+          <el-button type="success" plain @click="onExportList"
+            >导出列表</el-button
+          >
           <el-button type="danger" plain @click="onBatchDelete">
             批量删除
           </el-button>
@@ -411,7 +435,7 @@ fetchVehicles();
           :total="total"
           :current-page="queryState.page"
           :page-size="queryState.pageSize"
-          :page-sizes="[10, 20, 50]"
+          :page-sizes="DEFAULT_PAGE_SIZES"
           @size-change="onSizeChange"
           @current-change="onCurrentChange"
         />

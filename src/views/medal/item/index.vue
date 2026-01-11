@@ -4,6 +4,7 @@ import type { FormInstance, FormRules } from "element-plus";
 import { addDialog } from "@/components/ReDialog";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { message } from "@/utils/message";
+import { DEFAULT_PAGE_SIZES, exportToCsv, type CsvColumn } from "@/utils/table";
 import {
   type MedalItem,
   type MedalTypeItem,
@@ -83,6 +84,26 @@ const tableData = ref<MedalItem[]>([]);
 const total = ref(0);
 const selectionIds = ref<number[]>([]);
 
+const exporting = ref(false);
+
+const exportColumns: CsvColumn<MedalItem>[] = [
+  { label: "名称", key: "name" },
+  {
+    label: "类型",
+    key: "typeId",
+    format: (_value, row) =>
+      typeLabelMap.value.get(row.typeId) ?? `#${row.typeId}`
+  },
+  { label: "标识", key: "code" },
+  { label: "描述", key: "description" },
+  {
+    label: "状态",
+    key: "status",
+    format: (_value, row) => (row.status === 1 ? "启用" : "禁用")
+  },
+  { label: "创建时间", key: "createdAt" }
+];
+
 const listParams = computed((): MedalItemListParams => {
   const params: MedalItemListParams = {
     page: queryState.page,
@@ -141,6 +162,33 @@ function onCurrentChange(page: number): void {
 
 function onSelectionChange(rows: MedalItem[]): void {
   selectionIds.value = rows.map(r => r.id);
+}
+
+async function onExportList(): Promise<void> {
+  if (total.value === 0) {
+    message("暂无可导出数据", { type: "warning" });
+    return;
+  }
+  exporting.value = true;
+  try {
+    const res = await getMedalItemList({
+      ...listParams.value,
+      page: 1,
+      pageSize: 3000
+    });
+    if (!res.success) {
+      message(res.message || "导出失败", { type: "error" });
+      return;
+    }
+    if (total.value > res.data.list.length) {
+      message("仅导出前 3000 条", { type: "warning" });
+    }
+    exportToCsv(res.data.list, exportColumns, "勋章列表");
+  } catch {
+    message("网络异常，请稍后重试", { type: "error" });
+  } finally {
+    exporting.value = false;
+  }
 }
 
 type ItemFormMode = "create" | "edit";
@@ -435,6 +483,14 @@ fetchItems();
           <el-button type="primary" @click="openItemDialog('create')">
             新增勋章
           </el-button>
+          <el-button
+            type="success"
+            plain
+            :loading="exporting"
+            @click="onExportList"
+          >
+            导出列表
+          </el-button>
           <el-button type="danger" plain @click="onBatchDelete">
             批量删除
           </el-button>
@@ -507,7 +563,7 @@ fetchItems();
           :total="total"
           :current-page="queryState.page"
           :page-size="queryState.pageSize"
-          :page-sizes="[10, 20, 50]"
+          :page-sizes="DEFAULT_PAGE_SIZES"
           @size-change="onSizeChange"
           @current-change="onCurrentChange"
         />
