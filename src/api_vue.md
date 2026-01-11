@@ -253,7 +253,7 @@
 
 - `username`（string，必填）：用户名，长度 3-50
 - `password`（string，必填）：密码，长度 6-100
-- `email`（string，必填）：邮箱
+- `email`（string，可选）：邮箱
 - `avatar`（string，可选）：头像 URL
 - `nickname`（string，可选）：昵称
 - `carModel`（string，可选）：车型
