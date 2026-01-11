@@ -3,40 +3,45 @@ import { defineFakeRoute } from "vite-plugin-fake-server/client";
 
 export default defineFakeRoute([
   {
-    url: "/login",
+    url: "/auth/login",
     method: "post",
     response: ({ body }) => {
-      if (body.username === "admin") {
-        return {
-          success: true,
-          data: {
-            avatar: "https://avatars.githubusercontent.com/u/44761321",
-            username: "admin",
-            nickname: "小铭",
-            // 一个用户可能有多个角色
-            roles: ["admin"],
-            // 按钮级别权限
-            permissions: ["*:*:*"],
-            accessToken: "eyJhbGciOiJIUzUxMiJ9.admin",
-            refreshToken: "eyJhbGciOiJIUzUxMiJ9.adminRefresh",
-            expires: "2030/10/30 00:00:00"
-          }
-        };
-      } else {
-        return {
-          success: true,
-          data: {
-            avatar: "https://avatars.githubusercontent.com/u/52823142",
-            username: "common",
-            nickname: "小林",
-            roles: ["common"],
-            permissions: ["permission:btn:add", "permission:btn:edit"],
-            accessToken: "eyJhbGciOiJIUzUxMiJ9.common",
-            refreshToken: "eyJhbGciOiJIUzUxMiJ9.commonRefresh",
-            expires: "2030/10/30 00:00:00"
-          }
-        };
+      const account =
+        typeof body.account === "string"
+          ? body.account
+          : typeof body.username === "string"
+            ? body.username
+            : typeof body.identifier === "string"
+              ? body.identifier
+              : "";
+
+      const password = typeof body.password === "string" ? body.password : "";
+      if (!account || !password) {
+        return { error: "ValidationError" };
       }
+
+      const isAdmin = account === "admin";
+      return {
+        token: isAdmin
+          ? "eyJhbGciOiJIUzUxMiJ9.admin"
+          : "eyJhbGciOiJIUzUxMiJ9.user",
+        user: {
+          id: isAdmin
+            ? "550e8400-e29b-41d4-a716-446655440000"
+            : "550e8400-e29b-41d4-a716-446655440111",
+          username: isAdmin ? "admin" : account,
+          nickname: isAdmin ? "" : "",
+          avatar: isAdmin
+            ? "https://avatars.githubusercontent.com/u/44761321"
+            : "https://avatars.githubusercontent.com/u/52823142",
+          carModel: "",
+          city: "",
+          email: isAdmin ? "admin@example.com" : "user@example.com",
+          phone: null,
+          role: isAdmin ? "admin" : "user",
+          mustChangePassword: isAdmin
+        }
+      };
     }
   }
 ]);

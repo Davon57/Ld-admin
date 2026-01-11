@@ -2,11 +2,29 @@ const Layout = () => import("@/layout/index.vue");
 
 export default [
   {
+    path: "/bootstrap",
+    name: "Bootstrap",
+    component: () => import("@/views/bootstrap/index.vue"),
+    meta: {
+      title: "系统初始化",
+      showLink: false
+    }
+  },
+  {
     path: "/login",
     name: "Login",
     component: () => import("@/views/login/index.vue"),
     meta: {
       title: "登录",
+      showLink: false
+    }
+  },
+  {
+    path: "/change-password",
+    name: "ChangePassword",
+    component: () => import("@/views/change-password/index.vue"),
+    meta: {
+      title: "修改密码",
       showLink: false
     }
   },

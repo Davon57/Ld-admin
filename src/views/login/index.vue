@@ -3,7 +3,7 @@ import Motion from "./utils/motion";
 import { useRouter } from "vue-router";
 import { message } from "@/utils/message";
 import { loginRules } from "./utils/rule";
-import { ref, reactive, toRaw } from "vue";
+import { ref, reactive, toRaw, onMounted } from "vue";
 import { debounce } from "@pureadmin/utils";
 import { useNav } from "@/layout/hooks/useNav";
 import { useEventListener } from "@vueuse/core";
@@ -11,6 +11,7 @@ import type { FormInstance } from "element-plus";
 import { useLayout } from "@/layout/hooks/useLayout";
 import { useUserStoreHook } from "@/store/modules/user";
 import { initRouter, getTopMenu } from "@/router/utils";
+import { getBootstrapStatus } from "@/api/user";
 import { bg, avatar, illustration } from "./utils/static";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import { useDataThemeChange } from "@/layout/hooks/useDataThemeChange";
@@ -41,23 +42,43 @@ const ruleForm = reactive({
   password: "admin123"
 });
 
+onMounted(() => {
+  const account = router.currentRoute.value.query.account;
+  if (typeof account === "string" && account.trim()) {
+    ruleForm.username = account.trim();
+  }
+});
+
+async function redirectIfNotInitialized(): Promise<boolean> {
+  try {
+    const res = await getBootstrapStatus();
+    if (res?.needsBootstrap === true) {
+      router.replace("/bootstrap");
+      return true;
+    }
+  } catch {}
+  return false;
+}
+
 const onLogin = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
+  const redirected = await redirectIfNotInitialized();
+  if (redirected) return;
   await formEl.validate(valid => {
     if (valid) {
       loading.value = true;
       useUserStoreHook()
         .loginByUsername({
-          username: ruleForm.username,
+          account: ruleForm.username,
           password: ruleForm.password
         })
         .then(res => {
-          if (res.success) {
-            // 获取后端路由
+          if (res?.token) {
             return initRouter().then(() => {
               disabled.value = true;
+              const targetPath = getTopMenu(true)?.path || "/";
               router
-                .push(getTopMenu(true).path)
+                .push(targetPath)
                 .then(() => {
                   message("登录成功", { type: "success" });
                 })

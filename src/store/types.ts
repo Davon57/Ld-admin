@@ -1,4 +1,5 @@
 import type { RouteRecordName } from "vue-router";
+import type { CurrentUser } from "@/api/user";
 
 export type cacheType = {
   mode: string;
@@ -42,6 +43,7 @@ export type userType = {
   nickname?: string;
   roles?: Array<string>;
   permissions?: Array<string>;
+  profile?: CurrentUser | null;
   isRemembered?: boolean;
   loginDay?: number;
 };

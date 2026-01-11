@@ -8,10 +8,10 @@ import {
   storageLocal
 } from "../utils";
 import {
-  type UserResult,
-  type RefreshTokenResult,
+  getCurrentUser,
   getLogin,
-  refreshTokenApi
+  type CurrentUser,
+  type UserResult
 } from "@/api/user";
 import { useMultiTagsStoreHook } from "./multiTags";
 import { type DataInfo, setToken, removeToken, userKey } from "@/utils/auth";
@@ -29,6 +29,7 @@ export const useUserStore = defineStore("pure-user", {
     // 按钮级别权限
     permissions:
       storageLocal().getItem<DataInfo<number>>(userKey)?.permissions ?? [],
+    profile: storageLocal().getItem<DataInfo<number>>(userKey)?.profile ?? null,
     // 是否勾选了登录页的免登录
     isRemembered: false,
     // 登录页的免登录存储几天，默认7天
@@ -55,6 +56,9 @@ export const useUserStore = defineStore("pure-user", {
     SET_PERMS(permissions: Array<string>) {
       this.permissions = permissions;
     },
+    SET_PROFILE(profile: CurrentUser | null) {
+      this.profile = profile;
+    },
     /** 存储是否勾选了登录页的免登录 */
     SET_ISREMEMBERED(bool: boolean) {
       this.isRemembered = bool;
@@ -64,42 +68,62 @@ export const useUserStore = defineStore("pure-user", {
       this.loginDay = Number(value);
     },
     /** 登入 */
-    async loginByUsername(data) {
-      return new Promise<UserResult>((resolve, reject) => {
-        getLogin(data)
-          .then(data => {
-            if (data?.success) setToken(data.data);
-            resolve(data);
-          })
-          .catch(error => {
-            reject(error);
-          });
-      });
+    async loginByUsername(data: {
+      account: string;
+      password: string;
+    }): Promise<UserResult> {
+      const res = await getLogin(data);
+      if (res?.token) {
+        setToken(res);
+        await this.fetchCurrentUser().catch(() => null);
+      }
+      return res;
+    },
+
+    async fetchCurrentUser(): Promise<CurrentUser | null> {
+      const user = await getCurrentUser({});
+      this.SET_PROFILE(user);
+
+      const stored = storageLocal().getItem<DataInfo<number>>(userKey);
+      if (stored) {
+        storageLocal().setItem(userKey, {
+          ...stored,
+          profile: user
+        });
+      }
+
+      if (!user) return null;
+
+      this.SET_AVATAR(user.avatar);
+      this.SET_USERNAME(user.username);
+      this.SET_NICKNAME(user.nickname);
+      this.SET_ROLES(user.role ? [user.role] : []);
+      this.SET_PERMS(user.role === "admin" ? ["*:*:*"] : []);
+
+      if (stored) {
+        storageLocal().setItem(userKey, {
+          ...stored,
+          avatar: user.avatar,
+          username: user.username,
+          nickname: user.nickname,
+          roles: user.role ? [user.role] : (stored.roles ?? []),
+          permissions: user.role === "admin" ? ["*:*:*"] : [],
+          profile: user
+        });
+      }
+
+      return user;
     },
     /** 前端登出（不调用接口） */
     logOut() {
       this.username = "";
       this.roles = [];
       this.permissions = [];
+      this.profile = null;
       removeToken();
       useMultiTagsStoreHook().handleTags("equal", [...routerArrays]);
       resetRouter();
       router.push("/login");
-    },
-    /** 刷新`token` */
-    async handRefreshToken(data) {
-      return new Promise<RefreshTokenResult>((resolve, reject) => {
-        refreshTokenApi(data)
-          .then(data => {
-            if (data) {
-              setToken(data.data);
-              resolve(data);
-            }
-          })
-          .catch(error => {
-            reject(error);
-          });
-      });
     }
   }
 });

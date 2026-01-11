@@ -26,12 +26,14 @@ type StatusOption = { label: string; value: UserStatus };
 
 const roleOptions: RoleOption[] = [
   { label: "管理员", value: "admin" },
-  { label: "普通用户", value: "common" }
+  { label: "版主", value: "moderator" },
+  { label: "普通用户", value: "user" }
 ];
 
 const statusOptions: StatusOption[] = [
-  { label: "启用", value: 1 },
-  { label: "禁用", value: 0 }
+  { label: "启用", value: "active" },
+  { label: "停用", value: "inactive" },
+  { label: "封禁", value: "banned" }
 ];
 
 const queryState = reactive<
@@ -51,7 +53,7 @@ const queryState = reactive<
 const loading = ref(false);
 const tableData = ref<UserItem[]>([]);
 const total = ref(0);
-const selectionIds = ref<number[]>([]);
+const selectionIds = ref<string[]>([]);
 
 const exporting = ref(false);
 
@@ -61,16 +63,27 @@ const exportColumns: CsvColumn<UserItem>[] = [
   {
     label: "角色",
     key: "role",
-    format: (_value, row) => (row.role === "admin" ? "管理员" : "普通用户")
+    format: (_value, row) =>
+      row.role === "admin"
+        ? "管理员"
+        : row.role === "moderator"
+          ? "版主"
+          : "普通用户"
   },
   {
     label: "状态",
     key: "status",
-    format: (_value, row) => (row.status === 1 ? "启用" : "禁用")
+    format: (_value, row) =>
+      row.status === "active"
+        ? "启用"
+        : row.status === "inactive"
+          ? "停用"
+          : "封禁"
   },
   { label: "手机号", key: "phone" },
   { label: "邮箱", key: "email" },
-  { label: "创建时间", key: "createdAt" }
+  { label: "创建时间", key: "createdAt" },
+  { label: "修改时间", key: "updatedAt" }
 ];
 
 const listParams = computed((): UserListParams => {
@@ -163,7 +176,7 @@ async function onExportList(): Promise<void> {
 type UserFormMode = "create" | "edit";
 
 type UserFormModel = {
-  id?: number;
+  id?: string;
   username: string;
   nickname: string;
   role: UserRole;
@@ -203,6 +216,7 @@ const userFormRules: FormRules<UserFormModel> = {
       validator: (_rule, value: string, callback) => {
         if (!value) return callback(new Error("请输入密码"));
         if (value.length < 6) return callback(new Error("密码至少 6 位"));
+        if (value.length > 100) return callback(new Error("密码最多 100 位"));
         return callback();
       },
       trigger: "blur"
@@ -216,8 +230,8 @@ function openUserDialog(mode: UserFormMode, row?: UserItem): void {
     id: mode === "edit" ? row?.id : undefined,
     username: mode === "edit" ? (row?.username ?? "") : "",
     nickname: mode === "edit" ? (row?.nickname ?? "") : "",
-    role: mode === "edit" ? (row?.role ?? "common") : "common",
-    status: mode === "edit" ? (row?.status ?? 1) : 1,
+    role: mode === "edit" ? (row?.role ?? "user") : "user",
+    status: mode === "edit" ? (row?.status ?? "active") : "active",
     phone: mode === "edit" ? (row?.phone ?? "") : "",
     email: mode === "edit" ? (row?.email ?? "") : "",
     password: ""
@@ -239,6 +253,7 @@ function openUserDialog(mode: UserFormMode, row?: UserItem): void {
             phone: base.phone
           };
         }
+
         return base;
       });
 
@@ -336,8 +351,8 @@ function openUserDialog(mode: UserFormMode, row?: UserItem): void {
             nickname: model.nickname.trim(),
             role: model.role,
             status: model.status,
-            phone: model.phone.trim(),
-            email: model.email.trim(),
+            phone: model.phone.trim() ? model.phone.trim() : null,
+            email: model.email.trim() ? model.email.trim() : "",
             password: model.password
           });
           if (!res.success) {
@@ -363,8 +378,8 @@ function openUserDialog(mode: UserFormMode, row?: UserItem): void {
           nickname: model.nickname.trim(),
           role: model.role,
           status: model.status,
-          phone: model.phone.trim(),
-          email: model.email.trim()
+          phone: model.phone.trim() ? model.phone.trim() : null,
+          email: model.email.trim() ? model.email.trim() : null
         });
         if (!res.success) {
           message(res.message || "更新失败", { type: "error" });
@@ -526,18 +541,25 @@ fetchUsers();
         <el-table-column prop="role" label="角色" width="110">
           <template #default="{ row }">
             <el-tag v-if="row.role === 'admin'" type="warning">管理员</el-tag>
+            <el-tag v-else-if="row.role === 'moderator'" type="success">
+              版主
+            </el-tag>
             <el-tag v-else>普通用户</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="status" label="状态" width="90">
           <template #default="{ row }">
-            <el-tag v-if="row.status === 1" type="success">启用</el-tag>
-            <el-tag v-else type="info">禁用</el-tag>
+            <el-tag v-if="row.status === 'active'" type="success">启用</el-tag>
+            <el-tag v-else-if="row.status === 'inactive'" type="info">
+              停用
+            </el-tag>
+            <el-tag v-else type="danger">封禁</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="phone" label="手机号" min-width="140" />
         <el-table-column prop="email" label="邮箱" min-width="200" />
         <el-table-column prop="createdAt" label="创建时间" min-width="170" />
+        <el-table-column prop="updatedAt" label="修改时间" min-width="170" />
         <el-table-column label="操作" fixed="right" width="160">
           <template #default="{ row }">
             <el-space>

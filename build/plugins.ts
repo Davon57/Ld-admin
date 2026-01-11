@@ -15,7 +15,8 @@ import { vitePluginFakeServer } from "vite-plugin-fake-server";
 
 export function getPluginsList(
   VITE_CDN: boolean,
-  VITE_COMPRESSION: ViteCompression
+  VITE_COMPRESSION: ViteCompression,
+  VITE_MOCK: boolean
 ): PluginOption[] {
   const lifecycle = process.env.npm_lifecycle_event;
   return [
@@ -40,13 +41,14 @@ export function getPluginsList(
      * vite-plugin-router-warn只在开发环境下启用，只处理vue-router文件并且只在服务启动或重启时运行一次，性能消耗可忽略不计
      */
     removeNoMatch(),
-    // mock支持
-    vitePluginFakeServer({
-      logger: false,
-      include: "mock",
-      infixName: false,
-      enableProd: true
-    }),
+    VITE_MOCK
+      ? vitePluginFakeServer({
+          logger: false,
+          include: "mock",
+          infixName: false,
+          enableProd: false
+        })
+      : null,
     // svg组件化支持
     svgLoader(),
     // 自动按需加载图标
