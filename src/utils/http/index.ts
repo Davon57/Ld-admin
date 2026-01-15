@@ -1,7 +1,9 @@
 import Axios, {
   type AxiosInstance,
+  AxiosHeaders,
   type AxiosRequestConfig,
-  type CustomParamsSerializer
+  type CustomParamsSerializer,
+  type InternalAxiosRequestConfig
 } from "axios";
 import type {
   PureHttpError,
@@ -12,6 +14,37 @@ import type {
 import { stringify } from "qs";
 import { getToken, formatToken, removeToken } from "@/utils/auth";
 import { router } from "@/router";
+import { message } from "@/utils/message";
+
+type ApiResponse<T> = {
+  code: string;
+  message: string;
+  data: T;
+};
+
+function isApiResponse<T = unknown>(value: unknown): value is ApiResponse<T> {
+  if (!value || typeof value !== "object") return false;
+  const v = value as Record<string, unknown>;
+  return (
+    typeof v.code === "string" &&
+    typeof v.message === "string" &&
+    Object.prototype.hasOwnProperty.call(v, "data")
+  );
+}
+
+function getLegacyErrorMessage(value: unknown): string | null {
+  if (!value || typeof value !== "object") return null;
+  const v = value as Record<string, unknown>;
+  return typeof v.error === "string" ? v.error : null;
+}
+
+function shouldShowSuccessMessage(config: PureHttpRequestConfig): boolean {
+  return config.showSuccessMessage === true;
+}
+
+function shouldShowErrorMessage(config: PureHttpRequestConfig): boolean {
+  return config.showErrorMessage !== false;
+}
 
 // 相关配置请参考：www.axios-js.com/zh-cn/docs/#axios-request-config-1
 const defaultConfig: AxiosRequestConfig = {
@@ -43,14 +76,17 @@ class PureHttp {
   /** 请求拦截 */
   private httpInterceptorsRequest(): void {
     PureHttp.axiosInstance.interceptors.request.use(
-      async (config: PureHttpRequestConfig): Promise<any> => {
+      async (
+        config: InternalAxiosRequestConfig
+      ): Promise<InternalAxiosRequestConfig> => {
+        const $config = config as unknown as PureHttpRequestConfig;
         // 优先判断post/get等方法是否传入回调，否则执行初始化设置等回调
-        if (typeof config.beforeRequestCallback === "function") {
-          config.beforeRequestCallback(config);
+        if (typeof $config.beforeRequestCallback === "function") {
+          $config.beforeRequestCallback($config);
           return config;
         }
         if (PureHttp.initConfig.beforeRequestCallback) {
-          PureHttp.initConfig.beforeRequestCallback(config);
+          PureHttp.initConfig.beforeRequestCallback($config);
           return config;
         }
         /** 请求白名单，放置一些不需要`token`的接口 */
@@ -61,11 +97,18 @@ class PureHttp {
           "/system/bootstrap/init"
         ];
 
-        if (whiteList.some(url => config.url.endsWith(url))) return config;
+        if (whiteList.some(url => $config.url.endsWith(url))) return config;
 
         const data = getToken();
         if (data?.accessToken) {
-          config.headers["Authorization"] = formatToken(data.accessToken);
+          const token = formatToken(data.accessToken);
+          if (config.headers instanceof AxiosHeaders) {
+            config.headers.set("Authorization", token);
+          } else {
+            config.headers = config.headers ?? {};
+            (config.headers as Record<string, unknown>)["Authorization"] =
+              token;
+          }
         }
         return config;
       },
@@ -90,11 +133,52 @@ class PureHttp {
           PureHttp.initConfig.beforeResponseCallback(response);
           return response.data;
         }
-        return response.data;
+        const payload = response.data;
+
+        const legacyError = getLegacyErrorMessage(payload);
+        if (legacyError) {
+          if (shouldShowErrorMessage($config)) {
+            message(legacyError, { type: "error", grouping: true });
+          }
+          return Promise.reject(new Error(legacyError));
+        }
+
+        if (!isApiResponse(payload)) {
+          return payload;
+        }
+
+        if (payload.code !== "0") {
+          if (shouldShowErrorMessage($config)) {
+            message(payload.message || "请求失败", {
+              type: "error",
+              grouping: true
+            });
+          }
+          return Promise.reject(new Error(payload.message || "请求失败"));
+        }
+
+        if (shouldShowSuccessMessage($config)) {
+          message(payload.message || "success", {
+            type: "success",
+            grouping: true
+          });
+        }
+
+        return payload.data;
       },
       (error: PureHttpError) => {
         const $error = error;
         $error.isCancelRequest = Axios.isCancel($error);
+
+        if ($error.isCancelRequest) {
+          return Promise.reject($error);
+        }
+
+        const cfg = ($error.config ?? {}) as PureHttpRequestConfig;
+        if (!shouldShowErrorMessage(cfg)) {
+          return Promise.reject($error);
+        }
+
         const status = $error?.response?.status;
         if (status === 401) {
           removeToken();
@@ -102,6 +186,29 @@ class PureHttp {
             router.replace("/login");
           }
         }
+
+        const responseData = $error?.response?.data as unknown;
+        if (isApiResponse(responseData)) {
+          message(responseData.message || "请求失败", {
+            type: "error",
+            grouping: true
+          });
+        } else {
+          const legacyError = getLegacyErrorMessage(responseData);
+          if (legacyError) {
+            message(legacyError, { type: "error", grouping: true });
+          } else if (typeof status === "number") {
+            message(`请求失败（${status}）`, { type: "error", grouping: true });
+          } else if (
+            typeof $error.message === "string" &&
+            $error.message.trim()
+          ) {
+            message($error.message, { type: "error", grouping: true });
+          } else {
+            message("网络异常，请稍后重试", { type: "error", grouping: true });
+          }
+        }
+
         // 所有的响应异常 区分来源为取消请求/非取消请求
         return Promise.reject($error);
       }

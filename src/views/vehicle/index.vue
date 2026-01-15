@@ -4,82 +4,114 @@ import type { FormInstance, FormRules } from "element-plus";
 import { addDialog } from "@/components/ReDialog";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { message } from "@/utils/message";
-import { DEFAULT_PAGE_SIZES, exportToCsv, type CsvColumn } from "@/utils/table";
 import {
-  type VehicleItem,
-  type Status,
-  type VehicleListParams,
-  getVehicleList,
-  createVehicle,
-  updateVehicle,
-  deleteVehicle,
-  batchDeleteVehicles
+  DEFAULT_PAGE_SIZES,
+  exportToXlsx,
+  type CsvColumn
+} from "@/utils/table";
+import {
+  type Car,
+  type CarStatus,
+  getCarList,
+  createCar,
+  updateCar,
+  deleteCar,
+  batchDeleteCars
 } from "@/api/vehicle";
 
 defineOptions({
   name: "VehicleManage"
 });
 
-type StatusOption = { label: string; value: Status };
+type StatusOption = { label: string; value: CarStatus };
 const statusOptions: StatusOption[] = [
-  { label: "启用", value: 1 },
-  { label: "禁用", value: 0 }
+  { label: "在售", value: "on_sale" },
+  { label: "停产", value: "discontinued" }
 ];
 
-const queryState = reactive<
-  Required<Pick<VehicleListParams, "page" | "pageSize">> & {
-    keyword: string;
-    status: "" | Status;
-  }
->({
+type EnabledOption = { label: string; value: boolean };
+const enabledOptions: EnabledOption[] = [
+  { label: "启用", value: true },
+  { label: "停用", value: false }
+];
+
+const queryState = reactive<{
+  page: number;
+  pageSize: number;
+  keyword: string;
+  status: "" | CarStatus;
+  isEnabled: "" | boolean;
+}>({
   page: 1,
   pageSize: 10,
   keyword: "",
-  status: ""
+  status: "",
+  isEnabled: ""
 });
 
 const loading = ref(false);
-const tableData = ref<VehicleItem[]>([]);
-const total = ref(0);
-const selectionIds = ref<number[]>([]);
+const exporting = ref(false);
+const allCars = ref<Car[]>([]);
+const selectionIds = ref<string[]>([]);
 
-const exportColumns: CsvColumn<VehicleItem>[] = [
+function normalizeText(text: string): string {
+  return text.trim().toLowerCase();
+}
+
+const filteredCars = computed((): Car[] => {
+  const keyword = normalizeText(queryState.keyword);
+  const status = queryState.status;
+  const isEnabled = queryState.isEnabled;
+
+  return allCars.value
+    .filter(c => (status ? c.status === status : true))
+    .filter(c => (isEnabled === "" ? true : c.isEnabled === isEnabled))
+    .filter(c => {
+      if (!keyword) return true;
+      const values = [c.carId, String(c.year), c.model, c.version, c.remark];
+      return values.some(v => normalizeText(String(v)).includes(keyword));
+    });
+});
+
+const total = computed((): number => filteredCars.value.length);
+
+const tableData = computed((): Car[] => {
+  const page = Math.max(1, Number(queryState.page || 1));
+  const pageSize = Math.max(1, Number(queryState.pageSize || 10));
+  const start = (page - 1) * pageSize;
+  return filteredCars.value.slice(start, start + pageSize);
+});
+
+const exportColumns: CsvColumn<Car>[] = [
+  { label: "车辆标识", key: "carId" },
   { label: "年份", key: "year" },
   { label: "车型", key: "model" },
   { label: "版本", key: "version" },
   {
     label: "状态",
     key: "status",
-    format: (_value, row) => (row.status === 1 ? "启用" : "禁用")
+    format: (_value, row) => (row.status === "on_sale" ? "在售" : "停产")
   },
-  { label: "创建时间", key: "createdAt" }
+  {
+    label: "启用",
+    key: "isEnabled",
+    format: (_value, row) => (row.isEnabled ? "启用" : "停用")
+  },
+  { label: "备注", key: "remark" },
+  { label: "创建时间", key: "createdAt" },
+  { label: "更新时间", key: "updatedAt" }
 ];
 
-const listParams = computed((): VehicleListParams => {
-  const params: VehicleListParams = {
-    page: queryState.page,
-    pageSize: queryState.pageSize
-  };
-  const keyword = queryState.keyword.trim();
-  if (keyword) params.keyword = keyword;
-  if (queryState.status !== "") params.status = queryState.status;
-  return params;
-});
-
-async function fetchVehicles(): Promise<void> {
+async function fetchCars(): Promise<void> {
   loading.value = true;
   try {
-    const res = await getVehicleList(listParams.value);
-    if (!res.success) {
-      message(res.message || "获取车辆列表失败", { type: "error" });
-      tableData.value = [];
-      total.value = 0;
-      return;
-    }
-    tableData.value = res.data.list;
-    total.value = res.data.total;
-  } catch {
-    message("网络异常，请稍后重试", { type: "error" });
+    const list = await getCarList({});
+    allCars.value = list;
+  } catch (err) {
+    allCars.value = [];
+    message(err instanceof Error ? err.message : "网络异常，请稍后重试", {
+      type: "error"
+    });
   } finally {
     loading.value = false;
   }
@@ -87,7 +119,6 @@ async function fetchVehicles(): Promise<void> {
 
 function onSearch(): void {
   queryState.page = 1;
-  fetchVehicles();
 }
 
 function onReset(): void {
@@ -95,40 +126,48 @@ function onReset(): void {
   queryState.pageSize = 10;
   queryState.keyword = "";
   queryState.status = "";
-  fetchVehicles();
+  queryState.isEnabled = "";
 }
 
 function onSizeChange(size: number): void {
   queryState.pageSize = size;
   queryState.page = 1;
-  fetchVehicles();
 }
 
 function onCurrentChange(page: number): void {
   queryState.page = page;
-  fetchVehicles();
 }
 
-function onSelectionChange(rows: VehicleItem[]): void {
+function onSelectionChange(rows: Car[]): void {
   selectionIds.value = rows.map(r => r.id);
 }
 
-function onExportList(): void {
+async function onExportList(): Promise<void> {
   if (tableData.value.length === 0) {
     message("暂无可导出数据", { type: "warning" });
     return;
   }
-  exportToCsv(tableData.value, exportColumns, "车型列表");
+
+  exporting.value = true;
+  try {
+    await exportToXlsx(tableData.value, exportColumns, "车辆列表");
+  } catch {
+    message("导出失败", { type: "error" });
+  } finally {
+    exporting.value = false;
+  }
 }
 
 type VehicleFormMode = "create" | "edit";
 
 type VehicleFormModel = {
-  id?: number;
+  id?: string;
+  carId?: string;
   year: number | null;
   model: string;
   version: string;
-  status: Status;
+  status: CarStatus;
+  isEnabled: boolean;
   remark: string;
 };
 
@@ -137,17 +176,20 @@ const vehicleFormRules: FormRules<VehicleFormModel> = {
   model: [{ required: true, message: "请输入车型", trigger: "blur" }],
   version: [{ required: true, message: "请输入版本", trigger: "blur" }],
   status: [{ required: true, message: "请选择状态", trigger: "change" }],
+  isEnabled: [{ required: true, message: "请选择是否启用", trigger: "change" }],
   remark: []
 };
 
-function openVehicleDialog(mode: VehicleFormMode, row?: VehicleItem): void {
+function openVehicleDialog(mode: VehicleFormMode, row?: Car): void {
   const formRef = ref<FormInstance>();
   const model = reactive<VehicleFormModel>({
     id: mode === "edit" ? row?.id : undefined,
+    carId: mode === "edit" ? row?.carId : undefined,
     year: mode === "edit" ? (row?.year ?? null) : null,
     model: mode === "edit" ? (row?.model ?? "") : "",
     version: mode === "edit" ? (row?.version ?? "") : "",
-    status: mode === "edit" ? (row?.status ?? 1) : 1,
+    status: mode === "edit" ? (row?.status ?? "on_sale") : "on_sale",
+    isEnabled: mode === "edit" ? (row?.isEnabled ?? true) : true,
     remark: mode === "edit" ? (row?.remark ?? "") : ""
   });
 
@@ -199,6 +241,15 @@ function openVehicleDialog(mode: VehicleFormMode, row?: VehicleItem): void {
               }))}
             />
           </el-form-item>
+          <el-form-item label="启用" prop="isEnabled">
+            <el-segmented
+              v-model={model.isEnabled}
+              options={enabledOptions.map(s => ({
+                label: s.label,
+                value: s.value
+              }))}
+            />
+          </el-form-item>
           <el-form-item label="备注" prop="remark">
             <el-input
               v-model={model.remark}
@@ -214,7 +265,7 @@ function openVehicleDialog(mode: VehicleFormMode, row?: VehicleItem): void {
   });
 
   addDialog({
-    title: mode === "create" ? "新增车型" : "编辑车型",
+    title: mode === "create" ? "新增车辆" : "编辑车辆",
     width: "760px",
     fullscreenIcon: true,
     sureBtnLoading: true,
@@ -229,59 +280,59 @@ function openVehicleDialog(mode: VehicleFormMode, row?: VehicleItem): void {
           model: model.model.trim(),
           version: model.version.trim(),
           status: model.status,
+          isEnabled: model.isEnabled,
           remark: model.remark.trim()
         };
 
         if (mode === "create") {
-          const res = await createVehicle(payload);
-          if (!res.success) {
-            message(res.message || "新增失败", { type: "error" });
-            closeLoading();
-            return;
-          }
+          await createCar(payload);
           message("新增成功", { type: "success" });
           done();
           queryState.page = 1;
-          fetchVehicles();
+          fetchCars();
           return;
         }
 
-        if (!model.id) {
+        if (!model.id && !model.carId) {
           message("车型信息异常", { type: "error" });
           closeLoading();
           return;
         }
 
-        const res = await updateVehicle({ id: model.id, ...payload });
-        if (!res.success) {
-          message(res.message || "更新失败", { type: "error" });
-          closeLoading();
-          return;
+        if (model.id) {
+          await updateCar({ id: model.id, ...payload });
+        } else if (model.carId) {
+          await updateCar({ carId: model.carId, ...payload });
         }
         message("更新成功", { type: "success" });
         done();
-        fetchVehicles();
-      } catch {
+        fetchCars();
+      } catch (err) {
+        if (err instanceof Error) {
+          message(err.message, { type: "error" });
+        }
         closeLoading();
       }
     }
   });
 }
 
-async function onDeleteRow(row: VehicleItem): Promise<void> {
+async function onDeleteRow(row: Car): Promise<void> {
   try {
-    const res = await deleteVehicle({ id: row.id });
-    if (!res.success) {
-      message(res.message || "删除失败", { type: "error" });
+    const res = await deleteCar({ id: row.id });
+    if (!res.ok) {
+      message("删除失败", { type: "error" });
       return;
     }
     message("删除成功", { type: "success" });
     if (queryState.page > 1 && tableData.value.length === 1) {
       queryState.page -= 1;
     }
-    fetchVehicles();
-  } catch {
-    message("网络异常，请稍后重试", { type: "error" });
+    fetchCars();
+  } catch (err) {
+    message(err instanceof Error ? err.message : "网络异常，请稍后重试", {
+      type: "error"
+    });
   }
 }
 
@@ -314,9 +365,14 @@ async function onBatchDelete(): Promise<void> {
     beforeSure: async (done, { closeLoading }) => {
       try {
         const ids = [...selectionIds.value];
-        const res = await batchDeleteVehicles({ ids });
-        if (!res.success) {
-          message(res.message || "批量删除失败", { type: "error" });
+        const res = await batchDeleteCars({ ids });
+        if (!res.ok) {
+          message(
+            res.failedCount > 0
+              ? `批量删除失败 ${res.failedCount} 条`
+              : "批量删除失败",
+            { type: "error" }
+          );
           closeLoading();
           return;
         }
@@ -326,16 +382,18 @@ async function onBatchDelete(): Promise<void> {
           queryState.page -= 1;
         }
         selectionIds.value = [];
-        fetchVehicles();
-      } catch {
+        fetchCars();
+      } catch (err) {
         closeLoading();
-        message("网络异常，请稍后重试", { type: "error" });
+        message(err instanceof Error ? err.message : "网络异常，请稍后重试", {
+          type: "error"
+        });
       }
     }
   });
 }
 
-fetchVehicles();
+fetchCars();
 </script>
 
 <template>
@@ -362,6 +420,21 @@ fetchVehicles();
             />
           </el-select>
         </el-form-item>
+        <el-form-item label="启用">
+          <el-select
+            v-model="queryState.isEnabled"
+            clearable
+            class="w-[160px]!"
+          >
+            <el-option label="全部" value="" />
+            <el-option
+              v-for="opt in enabledOptions"
+              :key="String(opt.value)"
+              :label="opt.label"
+              :value="opt.value"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="onSearch">查询</el-button>
           <el-button @click="onReset">重置</el-button>
@@ -369,13 +442,17 @@ fetchVehicles();
       </el-form>
     </el-card>
 
-    <PureTableBar class="mt-2" title="车型列表" @refresh="fetchVehicles">
+    <PureTableBar class="mt-2" title="车辆列表" @refresh="fetchCars">
       <template #buttons>
         <el-space wrap>
           <el-button type="primary" @click="openVehicleDialog('create')">
-            新增车型
+            新增车辆
           </el-button>
-          <el-button type="success" plain @click="onExportList"
+          <el-button
+            type="success"
+            plain
+            :loading="exporting"
+            @click="onExportList"
             >导出列表</el-button
           >
           <el-button type="danger" plain @click="onBatchDelete">
@@ -392,16 +469,25 @@ fetchVehicles();
         @selection-change="onSelectionChange"
       >
         <el-table-column type="selection" width="46" />
+        <el-table-column prop="carId" label="车辆标识" min-width="120" />
         <el-table-column prop="year" label="年份" width="100" />
         <el-table-column prop="model" label="车型" min-width="160" />
-        <el-table-column prop="version" label="版本" min-width="120" />
+        <el-table-column prop="version" label="版本" min-width="140" />
         <el-table-column prop="status" label="状态" width="90">
           <template #default="{ row }">
-            <el-tag v-if="row.status === 1" type="success">启用</el-tag>
-            <el-tag v-else type="info">禁用</el-tag>
+            <el-tag v-if="row.status === 'on_sale'" type="success">在售</el-tag>
+            <el-tag v-else type="info">停产</el-tag>
           </template>
         </el-table-column>
+        <el-table-column prop="isEnabled" label="启用" width="90">
+          <template #default="{ row }">
+            <el-tag v-if="row.isEnabled" type="success">启用</el-tag>
+            <el-tag v-else type="info">停用</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="remark" label="备注" min-width="160" />
         <el-table-column prop="createdAt" label="创建时间" min-width="170" />
+        <el-table-column prop="updatedAt" label="更新时间" min-width="170" />
         <el-table-column label="操作" fixed="right" width="160">
           <template #default="{ row }">
             <el-space>
@@ -413,7 +499,7 @@ fetchVehicles();
                 编辑
               </el-button>
               <el-popconfirm
-                title="确认删除该车型？"
+                title="确认删除该车辆？"
                 confirm-button-text="删除"
                 confirm-button-type="danger"
                 cancel-button-text="取消"

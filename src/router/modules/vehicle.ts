@@ -12,7 +12,15 @@ export default {
       name: "VehicleIndex",
       component: () => import("@/views/vehicle/index.vue"),
       meta: {
-        title: "车辆管理"
+        title: "车辆列表"
+      }
+    },
+    {
+      path: "/vehicle/owner",
+      name: "VehicleOwnerList",
+      component: () => import("@/views/vehicle/owner/index.vue"),
+      meta: {
+        title: "车主列表"
       }
     }
   ]

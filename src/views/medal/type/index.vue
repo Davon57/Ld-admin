@@ -4,7 +4,11 @@ import type { FormInstance, FormRules } from "element-plus";
 import { addDialog } from "@/components/ReDialog";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { message } from "@/utils/message";
-import { DEFAULT_PAGE_SIZES, exportToCsv, type CsvColumn } from "@/utils/table";
+import {
+  DEFAULT_PAGE_SIZES,
+  exportToXlsx,
+  type CsvColumn
+} from "@/utils/table";
 import {
   type MedalTypeItem,
   type Status,
@@ -90,16 +94,11 @@ async function fetchTypes(): Promise<void> {
   loading.value = true;
   try {
     const res = await getMedalTypeList(listParams.value);
-    if (!res.success) {
-      message(res.message || "获取类型列表失败", { type: "error" });
-      tableData.value = [];
-      total.value = 0;
-      return;
-    }
-    tableData.value = res.data.list;
-    total.value = res.data.total;
+    tableData.value = res.list;
+    total.value = res.total;
   } catch {
-    message("网络异常，请稍后重试", { type: "error" });
+    tableData.value = [];
+    total.value = 0;
   } finally {
     loading.value = false;
   }
@@ -134,27 +133,15 @@ function onSelectionChange(rows: MedalTypeItem[]): void {
 }
 
 async function onExportList(): Promise<void> {
-  if (total.value === 0) {
+  if (tableData.value.length === 0) {
     message("暂无可导出数据", { type: "warning" });
     return;
   }
   exporting.value = true;
   try {
-    const res = await getMedalTypeList({
-      ...listParams.value,
-      page: 1,
-      pageSize: 3000
-    });
-    if (!res.success) {
-      message(res.message || "导出失败", { type: "error" });
-      return;
-    }
-    if (total.value > res.data.list.length) {
-      message("仅导出前 3000 条", { type: "warning" });
-    }
-    exportToCsv(res.data.list, exportColumns, "类型列表");
+    await exportToXlsx(tableData.value, exportColumns, "类型列表");
   } catch {
-    message("网络异常，请稍后重试", { type: "error" });
+    message("导出失败", { type: "error" });
   } finally {
     exporting.value = false;
   }
@@ -240,17 +227,11 @@ function openTypeDialog(mode: TypeFormMode, row?: MedalTypeItem): void {
         const code = model.code.trim() || name;
 
         if (mode === "create") {
-          const res = await createMedalType({
+          await createMedalType({
             name,
             code,
             status: model.status
           });
-          if (!res.success) {
-            message(res.message || "新增失败", { type: "error" });
-            closeLoading();
-            return;
-          }
-          message("新增成功", { type: "success" });
           done();
           queryState.page = 1;
           fetchTypes();
@@ -263,18 +244,12 @@ function openTypeDialog(mode: TypeFormMode, row?: MedalTypeItem): void {
           return;
         }
 
-        const res = await updateMedalType({
+        await updateMedalType({
           id: model.id,
           name,
           code,
           status: model.status
         });
-        if (!res.success) {
-          message(res.message || "更新失败", { type: "error" });
-          closeLoading();
-          return;
-        }
-        message("更新成功", { type: "success" });
         done();
         fetchTypes();
       } catch {
@@ -286,19 +261,12 @@ function openTypeDialog(mode: TypeFormMode, row?: MedalTypeItem): void {
 
 async function onDeleteRow(row: MedalTypeItem): Promise<void> {
   try {
-    const res = await deleteMedalType({ id: row.id });
-    if (!res.success) {
-      message(res.message || "删除失败", { type: "error" });
-      return;
-    }
-    message("删除成功", { type: "success" });
+    await deleteMedalType({ id: row.id });
     if (queryState.page > 1 && tableData.value.length === 1) {
       queryState.page -= 1;
     }
     fetchTypes();
-  } catch {
-    message("网络异常，请稍后重试", { type: "error" });
-  }
+  } catch {}
 }
 
 async function onBatchDelete(): Promise<void> {
@@ -330,13 +298,7 @@ async function onBatchDelete(): Promise<void> {
     beforeSure: async (done, { closeLoading }) => {
       try {
         const ids = [...selectionIds.value];
-        const res = await batchDeleteMedalTypes({ ids });
-        if (!res.success) {
-          message(res.message || "批量删除失败", { type: "error" });
-          closeLoading();
-          return;
-        }
-        message("删除成功", { type: "success" });
+        await batchDeleteMedalTypes({ ids });
         done();
         if (queryState.page > 1 && deletingCount >= currentRows) {
           queryState.page -= 1;
@@ -345,7 +307,6 @@ async function onBatchDelete(): Promise<void> {
         fetchTypes();
       } catch {
         closeLoading();
-        message("网络异常，请稍后重试", { type: "error" });
       }
     }
   });

@@ -19,7 +19,7 @@ export type FeedbackItem = {
 };
 
 export type CreateFeedbackPayload = {
-  userId: string;
+  cby: string;
   type: string;
   description: string;
   contact?: string | null;

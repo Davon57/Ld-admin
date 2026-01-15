@@ -68,7 +68,7 @@ export type UserItem = {
   nickname: string;
   avatar: string;
   city: string;
-  email: string;
+  email: string | null;
   phone: string | null;
   role: UserRole;
   status: UserStatus;
@@ -87,12 +87,6 @@ export type UserListParams = {
 export type PageResult<T> = {
   list: T[];
   total: number;
-};
-
-export type BaseResult<T> = {
-  success: boolean;
-  data: T;
-  message?: string;
 };
 
 export type EmptyData = Record<string, never>;
@@ -152,7 +146,7 @@ function matchKeyword(user: UserItem, keyword: string): boolean {
 
 export const getUserList = async (
   data: UserListParams
-): Promise<BaseResult<PageResult<UserItem>>> => {
+): Promise<PageResult<UserItem>> => {
   const users = await http.request<UserItem[]>("post", "/users", { data: {} });
 
   const filtered = users
@@ -165,13 +159,7 @@ export const getUserList = async (
   const start = (page - 1) * pageSize;
   const list = filtered.slice(start, start + pageSize);
 
-  return {
-    success: true,
-    data: {
-      list,
-      total: filtered.length
-    }
-  };
+  return { list, total: filtered.length };
 };
 
 export type CreateUserPayload = {
@@ -188,9 +176,13 @@ export type CreateUserPayload = {
 
 export const createUser = async (
   data: CreateUserPayload
-): Promise<BaseResult<UserItem | EmptyData>> => {
-  const user = await http.request<UserItem>("post", "/users/create", { data });
-  return { success: true, data: user };
+): Promise<UserItem> => {
+  return http.request<UserItem>(
+    "post",
+    "/users/create",
+    { data },
+    { showSuccessMessage: true }
+  );
 };
 
 export type UpdateUserPayload = {
@@ -206,37 +198,48 @@ export type UpdateUserPayload = {
 
 export const updateUser = async (
   data: UpdateUserPayload
-): Promise<BaseResult<UserItem | EmptyData>> => {
-  const user = await http.request<UserItem>("post", "/users/update", { data });
-  return { success: true, data: user };
+): Promise<UserItem> => {
+  return http.request<UserItem>(
+    "post",
+    "/users/update",
+    { data },
+    { showSuccessMessage: true }
+  );
 };
 
 export const deleteUser = async (data: {
   id: string;
-}): Promise<BaseResult<EmptyData>> => {
-  const res = await http.request<{ ok: boolean }>("post", "/users/delete", {
-    data
-  });
-  return {
-    success: Boolean(res?.ok),
-    data: {}
-  };
+}): Promise<{ ok: boolean }> => {
+  return http.request<{ ok: boolean }>(
+    "post",
+    "/users/delete",
+    { data },
+    { showSuccessMessage: true }
+  );
+};
+
+export type BatchDeleteUsersResult = {
+  failedCount: number;
 };
 
 export const batchDeleteUsers = async (data: {
   ids: string[];
-}): Promise<BaseResult<EmptyData>> => {
+}): Promise<BatchDeleteUsersResult> => {
   const results = await Promise.allSettled(
-    data.ids.map(id => deleteUser({ id }))
+    data.ids.map(id =>
+      http.request<{ ok: boolean }>(
+        "post",
+        "/users/delete",
+        { data: { id } },
+        { showSuccessMessage: false }
+      )
+    )
   );
-  const failed = results.filter(r => r.status === "rejected").length;
-  const okFalse = results
+
+  const rejectedCount = results.filter(r => r.status === "rejected").length;
+  const okFalseCount = results
     .filter(r => r.status === "fulfilled")
-    .filter(r => !r.value.success).length;
-  const totalFailed = failed + okFalse;
-  return {
-    success: totalFailed === 0,
-    data: {},
-    message: totalFailed === 0 ? undefined : `删除失败 ${totalFailed} 个用户`
-  };
+    .filter(r => !r.value?.ok).length;
+
+  return { failedCount: rejectedCount + okFalseCount };
 };

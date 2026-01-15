@@ -4,7 +4,11 @@ import type { FormInstance, FormRules, CascaderOption } from "element-plus";
 import { addDialog } from "@/components/ReDialog";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { message } from "@/utils/message";
-import { DEFAULT_PAGE_SIZES, exportToCsv, type CsvColumn } from "@/utils/table";
+import {
+  DEFAULT_PAGE_SIZES,
+  exportToXlsx,
+  type CsvColumn
+} from "@/utils/table";
 import {
   type UserItem,
   type UserRole,
@@ -104,16 +108,11 @@ async function fetchUsers(): Promise<void> {
   loading.value = true;
   try {
     const res = await getUserList(listParams.value);
-    if (!res.success) {
-      message(res.message || "获取用户列表失败", { type: "error" });
-      tableData.value = [];
-      total.value = 0;
-      return;
-    }
-    tableData.value = res.data.list;
-    total.value = res.data.total;
+    tableData.value = res.list;
+    total.value = res.total;
   } catch {
-    message("网络异常，请稍后重试", { type: "error" });
+    tableData.value = [];
+    total.value = 0;
   } finally {
     loading.value = false;
   }
@@ -149,27 +148,15 @@ function onSelectionChange(rows: UserItem[]): void {
 }
 
 async function onExportList(): Promise<void> {
-  if (total.value === 0) {
+  if (tableData.value.length === 0) {
     message("暂无可导出数据", { type: "warning" });
     return;
   }
   exporting.value = true;
   try {
-    const res = await getUserList({
-      ...listParams.value,
-      page: 1,
-      pageSize: 3000
-    });
-    if (!res.success) {
-      message(res.message || "导出失败", { type: "error" });
-      return;
-    }
-    if (total.value > res.data.list.length) {
-      message("仅导出前 3000 条", { type: "warning" });
-    }
-    exportToCsv(res.data.list, exportColumns, "用户列表");
+    await exportToXlsx(tableData.value, exportColumns, "用户列表");
   } catch {
-    message("网络异常，请稍后重试", { type: "error" });
+    message("导出失败", { type: "error" });
   } finally {
     exporting.value = false;
   }
@@ -502,7 +489,7 @@ function openUserDialog(mode: UserFormMode, row?: UserItem): void {
           const avatar = model.avatar.trim();
           const nickname = model.nickname.trim();
           const city = model.city.trim();
-          const res = await createUser({
+          await createUser({
             username: model.username.trim(),
             nickname: nickname ? nickname : undefined,
             avatar: avatar ? avatar : undefined,
@@ -513,12 +500,6 @@ function openUserDialog(mode: UserFormMode, row?: UserItem): void {
             email: email ? email : undefined,
             password: model.password
           });
-          if (!res.success) {
-            message(res.message || "新增失败", { type: "error" });
-            closeLoading();
-            return;
-          }
-          message("新增成功", { type: "success" });
           done();
           queryState.page = 1;
           fetchUsers();
@@ -531,7 +512,7 @@ function openUserDialog(mode: UserFormMode, row?: UserItem): void {
           return;
         }
 
-        const res = await updateUser({
+        await updateUser({
           id: model.id,
           nickname: model.nickname.trim(),
           avatar: model.avatar.trim() ? model.avatar.trim() : undefined,
@@ -541,12 +522,6 @@ function openUserDialog(mode: UserFormMode, row?: UserItem): void {
           phone: model.phone.trim() ? model.phone.trim() : null,
           email: model.email.trim() ? model.email.trim() : null
         });
-        if (!res.success) {
-          message(res.message || "更新失败", { type: "error" });
-          closeLoading();
-          return;
-        }
-        message("更新成功", { type: "success" });
         done();
         fetchUsers();
       } catch {
@@ -558,19 +533,12 @@ function openUserDialog(mode: UserFormMode, row?: UserItem): void {
 
 async function onDeleteRow(row: UserItem): Promise<void> {
   try {
-    const res = await deleteUser({ id: row.id });
-    if (!res.success) {
-      message(res.message || "删除失败", { type: "error" });
-      return;
-    }
-    message("删除成功", { type: "success" });
+    await deleteUser({ id: row.id });
     if (queryState.page > 1 && tableData.value.length === 1) {
       queryState.page -= 1;
     }
     fetchUsers();
-  } catch {
-    message("网络异常，请稍后重试", { type: "error" });
-  }
+  } catch {}
 }
 
 async function onBatchDelete(): Promise<void> {
@@ -603,12 +571,11 @@ async function onBatchDelete(): Promise<void> {
       try {
         const ids = [...selectionIds.value];
         const res = await batchDeleteUsers({ ids });
-        if (!res.success) {
-          message(res.message || "批量删除失败", { type: "error" });
-          closeLoading();
-          return;
+        if (res.failedCount > 0) {
+          message(`删除失败 ${res.failedCount} 个用户`, { type: "warning" });
+        } else {
+          message("删除成功", { type: "success" });
         }
-        message("删除成功", { type: "success" });
         done();
         if (queryState.page > 1 && deletingCount >= currentRows) {
           queryState.page -= 1;
@@ -617,7 +584,6 @@ async function onBatchDelete(): Promise<void> {
         fetchUsers();
       } catch {
         closeLoading();
-        message("网络异常，请稍后重试", { type: "error" });
       }
     }
   });

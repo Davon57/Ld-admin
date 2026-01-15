@@ -25,6 +25,8 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
         "/system": { target: VITE_API_BASE, changeOrigin: true },
         "/users": { target: VITE_API_BASE, changeOrigin: true },
         "/user": { target: VITE_API_BASE, changeOrigin: true },
+        "/cars": { target: VITE_API_BASE, changeOrigin: true },
+        "/car-friends": { target: VITE_API_BASE, changeOrigin: true },
         "/article": { target: VITE_API_BASE, changeOrigin: true },
         "/activity": { target: VITE_API_BASE, changeOrigin: true },
         "/ota": { target: VITE_API_BASE, changeOrigin: true },

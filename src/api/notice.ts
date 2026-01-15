@@ -4,12 +4,6 @@ export type Status = 0 | 1;
 
 export type EmptyData = Record<string, never>;
 
-export type BaseResult<T> = {
-  success: boolean;
-  data: T;
-  message?: string;
-};
-
 export type PageResult<T> = {
   list: T[];
   total: number;
@@ -36,37 +30,41 @@ export type UpdateNoticePayload = Pick<NoticeItem, "id"> &
   Partial<Omit<NoticeItem, "id" | "createdAt">>;
 
 export const getNoticeList = (data: NoticeListParams) => {
-  return http.request<BaseResult<PageResult<NoticeItem>>>(
-    "post",
-    "/notice/list",
-    { data }
-  );
+  return http.request<PageResult<NoticeItem>>("post", "/notice/list", { data });
 };
 
 export const createNotice = (data: CreateNoticePayload) => {
-  return http.request<BaseResult<NoticeItem | EmptyData>>(
+  return http.request<NoticeItem | EmptyData>(
     "post",
     "/notice/create",
-    { data }
+    { data },
+    { showSuccessMessage: true }
   );
 };
 
 export const updateNotice = (data: UpdateNoticePayload) => {
-  return http.request<BaseResult<NoticeItem | EmptyData>>(
+  return http.request<NoticeItem | EmptyData>(
     "post",
     "/notice/update",
-    { data }
+    { data },
+    { showSuccessMessage: true }
   );
 };
 
 export const deleteNotice = (data: { id: number }) => {
-  return http.request<BaseResult<EmptyData>>("post", "/notice/delete", {
-    data
-  });
+  return http.request<EmptyData>(
+    "post",
+    "/notice/delete",
+    { data },
+    { showSuccessMessage: true }
+  );
 };
 
 export const batchDeleteNotices = (data: { ids: number[] }) => {
-  return http.request<BaseResult<EmptyData>>("post", "/notice/batchDelete", {
-    data
-  });
+  return http.request<EmptyData>(
+    "post",
+    "/notice/batchDelete",
+    { data },
+    { showSuccessMessage: true }
+  );
 };

@@ -391,20 +391,271 @@
 
 **返回值（Success 200）**：数组 `Car[]`
 
-| 字段         | 类型           | 说明                            | 示例                                 |
-| ------------ | -------------- | ------------------------------- | ------------------------------------ |
-| id           | string         | 车辆 ID（UUID）                 | 550e8400-e29b-41d4-a716-446655440000 |
-| userId       | string         | 归属用户 ID（UUID）             | 550e8400-e29b-41d4-a716-446655440000 |
-| brand        | string         | 品牌                            | BMW                                  |
-| model        | string         | 车型                            | 330i                                 |
-| year         | number         | 年份                            | 2022                                 |
-| licensePlate | string         | 车牌号（唯一）                  | 京A12345                             |
-| color        | string \\ null | 颜色                            | 黑色                                 |
-| mileage      | number \\ null | 里程                            | 12000                                |
-| vin          | string \\ null | VIN（唯一）                     | WBA8D9C50JA123456                    |
-| isDefault    | boolean        | 是否默认车辆                    | false                                |
-| createdAt    | string         | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00                  |
-| updatedAt    | string         | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00                  |
+| 字段      | 类型    | 说明                            | 示例                                 |
+| --------- | ------- | ------------------------------- | ------------------------------------ |
+| id        | string  | 车辆 ID（UUID）                 | 550e8400-e29b-41d4-a716-446655440000 |
+| carId     | string  | 车辆唯一标识（8 位随机数）      | 00428100                             |
+| userId    | string  | 归属用户 ID（UUID）             | 550e8400-e29b-41d4-a716-446655440000 |
+| year      | number  | 年份                            | 2022                                 |
+| model     | string  | 型号                            | A4L                                  |
+| version   | string  | 版本号                          | 2.0T-2022                            |
+| status    | string  | 状态（on_sale/discontinued）    | on_sale                              |
+| isEnabled | boolean | 是否启用                        | true                                 |
+| remark    | string  | 备注                            | 试驾车                               |
+| createdAt | string  | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00                  |
+| updatedAt | string  | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00                  |
+
+---
+
+## 10.1 新增车辆（需登录）
+
+**接口标题**：新增车辆
+
+**功能描述**：为当前登录用户新增一条车辆记录。
+
+**接口路由**：`POST /cars/create`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `year`（number，必填）：年份
+- `model`（string，必填）：型号
+- `version`（string，可选）：版本号
+- `status`（string，可选）：状态（on_sale/discontinued，默认 on_sale）
+- `isEnabled`（boolean，可选）：是否启用（默认 true）
+- `remark`（string，可选）：备注
+
+**返回值（Success 201）**：对象 `Car`
+
+| 字段      | 类型    | 说明                            | 示例                                 |
+| --------- | ------- | ------------------------------- | ------------------------------------ |
+| id        | string  | 车辆 ID（UUID）                 | 550e8400-e29b-41d4-a716-446655440000 |
+| carId     | string  | 车辆唯一标识（8 位随机数）      | 00428100                             |
+| userId    | string  | 归属用户 ID（UUID）             | 550e8400-e29b-41d4-a716-446655440000 |
+| year      | number  | 年份                            | 2022                                 |
+| model     | string  | 型号                            | A4L                                  |
+| version   | string  | 版本号                          | 2.0T-2022                            |
+| status    | string  | 状态（on_sale/discontinued）    | on_sale                              |
+| isEnabled | boolean | 是否启用                        | true                                 |
+| remark    | string  | 备注                            | 试驾车                               |
+| createdAt | string  | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00                  |
+| updatedAt | string  | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00                  |
+
+---
+
+## 10.2 修改车辆（需登录）
+
+**接口标题**：修改车辆
+
+**功能描述**：更新一条车辆记录（仅允许操作当前登录用户自己的车辆）。
+
+**接口路由**：`POST /cars/update`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `id`（string，可选）：车辆 ID（UUID）
+- `carId`（string，可选）：车辆唯一标识（8 位随机数）
+- `year`（number，可选）：年份
+- `model`（string，可选）：型号
+- `version`（string，可选）：版本号
+- `status`（string，可选）：状态（on_sale/discontinued）
+- `isEnabled`（boolean，可选）：是否启用
+- `remark`（string，可选）：备注
+
+**返回值（Success 200）**：对象 `Car`
+
+| 字段      | 类型    | 说明                            | 示例                                 |
+| --------- | ------- | ------------------------------- | ------------------------------------ |
+| id        | string  | 车辆 ID（UUID）                 | 550e8400-e29b-41d4-a716-446655440000 |
+| carId     | string  | 车辆唯一标识（8 位随机数）      | 00428100                             |
+| userId    | string  | 归属用户 ID（UUID）             | 550e8400-e29b-41d4-a716-446655440000 |
+| year      | number  | 年份                            | 2022                                 |
+| model     | string  | 型号                            | A4L                                  |
+| version   | string  | 版本号                          | 2.0T-2022                            |
+| status    | string  | 状态（on_sale/discontinued）    | on_sale                              |
+| isEnabled | boolean | 是否启用                        | true                                 |
+| remark    | string  | 备注                            | 试驾车                               |
+| createdAt | string  | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00                  |
+| updatedAt | string  | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00                  |
+
+---
+
+## 10.3 删除车辆（需登录）
+
+**接口标题**：删除车辆
+
+**功能描述**：删除一条车辆记录（物理删除，仅允许操作当前登录用户自己的车辆）。
+
+**接口路由**：`POST /cars/delete`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `id`（string，可选）：车辆 ID（UUID）
+- `carId`（string，可选）：车辆唯一标识（8 位随机数）
+
+**返回值（Success 200）**：
+
+| 字段 | 类型    | 说明     | 示例 |
+| ---- | ------- | -------- | ---- |
+| ok   | boolean | 是否成功 | true |
+
+---
+
+## 10.4 获取车友列表（需登录）
+
+**接口标题**：车友列表
+
+**功能描述**：获取车友列表，支持按 userId 查询、按 carId/vin 查询，并支持分页。
+
+**接口路由**：`POST /car-friends`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `page`（number，可选）：页码（从 1 开始，默认 1）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 100）
+- `userId`（string，可选）：用户使用 ID（8 位随机数）
+- `carId`（string，可选）：车辆唯一标识（8 位随机数）
+- `vin`（string，可选）：VIN 码（17 位）
+
+**返回值（Success 200）**：对象
+
+| 字段     | 类型   | 说明     | 示例 |
+| -------- | ------ | -------- | ---- |
+| list     | array  | 车友列表 | -    |
+| total    | number | 总条数   | 32   |
+| page     | number | 当前页码 | 1    |
+| pageSize | number | 每页条数 | 10   |
+
+列表项 `CarFriend`：
+
+| 字段       | 类型          | 说明                            | 示例                                 |
+| ---------- | ------------- | ------------------------------- | ------------------------------------ |
+| id         | string        | 记录 ID（UUID）                 | 550e8400-e29b-41d4-a716-446655440000 |
+| userId     | string        | 归属用户 ID（UUID）             | 550e8400-e29b-41d4-a716-446655440000 |
+| username   | string        | 用户名                          | 张三                                 |
+| carId      | string        | 车辆唯一标识（8 位随机数）      | 00428100                             |
+| vin        | string \ null | VIN 码（17 位）                 | LFV2A21J3G1234567                    |
+| carModel   | string        | 车辆型号                        | A4L                                  |
+| carVersion | string        | 车辆版本                        | 2.0T-2022                            |
+| remark     | string        | 备注                            | 车友群 1                             |
+| createdAt  | string        | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-16 12:00:00                  |
+| updatedAt  | string        | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-16 12:00:00                  |
+
+---
+
+## 10.5 新增车友（需登录）
+
+**接口标题**：新增车友
+
+**功能描述**：新增一条车友记录（通过 userId 关联用户，服务端会写入对应 username）。
+
+**接口路由**：`POST /car-friends/create`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `userId`（string，必填）：用户使用 ID（8 位随机数）
+- `carId`（string，必填）：车辆唯一标识（8 位随机数）
+- `vin`（string，必填）：VIN 码（17 位）
+- `carModel`（string，必填）：车辆型号
+- `carVersion`（string，必填）：车辆版本
+- `remark`（string，可选）：备注
+
+**返回值（Success 201）**：对象 `CarFriend`
+
+| 字段       | 类型          | 说明                            | 示例                                 |
+| ---------- | ------------- | ------------------------------- | ------------------------------------ |
+| id         | string        | 记录 ID（UUID）                 | 550e8400-e29b-41d4-a716-446655440000 |
+| userId     | string        | 归属用户 ID（UUID）             | 550e8400-e29b-41d4-a716-446655440000 |
+| username   | string        | 用户名                          | 张三                                 |
+| carId      | string        | 车辆唯一标识（8 位随机数）      | 00428100                             |
+| vin        | string \ null | VIN 码（17 位）                 | LFV2A21J3G1234567                    |
+| carModel   | string        | 车辆型号                        | A4L                                  |
+| carVersion | string        | 车辆版本                        | 2.0T-2022                            |
+| remark     | string        | 备注                            | 车友群 1                             |
+| createdAt  | string        | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-16 12:00:00                  |
+| updatedAt  | string        | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-16 12:00:00                  |
+
+---
+
+## 10.6 修改车友（需登录）
+
+**接口标题**：修改车友
+
+**功能描述**：修改一条车友记录（按 id 定位，支持部分字段更新；传 userId 会同步更新 username）。
+
+**接口路由**：`POST /car-friends/update`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `id`（string，必填）：记录 ID（UUID）
+- `userId`（string，可选）：用户使用 ID（8 位随机数）
+- `carId`（string，可选）：车辆唯一标识（8 位随机数）
+- `vin`（string，可选）：VIN 码（17 位）
+- `carModel`（string，可选）：车辆型号
+- `carVersion`（string，可选）：车辆版本
+- `remark`（string，可选）：备注
+
+**返回值（Success 200）**：对象 `CarFriend`
+
+| 字段       | 类型          | 说明                            | 示例                                 |
+| ---------- | ------------- | ------------------------------- | ------------------------------------ |
+| id         | string        | 记录 ID（UUID）                 | 550e8400-e29b-41d4-a716-446655440000 |
+| userId     | string        | 归属用户 ID（UUID）             | 550e8400-e29b-41d4-a716-446655440000 |
+| username   | string        | 用户名                          | 张三                                 |
+| carId      | string        | 车辆唯一标识（8 位随机数）      | 00428100                             |
+| vin        | string \ null | VIN 码（17 位）                 | LFV2A21J3G1234567                    |
+| carModel   | string        | 车辆型号                        | A4L                                  |
+| carVersion | string        | 车辆版本                        | 2.0T-2022                            |
+| remark     | string        | 备注                            | 车友群 1                             |
+| createdAt  | string        | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-16 12:00:00                  |
+| updatedAt  | string        | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-16 12:00:00                  |
+
+---
+
+## 10.7 删除车友（需登录）
+
+**接口标题**：删除车友
+
+**功能描述**：删除一条车友记录（物理删除）。
+
+**接口路由**：`POST /car-friends/delete`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `id`（string，必填）：记录 ID（UUID）
+
+**返回值（Success 200）**：
+
+| 字段 | 类型    | 说明     | 示例 |
+| ---- | ------- | -------- | ---- |
+| ok   | boolean | 是否成功 | true |
 
 ---
 

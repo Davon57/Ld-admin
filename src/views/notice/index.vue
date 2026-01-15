@@ -4,7 +4,11 @@ import type { FormInstance, FormRules } from "element-plus";
 import { addDialog } from "@/components/ReDialog";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { message } from "@/utils/message";
-import { DEFAULT_PAGE_SIZES, exportToCsv, type CsvColumn } from "@/utils/table";
+import {
+  DEFAULT_PAGE_SIZES,
+  exportToXlsx,
+  type CsvColumn
+} from "@/utils/table";
 import {
   type NoticeItem,
   type Status,
@@ -70,16 +74,11 @@ async function fetchNotices(): Promise<void> {
   loading.value = true;
   try {
     const res = await getNoticeList(listParams.value);
-    if (!res.success) {
-      message(res.message || "获取公告列表失败", { type: "error" });
-      tableData.value = [];
-      total.value = 0;
-      return;
-    }
-    tableData.value = res.data.list;
-    total.value = res.data.total;
+    tableData.value = res.list;
+    total.value = res.total;
   } catch {
-    message("网络异常，请稍后重试", { type: "error" });
+    tableData.value = [];
+    total.value = 0;
   } finally {
     loading.value = false;
   }
@@ -114,27 +113,15 @@ function onSelectionChange(rows: NoticeItem[]): void {
 }
 
 async function onExportList(): Promise<void> {
-  if (total.value === 0) {
+  if (tableData.value.length === 0) {
     message("暂无可导出数据", { type: "warning" });
     return;
   }
   exporting.value = true;
   try {
-    const res = await getNoticeList({
-      ...listParams.value,
-      page: 1,
-      pageSize: 3000
-    });
-    if (!res.success) {
-      message(res.message || "导出失败", { type: "error" });
-      return;
-    }
-    if (total.value > res.data.list.length) {
-      message("仅导出前 3000 条", { type: "warning" });
-    }
-    exportToCsv(res.data.list, exportColumns, "公告列表");
+    await exportToXlsx(tableData.value, exportColumns, "公告列表");
   } catch {
-    message("网络异常，请稍后重试", { type: "error" });
+    message("导出失败", { type: "error" });
   } finally {
     exporting.value = false;
   }
@@ -220,17 +207,11 @@ function openNoticeDialog(mode: NoticeFormMode, row?: NoticeItem): void {
         await formRef.value?.validate();
 
         if (mode === "create") {
-          const res = await createNotice({
+          await createNotice({
             title: model.title.trim(),
             content: model.content.trim(),
             status: model.status
           });
-          if (!res.success) {
-            message(res.message || "新增失败", { type: "error" });
-            closeLoading();
-            return;
-          }
-          message("新增成功", { type: "success" });
           done();
           queryState.page = 1;
           fetchNotices();
@@ -243,18 +224,12 @@ function openNoticeDialog(mode: NoticeFormMode, row?: NoticeItem): void {
           return;
         }
 
-        const res = await updateNotice({
+        await updateNotice({
           id: model.id,
           title: model.title.trim(),
           content: model.content.trim(),
           status: model.status
         });
-        if (!res.success) {
-          message(res.message || "更新失败", { type: "error" });
-          closeLoading();
-          return;
-        }
-        message("更新成功", { type: "success" });
         done();
         fetchNotices();
       } catch {
@@ -266,19 +241,12 @@ function openNoticeDialog(mode: NoticeFormMode, row?: NoticeItem): void {
 
 async function onDeleteRow(row: NoticeItem): Promise<void> {
   try {
-    const res = await deleteNotice({ id: row.id });
-    if (!res.success) {
-      message(res.message || "删除失败", { type: "error" });
-      return;
-    }
-    message("删除成功", { type: "success" });
+    await deleteNotice({ id: row.id });
     if (queryState.page > 1 && tableData.value.length === 1) {
       queryState.page -= 1;
     }
     fetchNotices();
-  } catch {
-    message("网络异常，请稍后重试", { type: "error" });
-  }
+  } catch {}
 }
 
 async function onBatchDelete(): Promise<void> {
@@ -310,13 +278,7 @@ async function onBatchDelete(): Promise<void> {
     beforeSure: async (done, { closeLoading }) => {
       try {
         const ids = [...selectionIds.value];
-        const res = await batchDeleteNotices({ ids });
-        if (!res.success) {
-          message(res.message || "批量删除失败", { type: "error" });
-          closeLoading();
-          return;
-        }
-        message("删除成功", { type: "success" });
+        await batchDeleteNotices({ ids });
         done();
         if (queryState.page > 1 && deletingCount >= currentRows) {
           queryState.page -= 1;
@@ -325,7 +287,6 @@ async function onBatchDelete(): Promise<void> {
         fetchNotices();
       } catch {
         closeLoading();
-        message("网络异常，请稍后重试", { type: "error" });
       }
     }
   });

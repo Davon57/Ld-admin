@@ -30,6 +30,7 @@ import {
   deleteFeedback
 } from "@/api/feedback";
 import { getFeedbackTypeList } from "@/api/feedbackType";
+import Plus from "~icons/ep/plus";
 
 defineOptions({
   name: "FeedbackManage"
@@ -414,6 +415,7 @@ function openFeedbackDialog(mode: FeedbackFormMode, row?: FeedbackItem): void {
     setup() {
       const ElForm = resolveComponent("ElForm");
       const ElFormItem = resolveComponent("ElFormItem");
+      const ElIcon = resolveComponent("ElIcon");
       const ElInput = resolveComponent("ElInput");
       const ElSelect = resolveComponent("ElSelect");
       const ElOption = resolveComponent("ElOption");
@@ -537,17 +539,26 @@ function openFeedbackDialog(mode: FeedbackFormMode, row?: FeedbackItem): void {
                 { label: "图片", prop: "images" },
                 {
                   default: () =>
-                    h(ElUpload as any, {
-                      action: "/",
-                      autoUpload: false,
-                      multiple: true,
-                      accept: "image/*",
-                      listType: "picture-card",
-                      limit: 6,
-                      fileList: fileList.value,
-                      onChange,
-                      onRemove
-                    })
+                    h(
+                      ElUpload as any,
+                      {
+                        action: "/",
+                        autoUpload: false,
+                        multiple: true,
+                        accept: "image/*",
+                        listType: "picture-card",
+                        limit: 6,
+                        fileList: fileList.value,
+                        onChange,
+                        onRemove
+                      },
+                      {
+                        default: () =>
+                          h(ElIcon as any, null, {
+                            default: () => [h(Plus)]
+                          })
+                      }
+                    )
                 }
               )
             ]
@@ -572,13 +583,18 @@ function openFeedbackDialog(mode: FeedbackFormMode, row?: FeedbackItem): void {
         const env = model.env.trim();
 
         if (mode === "create") {
-          if (!model.userId) {
+          const cby = (
+            userStore.username ||
+            userStore.profile?.username ||
+            ""
+          ).trim();
+          if (!cby) {
             message("当前登录用户信息缺失，请重新登录", { type: "error" });
             closeLoading();
             return;
           }
           const res = await createFeedback({
-            userId: model.userId,
+            cby,
             type,
             description,
             contact: model.contact.trim() ? model.contact.trim() : null,

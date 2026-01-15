@@ -1,74 +1,182 @@
 import { http } from "@/utils/http";
 
-export type Status = 0 | 1;
+export type CarStatus = "on_sale" | "discontinued";
 
-export type EmptyData = Record<string, never>;
-
-export type BaseResult<T> = {
-  success: boolean;
-  data: T;
-  message?: string;
-};
-
-export type PageResult<T> = {
-  list: T[];
-  total: number;
-};
-
-export type VehicleItem = {
-  id: number;
+export type Car = {
+  id: string;
+  carId: string;
+  userId: string;
   year: number;
   model: string;
   version: string;
-  status: Status;
+  status: CarStatus;
+  isEnabled: boolean;
   remark: string;
   createdAt: string;
+  updatedAt: string;
 };
 
-export type VehicleListParams = {
+export type CreateCarPayload = {
+  year: number;
+  model: string;
+  version?: string;
+  status?: CarStatus;
+  isEnabled?: boolean;
+  remark?: string;
+};
+
+export type UpdateCarPayload =
+  | ({ id: string } & Partial<CreateCarPayload>)
+  | ({ carId: string } & Partial<CreateCarPayload>);
+
+export type OkResult = {
+  ok: boolean;
+};
+
+type ApiError = {
+  error: string;
+};
+
+function unwrapApiResult<T>(res: T | ApiError): T {
+  if (typeof (res as ApiError)?.error === "string") {
+    throw new Error((res as ApiError).error);
+  }
+  return res as T;
+}
+
+export const getCarList = async (data: Record<string, never> = {}) => {
+  const res = await http.request<Car[] | ApiError>("post", "/cars", { data });
+  return unwrapApiResult(res);
+};
+
+export const createCar = async (data: CreateCarPayload) => {
+  const res = await http.request<Car | ApiError>("post", "/cars/create", {
+    data
+  });
+  return unwrapApiResult(res);
+};
+
+export const updateCar = async (data: UpdateCarPayload) => {
+  const res = await http.request<Car | ApiError>("post", "/cars/update", {
+    data
+  });
+  return unwrapApiResult(res);
+};
+
+export const deleteCar = async (data: { id?: string; carId?: string }) => {
+  const res = await http.request<OkResult | ApiError>("post", "/cars/delete", {
+    data
+  });
+  return unwrapApiResult(res);
+};
+
+export const batchDeleteCars = async (data: {
+  ids?: string[];
+  carIds?: string[];
+}): Promise<{ ok: boolean; failedCount: number }> => {
+  const deletePayloads = [
+    ...(data.ids ?? []).map(id => ({ id })),
+    ...(data.carIds ?? []).map(carId => ({ carId }))
+  ];
+
+  if (deletePayloads.length === 0) {
+    return { ok: true, failedCount: 0 };
+  }
+
+  const results = await Promise.allSettled(
+    deletePayloads.map(payload => deleteCar(payload))
+  );
+
+  const failedCount = results
+    .map(r => {
+      if (r.status === "rejected") return 1;
+      return r.value.ok ? 0 : 1;
+    })
+    .reduce((sum, n) => sum + n, 0);
+
+  return { ok: failedCount === 0, failedCount };
+};
+
+export type CarFriend = {
+  id: string;
+  userId: string;
+  username?: string;
+  carId: string;
+  vin?: string | null;
+  carModel: string;
+  carVersion: string;
+  remark: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CarFriendListParams = {
+  page?: number;
+  pageSize?: number;
+  userId?: string;
+  carId?: string;
+  vin?: string;
+};
+
+export type CarFriendListResult = {
+  list: CarFriend[];
+  total: number;
   page: number;
   pageSize: number;
-  keyword?: string;
-  status?: Status;
 };
 
-export type CreateVehiclePayload = Omit<VehicleItem, "id" | "createdAt">;
-
-export type UpdateVehiclePayload = Pick<VehicleItem, "id"> &
-  Partial<Omit<VehicleItem, "id" | "createdAt">>;
-
-export const getVehicleList = (data: VehicleListParams) => {
-  return http.request<BaseResult<PageResult<VehicleItem>>>(
+export const getCarFriendList = async (data: CarFriendListParams) => {
+  const res = await http.request<CarFriendListResult | ApiError>(
     "post",
-    "/vehicle/list",
-    { data }
+    "/car-friends",
+    {
+      data
+    }
   );
+  return unwrapApiResult(res);
 };
 
-export const createVehicle = (data: CreateVehiclePayload) => {
-  return http.request<BaseResult<VehicleItem | EmptyData>>(
+export type CreateCarFriendPayload = {
+  userId: string;
+  carId: string;
+  vin: string;
+  carModel: string;
+  carVersion: string;
+  remark?: string;
+};
+
+export type UpdateCarFriendPayload = Pick<CarFriend, "id"> &
+  Partial<CreateCarFriendPayload>;
+
+export const createCarFriend = async (data: CreateCarFriendPayload) => {
+  const res = await http.request<CarFriend | ApiError>(
     "post",
-    "/vehicle/create",
-    { data }
+    "/car-friends/create",
+    {
+      data
+    }
   );
+  return unwrapApiResult(res);
 };
 
-export const updateVehicle = (data: UpdateVehiclePayload) => {
-  return http.request<BaseResult<VehicleItem | EmptyData>>(
+export const updateCarFriend = async (data: UpdateCarFriendPayload) => {
+  const res = await http.request<CarFriend | ApiError>(
     "post",
-    "/vehicle/update",
-    { data }
+    "/car-friends/update",
+    {
+      data
+    }
   );
+  return unwrapApiResult(res);
 };
 
-export const deleteVehicle = (data: { id: number }) => {
-  return http.request<BaseResult<EmptyData>>("post", "/vehicle/delete", {
-    data
-  });
-};
-
-export const batchDeleteVehicles = (data: { ids: number[] }) => {
-  return http.request<BaseResult<EmptyData>>("post", "/vehicle/batchDelete", {
-    data
-  });
+export const deleteCarFriend = async (data: { id: string }) => {
+  const res = await http.request<OkResult | ApiError>(
+    "post",
+    "/car-friends/delete",
+    {
+      data
+    }
+  );
+  return unwrapApiResult(res);
 };
