@@ -49,10 +49,11 @@
 
 **返回值（Success 201）**：
 
-| 字段     | 类型   | 说明            | 示例                                 |
-| -------- | ------ | --------------- | ------------------------------------ |
-| id       | string | 用户 ID（UUID） | 550e8400-e29b-41d4-a716-446655440000 |
-| username | string | 用户名          | 张三                                 |
+| 字段     | 类型   | 说明                      | 示例                                 |
+| -------- | ------ | ------------------------- | ------------------------------------ |
+| id       | string | 用户 ID（UUID）           | 550e8400-e29b-41d4-a716-446655440000 |
+| userId   | string | 用户使用 ID（8 位随机数） | 00428100                             |
+| username | string | 用户名                    | 张三                                 |
 
 ---
 
@@ -76,12 +77,12 @@
 | token                   | string        | JWT token                     | eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9... |
 | user                    | object        | 用户信息                      | -                                       |
 | user.id                 | string        | 用户 ID（UUID）               | 550e8400-e29b-41d4-a716-446655440000    |
+| user.userId             | string        | 用户使用 ID（8 位随机数）     | 00428100                                |
 | user.username           | string        | 用户名                        | 张三                                    |
 | user.nickname           | string        | 昵称                          | 三哥                                    |
 | user.avatar             | string        | 头像 URL                      | https://example.com/avatar.png          |
-| user.carModel           | string        | 车型                          | 330i                                    |
 | user.city               | string        | 所在城市                      | 北京                                    |
-| user.email              | string        | 邮箱                          | zhangsan@example.com                    |
+| user.email              | string \ null | 邮箱                          | zhangsan@example.com                    |
 | user.phone              | string \ null | 手机号                        | 13800138000                             |
 | user.role               | string        | 角色（user/admin/moderator）  | user                                    |
 | user.mustChangePassword | boolean       | 是否需要改密（首次登录/自举） | false                                   |
@@ -127,13 +128,14 @@
 
 **返回值（Success 201）**：对象
 
-| 字段               | 类型    | 说明            | 示例                                 |
-| ------------------ | ------- | --------------- | ------------------------------------ |
-| id                 | string  | 用户 ID（UUID） | 550e8400-e29b-41d4-a716-446655440000 |
-| username           | string  | 用户名          | admin                                |
-| email              | string  | 邮箱            | admin@local.invalid                  |
-| role               | string  | 角色            | admin                                |
-| mustChangePassword | boolean | 是否需要改密    | true                                 |
+| 字段               | 类型    | 说明                      | 示例                                 |
+| ------------------ | ------- | ------------------------- | ------------------------------------ |
+| id                 | string  | 用户 ID（UUID）           | 550e8400-e29b-41d4-a716-446655440000 |
+| userId             | string  | 用户使用 ID（8 位随机数） | 00428100                             |
+| username           | string  | 用户名                    | admin                                |
+| email              | string  | 邮箱                      | admin@local.invalid                  |
+| role               | string  | 角色                      | admin                                |
+| mustChangePassword | boolean | 是否需要改密              | true                                 |
 
 ---
 
@@ -155,19 +157,20 @@
 
 **返回值（Success 200）**：数组 `User[]`
 
-| 字段      | 类型          | 说明                           | 示例                                 |
-| --------- | ------------- | ------------------------------ | ------------------------------------ |
-| id        | string        | 用户 ID（UUID）                | 550e8400-e29b-41d4-a716-446655440000 |
-| username  | string        | 用户名                         | 张三                                 |
-| nickname  | string        | 昵称                           | 三哥                                 |
-| avatar    | string        | 头像 URL                       | https://example.com/avatar.png       |
-| carModel  | string        | 车型                           | 330i                                 |
-| city      | string        | 所在城市                       | 北京                                 |
-| email     | string        | 邮箱                           | zhangsan@example.com                 |
-| phone     | string \ null | 手机号                         | 13800138000                          |
-| role      | string        | 角色（user/admin/moderator）   | user                                 |
-| status    | string        | 状态（active/inactive/banned） | active                               |
-| createdAt | string        | 创建时间（ISO）                | 2026-01-10T00:00:00.000Z             |
+| 字段      | 类型          | 说明                            | 示例                                 |
+| --------- | ------------- | ------------------------------- | ------------------------------------ |
+| id        | string        | 用户 ID（UUID）                 | 550e8400-e29b-41d4-a716-446655440000 |
+| userId    | string        | 用户使用 ID（8 位随机数）       | 00428100                             |
+| username  | string        | 用户名                          | 张三                                 |
+| nickname  | string        | 昵称                            | 三哥                                 |
+| avatar    | string        | 头像 URL                        | https://example.com/avatar.png       |
+| city      | string        | 所在城市                        | 北京                                 |
+| email     | string \ null | 邮箱                            | zhangsan@example.com                 |
+| phone     | string \ null | 手机号                          | 13800138000                          |
+| role      | string        | 角色（user/admin/moderator）    | user                                 |
+| status    | string        | 状态（active/inactive/banned）  | active                               |
+| createdAt | string        | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00                  |
+| updatedAt | string        | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00                  |
 
 ---
 
@@ -192,12 +195,12 @@
 | 字段     | 类型          | 说明                           | 示例                                 |
 | -------- | ------------- | ------------------------------ | ------------------------------------ |
 | id       | string        | 用户 ID（UUID）                | 550e8400-e29b-41d4-a716-446655440000 |
+| userId   | string        | 用户使用 ID（8 位随机数）      | 00428100                             |
 | username | string        | 用户名                         | 张三                                 |
 | nickname | string        | 昵称                           | 三哥                                 |
 | avatar   | string        | 头像 URL                       | https://example.com/avatar.png       |
-| carModel | string        | 车型                           | 330i                                 |
 | city     | string        | 所在城市                       | 北京                                 |
-| email    | string        | 邮箱                           | zhangsan@example.com                 |
+| email    | string \ null | 邮箱                           | zhangsan@example.com                 |
 | phone    | string \ null | 手机号                         | 13800138000                          |
 | role     | string        | 角色（user/admin/moderator）   | user                                 |
 | status   | string        | 状态（active/inactive/banned） | active                               |
@@ -208,7 +211,7 @@
 
 **接口标题**：用户详情
 
-**功能描述**：根据用户 ID 获取用户详情。
+**功能描述**：根据用户 ID 获取用户详情（支持 UUID 的 id 或 8 位 userId）。
 
 **接口路由**：`POST /users/detail`
 
@@ -218,19 +221,20 @@
 
 **参数（Body）**：
 
-- `id`（string，必填）：用户 ID（UUID）
+- `id`（string，可选）：用户 ID（UUID）
+- `userId`（string，可选）：用户使用 ID（8 位随机数）
 
 **返回值（Success 200）**：对象 `User`
 
 | 字段     | 类型          | 说明                           | 示例                                 |
 | -------- | ------------- | ------------------------------ | ------------------------------------ |
 | id       | string        | 用户 ID（UUID）                | 550e8400-e29b-41d4-a716-446655440000 |
+| userId   | string        | 用户使用 ID（8 位随机数）      | 00428100                             |
 | username | string        | 用户名                         | 张三                                 |
 | nickname | string        | 昵称                           | 三哥                                 |
 | avatar   | string        | 头像 URL                       | https://example.com/avatar.png       |
-| carModel | string        | 车型                           | 330i                                 |
 | city     | string        | 所在城市                       | 北京                                 |
-| email    | string        | 邮箱                           | zhangsan@example.com                 |
+| email    | string \ null | 邮箱                           | zhangsan@example.com                 |
 | phone    | string \ null | 手机号                         | 13800138000                          |
 | role     | string        | 角色（user/admin/moderator）   | user                                 |
 | status   | string        | 状态（active/inactive/banned） | active                               |
@@ -253,10 +257,9 @@
 
 - `username`（string，必填）：用户名，长度 3-50
 - `password`（string，必填）：密码，长度 6-100
-- `email`（string，可选）：邮箱
+- `email`（string \ null，可选）：邮箱
 - `avatar`（string，可选）：头像 URL
 - `nickname`（string，可选）：昵称
-- `carModel`（string，可选）：车型
 - `city`（string，可选）：所在城市
 - `phone`（string \ null，可选）：手机号
 - `role`（string，可选）：角色（user/admin/moderator）
@@ -267,12 +270,12 @@
 | 字段     | 类型          | 说明                           | 示例                                 |
 | -------- | ------------- | ------------------------------ | ------------------------------------ |
 | id       | string        | 用户 ID（UUID）                | 550e8400-e29b-41d4-a716-446655440000 |
+| userId   | string        | 用户使用 ID（8 位随机数）      | 00428100                             |
 | username | string        | 用户名                         | 张三                                 |
 | nickname | string        | 昵称                           | 三哥                                 |
 | avatar   | string        | 头像 URL                       | https://example.com/avatar.png       |
-| carModel | string        | 车型                           | 330i                                 |
 | city     | string        | 所在城市                       | 北京                                 |
-| email    | string        | 邮箱                           | zhangsan@example.com                 |
+| email    | string \ null | 邮箱                           | zhangsan@example.com                 |
 | phone    | string \ null | 手机号                         | 13800138000                          |
 | role     | string        | 角色（user/admin/moderator）   | user                                 |
 | status   | string        | 状态（active/inactive/banned） | active                               |
@@ -294,9 +297,9 @@
 **参数（Body）**：
 
 - `id`（string，可选）：用户 ID（UUID）
+- `userId`（string，可选）：用户使用 ID（8 位随机数）
 - `avatar`（string，可选）：头像 URL
 - `nickname`（string，可选）：昵称
-- `carModel`（string，可选）：车型
 - `city`（string，可选）：所在城市
 - `email`（string，可选）：邮箱
 - `phone`（string \ null，可选）：手机号
@@ -308,12 +311,12 @@
 | 字段     | 类型          | 说明                           | 示例                                 |
 | -------- | ------------- | ------------------------------ | ------------------------------------ |
 | id       | string        | 用户 ID（UUID）                | 550e8400-e29b-41d4-a716-446655440000 |
+| userId   | string        | 用户使用 ID（8 位随机数）      | 00428100                             |
 | username | string        | 用户名                         | 张三                                 |
 | nickname | string        | 昵称                           | 三哥                                 |
 | avatar   | string        | 头像 URL                       | https://example.com/avatar.png       |
-| carModel | string        | 车型                           | 330i                                 |
 | city     | string        | 所在城市                       | 北京                                 |
-| email    | string        | 邮箱                           | zhangsan@example.com                 |
+| email    | string \ null | 邮箱                           | zhangsan@example.com                 |
 | phone    | string \ null | 手机号                         | 13800138000                          |
 | role     | string        | 角色（user/admin/moderator）   | user                                 |
 | status   | string        | 状态（active/inactive/banned） | active                               |
@@ -334,7 +337,8 @@
 
 **参数（Body）**：
 
-- `id`（string，必填）：用户 ID（UUID）
+- `id`（string，可选）：用户 ID（UUID）
+- `userId`（string，可选）：用户使用 ID（8 位随机数）
 
 **返回值（Success 200）**：
 
@@ -387,20 +391,20 @@
 
 **返回值（Success 200）**：数组 `Car[]`
 
-| 字段         | 类型           | 说明                | 示例                                 |
-| ------------ | -------------- | ------------------- | ------------------------------------ |
-| id           | string         | 车辆 ID（UUID）     | 550e8400-e29b-41d4-a716-446655440000 |
-| userId       | string         | 归属用户 ID（UUID） | 550e8400-e29b-41d4-a716-446655440000 |
-| brand        | string         | 品牌                | BMW                                  |
-| model        | string         | 车型                | 330i                                 |
-| year         | number         | 年份                | 2022                                 |
-| licensePlate | string         | 车牌号（唯一）      | 京A12345                             |
-| color        | string \\ null | 颜色                | 黑色                                 |
-| mileage      | number \\ null | 里程                | 12000                                |
-| vin          | string \\ null | VIN（唯一）         | WBA8D9C50JA123456                    |
-| isDefault    | boolean        | 是否默认车辆        | false                                |
-| createdAt    | string         | 创建时间（ISO）     | 2026-01-10T00:00:00.000Z             |
-| updatedAt    | string         | 更新时间（ISO）     | 2026-01-10T00:00:00.000Z             |
+| 字段         | 类型           | 说明                            | 示例                                 |
+| ------------ | -------------- | ------------------------------- | ------------------------------------ |
+| id           | string         | 车辆 ID（UUID）                 | 550e8400-e29b-41d4-a716-446655440000 |
+| userId       | string         | 归属用户 ID（UUID）             | 550e8400-e29b-41d4-a716-446655440000 |
+| brand        | string         | 品牌                            | BMW                                  |
+| model        | string         | 车型                            | 330i                                 |
+| year         | number         | 年份                            | 2022                                 |
+| licensePlate | string         | 车牌号（唯一）                  | 京A12345                             |
+| color        | string \\ null | 颜色                            | 黑色                                 |
+| mileage      | number \\ null | 里程                            | 12000                                |
+| vin          | string \\ null | VIN（唯一）                     | WBA8D9C50JA123456                    |
+| isDefault    | boolean        | 是否默认车辆                    | false                                |
+| createdAt    | string         | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00                  |
+| updatedAt    | string         | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00                  |
 
 ---
 
@@ -422,16 +426,16 @@
 
 **返回值（Success 200）**：数组 `Post[]`
 
-| 字段      | 类型           | 说明                           | 示例                                 |
-| --------- | -------------- | ------------------------------ | ------------------------------------ |
-| id        | string         | 帖子 ID（UUID）                | 550e8400-e29b-41d4-a716-446655440000 |
-| userId    | string         | 作者用户 ID（UUID）            | 550e8400-e29b-41d4-a716-446655440000 |
-| carId     | string \\ null | 关联车辆 ID（UUID）            | 550e8400-e29b-41d4-a716-446655440000 |
-| title     | string         | 标题                           | 我的第一台车                         |
-| content   | string         | 内容                           | ...                                  |
-| status    | string         | 状态（draft/published/hidden） | published                            |
-| createdAt | string         | 创建时间（ISO）                | 2026-01-10T00:00:00.000Z             |
-| updatedAt | string         | 更新时间（ISO）                | 2026-01-10T00:00:00.000Z             |
+| 字段      | 类型           | 说明                            | 示例                                 |
+| --------- | -------------- | ------------------------------- | ------------------------------------ |
+| id        | string         | 帖子 ID（UUID）                 | 550e8400-e29b-41d4-a716-446655440000 |
+| userId    | string         | 作者用户 ID（UUID）             | 550e8400-e29b-41d4-a716-446655440000 |
+| carId     | string \\ null | 关联车辆 ID（UUID）             | 550e8400-e29b-41d4-a716-446655440000 |
+| title     | string         | 标题                            | 我的第一台车                         |
+| content   | string         | 内容                            | ...                                  |
+| status    | string         | 状态（draft/published/hidden）  | published                            |
+| createdAt | string         | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00                  |
+| updatedAt | string         | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00                  |
 
 ---
 
@@ -453,15 +457,263 @@
 
 **返回值（Success 200）**：数组 `Club[]`
 
-| 字段        | 类型   | 说明                    | 示例                                 |
-| ----------- | ------ | ----------------------- | ------------------------------------ |
-| id          | string | 俱乐部 ID（UUID）       | 550e8400-e29b-41d4-a716-446655440000 |
-| creatorId   | string | 创建者用户 ID（UUID）   | 550e8400-e29b-41d4-a716-446655440000 |
-| name        | string | 名称（唯一）            | 宝马车友会                           |
-| description | string | 描述                    | -                                    |
-| status      | string | 状态（active/inactive） | active                               |
-| createdAt   | string | 创建时间（ISO）         | 2026-01-10T00:00:00.000Z             |
-| updatedAt   | string | 更新时间（ISO）         | 2026-01-10T00:00:00.000Z             |
+| 字段        | 类型   | 说明                            | 示例                                 |
+| ----------- | ------ | ------------------------------- | ------------------------------------ |
+| id          | string | 俱乐部 ID（UUID）               | 550e8400-e29b-41d4-a716-446655440000 |
+| creatorId   | string | 创建者用户 ID（UUID）           | 550e8400-e29b-41d4-a716-446655440000 |
+| name        | string | 名称（唯一）                    | 宝马车友会                           |
+| description | string | 描述                            | -                                    |
+| status      | string | 状态（active/inactive）         | active                               |
+| createdAt   | string | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00                  |
+| updatedAt   | string | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00                  |
+
+---
+
+## 13. 获取反馈列表（需登录）
+
+**接口标题**：反馈列表
+
+**功能描述**：获取反馈列表（当前无分页/筛选逻辑，按创建时间倒序返回）。
+
+**接口路由**：`POST /feedbacks`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- 无（可传 `{}`，当前不会被使用）
+
+**返回值（Success 200）**：数组 `Feedback[]`
+
+| 字段                | 类型          | 说明                            | 示例                                 |
+| ------------------- | ------------- | ------------------------------- | ------------------------------------ |
+| id                  | string        | 反馈 ID（UUID）                 | 550e8400-e29b-41d4-a716-446655440000 |
+| cby                 | string        | 用户名（创建人）                | 张三                                 |
+| type                | string        | 反馈问题类型                    | bug                                  |
+| description         | string        | 反馈描述                        | 页面无法加载                         |
+| contact             | string \ null | 联系方式（可选）                | 13800138000                          |
+| env                 | string        | 环境信息（字符串）              | Windows 11 / Chrome 120              |
+| images              | array         | 图片数组                        | -                                    |
+| images[].url        | string        | 图片 base64（或 dataURL）       | data:image/png;base64,iVBORw0...     |
+| images[].uploadTime | string        | 上传时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00                  |
+| createdAt           | string        | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00                  |
+| updatedAt           | string        | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00                  |
+
+---
+
+## 14. 新增反馈（需登录）
+
+**接口标题**：新增反馈
+
+**功能描述**：创建一条新的反馈记录。
+
+**接口路由**：`POST /feedbacks/create`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `cby`（string，必填）：用户名
+- `type`（string，必填）：反馈问题类型
+- `description`（string，必填）：描述
+- `contact`（string \ null，可选）：联系方式
+- `env`（string，必填）：环境信息（字符串）
+- `images`（array，可选）：图片数组
+  - `images[].url`（string，必填）：图片 base64（或 dataURL）
+  - `images[].uploadTime`（string，必填）：上传时间（可传任意可解析日期字符串，返回会格式化）
+
+**返回值（Success 201）**：对象 `Feedback`
+
+| 字段        | 类型          | 说明                            | 示例                                 |
+| ----------- | ------------- | ------------------------------- | ------------------------------------ |
+| id          | string        | 反馈 ID（UUID）                 | 550e8400-e29b-41d4-a716-446655440000 |
+| cby         | string        | 用户名（创建人）                | 张三                                 |
+| type        | string        | 反馈问题类型                    | bug                                  |
+| description | string        | 反馈描述                        | 页面无法加载                         |
+| contact     | string \ null | 联系方式（可选）                | 13800138000                          |
+| env         | string        | 环境信息（字符串）              | Windows 11 / Chrome 120              |
+| images      | array         | 图片数组（uploadTime 已格式化） | -                                    |
+| createdAt   | string        | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00                  |
+| updatedAt   | string        | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00                  |
+
+---
+
+## 15. 修改反馈（需登录）
+
+**接口标题**：修改反馈
+
+**功能描述**：更新反馈内容（按 id 定位，支持部分字段更新）。
+
+**接口路由**：`POST /feedbacks/update`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `id`（string，必填）：反馈 ID（UUID）
+- `type`（string，可选）：反馈问题类型
+- `description`（string，可选）：描述
+- `contact`（string \ null，可选）：联系方式
+- `env`（string，可选）：环境信息（字符串）
+- `images`（array，可选）：图片数组（整体替换）
+
+**返回值（Success 200）**：对象 `Feedback`
+
+| 字段        | 类型          | 说明                            | 示例                                 |
+| ----------- | ------------- | ------------------------------- | ------------------------------------ |
+| id          | string        | 反馈 ID（UUID）                 | 550e8400-e29b-41d4-a716-446655440000 |
+| cby         | string        | 用户名（创建人）                | 张三                                 |
+| type        | string        | 反馈问题类型                    | bug                                  |
+| description | string        | 反馈描述                        | 页面无法加载                         |
+| contact     | string \ null | 联系方式（可选）                | 13800138000                          |
+| env         | string        | 环境信息（字符串）              | Windows 11 / Chrome 120              |
+| images      | array         | 图片数组（uploadTime 已格式化） | -                                    |
+| createdAt   | string        | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00                  |
+| updatedAt   | string        | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00                  |
+
+---
+
+## 16. 删除反馈（需登录）
+
+**接口标题**：删除反馈
+
+**功能描述**：删除反馈（软删除）。
+
+**接口路由**：`POST /feedbacks/delete`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `id`（string，必填）：反馈 ID（UUID）
+
+**返回值（Success 200）**：
+
+| 字段 | 类型    | 说明     | 示例 |
+| ---- | ------- | -------- | ---- |
+| ok   | boolean | 是否成功 | true |
+
+---
+
+## 17. 获取反馈类型列表（需登录）
+
+**接口标题**：反馈类型列表
+
+**功能描述**：获取反馈类型列表（按创建时间倒序返回）。
+
+**接口路由**：`POST /feedback-types`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- 无（可传 `{}`，当前不会被使用）
+
+**返回值（Success 200）**：数组 `FeedbackType[]`
+
+| 字段        | 类型   | 说明                            | 示例                                 |
+| ----------- | ------ | ------------------------------- | ------------------------------------ |
+| id          | string | 类型 ID（UUID）                 | 550e8400-e29b-41d4-a716-446655440000 |
+| code        | string | 随机 6 位编码（唯一）           | 004281                               |
+| name        | string | 类型名                          | BUG 反馈                             |
+| description | string | 类型描述                        | 影响使用的错误与异常                 |
+| createdAt   | string | 新增时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00                  |
+| updatedAt   | string | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00                  |
+
+---
+
+## 18. 新增反馈类型（需登录）
+
+**接口标题**：新增反馈类型
+
+**功能描述**：创建一条新的反馈类型记录（`code` 由后端随机生成 6 位数）。
+
+**接口路由**：`POST /feedback-types/create`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `name`（string，必填）：类型名
+- `description`（string，可选）：类型描述
+
+**返回值（Success 201）**：对象 `FeedbackType`
+
+| 字段        | 类型   | 说明                            | 示例                                 |
+| ----------- | ------ | ------------------------------- | ------------------------------------ |
+| id          | string | 类型 ID（UUID）                 | 550e8400-e29b-41d4-a716-446655440000 |
+| code        | string | 随机 6 位编码（唯一）           | 004281                               |
+| name        | string | 类型名                          | BUG 反馈                             |
+| description | string | 类型描述                        | 影响使用的错误与异常                 |
+| createdAt   | string | 新增时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00                  |
+| updatedAt   | string | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00                  |
+
+---
+
+## 19. 修改反馈类型（需登录）
+
+**接口标题**：修改反馈类型
+
+**功能描述**：更新反馈类型内容（按 id 定位，支持部分字段更新）。
+
+**接口路由**：`POST /feedback-types/update`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `id`（string，必填）：类型 ID（UUID）
+- `name`（string，可选）：类型名
+- `description`（string，可选）：类型描述
+
+**返回值（Success 200）**：对象 `FeedbackType`
+
+| 字段        | 类型   | 说明                            | 示例                                 |
+| ----------- | ------ | ------------------------------- | ------------------------------------ |
+| id          | string | 类型 ID（UUID）                 | 550e8400-e29b-41d4-a716-446655440000 |
+| code        | string | 随机 6 位编码（唯一）           | 004281                               |
+| name        | string | 类型名                          | BUG 反馈                             |
+| description | string | 类型描述                        | 影响使用的错误与异常                 |
+| createdAt   | string | 新增时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00                  |
+| updatedAt   | string | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00                  |
+
+---
+
+## 20. 删除反馈类型（需登录）
+
+**接口标题**：删除反馈类型
+
+**功能描述**：删除反馈类型（软删除）。
+
+**接口路由**：`POST /feedback-types/delete`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `id`（string，必填）：类型 ID（UUID）
+
+**返回值（Success 200）**：
+
+| 字段 | 类型    | 说明     | 示例 |
+| ---- | ------- | -------- | ---- |
+| ok   | boolean | 是否成功 | true |
 
 ---
 

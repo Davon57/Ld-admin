@@ -4,6 +4,7 @@ export type UserResult = {
   token: string;
   user: {
     id: string;
+    userId: string;
     username: string;
     nickname: string;
     avatar: string;
@@ -47,6 +48,7 @@ export type ChangePasswordResult = {
 
 export type CurrentUser = {
   id: string;
+  userId: string;
   username: string;
   nickname: string;
   avatar: string;

@@ -30,7 +30,9 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
         "/ota": { target: VITE_API_BASE, changeOrigin: true },
         "/vehicle": { target: VITE_API_BASE, changeOrigin: true },
         "/medal": { target: VITE_API_BASE, changeOrigin: true },
-        "/notice": { target: VITE_API_BASE, changeOrigin: true }
+        "/notice": { target: VITE_API_BASE, changeOrigin: true },
+        "/feedbacks": { target: VITE_API_BASE, changeOrigin: true },
+        "/feedback-types": { target: VITE_API_BASE, changeOrigin: true }
       }
     : {};
   return {
