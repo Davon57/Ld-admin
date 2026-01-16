@@ -155,7 +155,12 @@ async function onSubmit(): Promise<void> {
     };
 
     const res = await bootstrapInit(payload);
-    if (!res?.id) {
+    const created = Boolean(
+      res &&
+        (("id" in res && Boolean(res.id)) ||
+          ("userId" in res && Boolean(res.userId)))
+    );
+    if (!created) {
       message("初始化失败", { type: "error" });
       return;
     }

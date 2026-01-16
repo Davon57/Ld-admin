@@ -17,8 +17,7 @@ import {
   getUserList,
   createUser,
   updateUser,
-  deleteUser,
-  batchDeleteUsers
+  deleteUser
 } from "@/api/user";
 
 defineOptions({
@@ -57,11 +56,11 @@ const queryState = reactive<
 const loading = ref(false);
 const tableData = ref<UserItem[]>([]);
 const total = ref(0);
-const selectionIds = ref<string[]>([]);
 
 const exporting = ref(false);
 
 const exportColumns: CsvColumn<UserItem>[] = [
+  { label: "编码", key: "userId" },
   { label: "头像", key: "avatar" },
   { label: "用户名", key: "username" },
   { label: "昵称", key: "nickname" },
@@ -141,10 +140,6 @@ function onSizeChange(size: number): void {
 function onCurrentChange(page: number): void {
   queryState.page = page;
   fetchUsers();
-}
-
-function onSelectionChange(rows: UserItem[]): void {
-  selectionIds.value = rows.map(r => r.userId);
 }
 
 async function onExportList(): Promise<void> {
@@ -541,54 +536,6 @@ async function onDeleteRow(row: UserItem): Promise<void> {
   } catch {}
 }
 
-async function onBatchDelete(): Promise<void> {
-  if (selectionIds.value.length === 0) {
-    message("请选择要删除的用户", { type: "warning" });
-    return;
-  }
-
-  const deletingCount = selectionIds.value.length;
-  const currentRows = tableData.value.length;
-
-  const BatchDeleteContent = defineComponent({
-    name: "BatchDeleteContent",
-    setup() {
-      return () => (
-        <div class="text-[14px] leading-6">
-          确认删除选中的 {selectionIds.value.length} 个用户？
-        </div>
-      );
-    }
-  });
-
-  addDialog({
-    title: "批量删除",
-    width: "420px",
-    closeOnClickModal: false,
-    sureBtnLoading: true,
-    contentRenderer: () => h(BatchDeleteContent),
-    beforeSure: async (done, { closeLoading }) => {
-      try {
-        const userIds = [...selectionIds.value];
-        const res = await batchDeleteUsers({ userIds });
-        if (res.failedCount > 0) {
-          message(`删除失败 ${res.failedCount} 个用户`, { type: "warning" });
-        } else {
-          message("删除成功", { type: "success" });
-        }
-        done();
-        if (queryState.page > 1 && deletingCount >= currentRows) {
-          queryState.page -= 1;
-        }
-        selectionIds.value = [];
-        fetchUsers();
-      } catch {
-        closeLoading();
-      }
-    }
-  });
-}
-
 fetchUsers();
 </script>
 
@@ -648,9 +595,6 @@ fetchUsers();
           >
             导出列表
           </el-button>
-          <el-button type="danger" plain @click="onBatchDelete">
-            批量删除
-          </el-button>
         </el-space>
       </template>
 
@@ -659,28 +603,87 @@ fetchUsers();
         :loading="loading"
         row-key="userId"
         class="w-full"
-        @selection-change="onSelectionChange"
       >
-        <el-table-column type="selection" width="46" />
-        <el-table-column prop="avatar" label="头像" width="70">
+        <el-table-column type="expand" width="44">
           <template #default="{ row }">
-            <el-image
-              v-if="row.avatar"
-              :src="row.avatar"
-              fit="cover"
-              class="h-8 w-8 rounded-full"
-              :preview-src-list="[row.avatar]"
-              preview-teleported
-            />
-            <div
-              v-else
-              class="h-8 w-8 rounded-full bg-[var(--el-fill-color-light)]"
-            />
+            <div class="px-6 py-4">
+              <div
+                class="flex items-center gap-8 overflow-x-auto whitespace-nowrap"
+              >
+                <div class="flex items-center gap-3">
+                  <div
+                    class="text-[13px] text-[var(--el-text-color-secondary)]"
+                  >
+                    头像
+                  </div>
+                  <div class="flex items-center">
+                    <el-image
+                      v-if="row.avatar"
+                      :src="row.avatar"
+                      fit="cover"
+                      class="h-8 w-8 rounded-full"
+                      :preview-src-list="[row.avatar]"
+                      preview-teleported
+                    />
+                    <div
+                      v-else
+                      class="h-8 w-8 rounded-full bg-[var(--el-fill-color-light)]"
+                    />
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                  <div
+                    class="text-[13px] text-[var(--el-text-color-secondary)]"
+                  >
+                    昵称
+                  </div>
+                  <div class="text-[14px] text-[var(--el-text-color-primary)]">
+                    {{ row.nickname || "-" }}
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                  <div
+                    class="text-[13px] text-[var(--el-text-color-secondary)]"
+                  >
+                    城市
+                  </div>
+                  <div class="text-[14px] text-[var(--el-text-color-primary)]">
+                    {{ row.city || "-" }}
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                  <div
+                    class="text-[13px] text-[var(--el-text-color-secondary)]"
+                  >
+                    手机号
+                  </div>
+                  <div class="text-[14px] text-[var(--el-text-color-primary)]">
+                    {{ row.phone || "-" }}
+                  </div>
+                </div>
+
+                <div class="flex min-w-0 items-center gap-3">
+                  <div
+                    class="text-[13px] text-[var(--el-text-color-secondary)]"
+                  >
+                    邮箱
+                  </div>
+                  <div
+                    class="max-w-[520px] truncate text-[14px] text-[var(--el-text-color-primary)]"
+                    :title="row.email || '-'"
+                  >
+                    {{ row.email || "-" }}
+                  </div>
+                </div>
+              </div>
+            </div>
           </template>
         </el-table-column>
-        <el-table-column prop="username" label="用户名" min-width="140" />
-        <el-table-column prop="nickname" label="昵称" min-width="140" />
-        <el-table-column prop="city" label="城市" min-width="120" />
+        <el-table-column prop="userId" label="编码" min-width="150" />
+        <el-table-column prop="username" label="用户名" min-width="160" />
         <el-table-column prop="role" label="角色" width="110">
           <template #default="{ row }">
             <el-tag v-if="row.role === 'admin'" type="warning">管理员</el-tag>
@@ -699,8 +702,6 @@ fetchUsers();
             <el-tag v-else type="danger">封禁</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="phone" label="手机号" min-width="140" />
-        <el-table-column prop="email" label="邮箱" min-width="200" />
         <el-table-column prop="createdAt" label="创建时间" min-width="170" />
         <el-table-column prop="updatedAt" label="修改时间" min-width="170" />
         <el-table-column label="操作" fixed="right" width="160">

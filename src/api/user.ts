@@ -37,6 +37,14 @@ export type BootstrapInitResult = {
   mustChangePassword: boolean;
 };
 
+export type BootstrapInitResultV2 = {
+  userId: string;
+  username: string;
+  email: string;
+  role: "admin";
+  mustChangePassword: boolean;
+};
+
 export type ChangePasswordPayload = {
   currentPassword: string;
   newPassword: string;
@@ -113,9 +121,13 @@ export const getBootstrapStatus = (data: Record<string, never> = {}) => {
 };
 
 export const bootstrapInit = (data: BootstrapInitPayload) => {
-  return http.request<BootstrapInitResult>("post", "/system/bootstrap/init", {
-    data
-  });
+  return http.request<BootstrapInitResult | BootstrapInitResultV2>(
+    "post",
+    "/system/bootstrap/init",
+    {
+      data
+    }
+  );
 };
 
 export const changePassword = (data: ChangePasswordPayload) => {

@@ -307,9 +307,8 @@ async function compressImageToDataUrl(file: File): Promise<string> {
 type FeedbackFormMode = "create" | "edit";
 
 type FeedbackFormModel = {
-  id?: string;
+  feedbackId?: string;
   userId: string;
-  operatorNo: string;
   type: string;
   description: string;
   contact: string;
@@ -318,7 +317,6 @@ type FeedbackFormModel = {
 };
 
 const feedbackFormRules: FormRules<FeedbackFormModel> = {
-  operatorNo: [],
   type: [
     {
       validator: (_rule, value: string, callback) => {
@@ -355,17 +353,12 @@ function openFeedbackDialog(mode: FeedbackFormMode, row?: FeedbackItem): void {
   const formRef = ref<FormInstance>();
   const userStore = useUserStoreHook();
   const defaultUserId = userStore.profile?.userId || "";
-  const defaultOperatorNo = defaultUserId;
   const defaultEnv =
     typeof navigator !== "undefined" ? navigator.userAgent : "";
 
   const model = reactive<FeedbackFormModel>({
-    id: mode === "edit" ? row?.id : undefined,
+    feedbackId: mode === "edit" ? row?.feedbackId : undefined,
     userId: mode === "edit" ? (row?.userId ?? "") : defaultUserId,
-    operatorNo:
-      mode === "edit"
-        ? (row?.userId ?? row?.cby ?? "").trim() || defaultOperatorNo
-        : defaultOperatorNo,
     type: mode === "edit" ? (row?.type ?? "") : "",
     description: mode === "edit" ? (row?.description ?? "") : "",
     contact: mode === "edit" ? (row?.contact ?? "") : "",
@@ -438,21 +431,6 @@ function openFeedbackDialog(mode: FeedbackFormMode, row?: FeedbackItem): void {
           },
           {
             default: () => [
-              h(
-                ElFormItem as any,
-                { label: "操作人(工号)", prop: "operatorNo" },
-                {
-                  default: () =>
-                    h(ElInput as any, {
-                      modelValue: model.operatorNo,
-                      "onUpdate:modelValue": (v: string) => {
-                        model.operatorNo = v;
-                      },
-                      disabled: true,
-                      placeholder: "自动带出"
-                    })
-                }
-              ),
               h(
                 ElFormItem as any,
                 { label: "类型", prop: "type" },
@@ -582,17 +560,18 @@ function openFeedbackDialog(mode: FeedbackFormMode, row?: FeedbackItem): void {
         const description = model.description.trim();
         const env = model.env.trim();
 
+        const cby = (
+          userStore.username ||
+          userStore.profile?.username ||
+          ""
+        ).trim();
+        if (!cby) {
+          message("当前登录用户信息缺失，请重新登录", { type: "error" });
+          closeLoading();
+          return;
+        }
+
         if (mode === "create") {
-          const cby = (
-            userStore.username ||
-            userStore.profile?.username ||
-            ""
-          ).trim();
-          if (!cby) {
-            message("当前登录用户信息缺失，请重新登录", { type: "error" });
-            closeLoading();
-            return;
-          }
           const res = await createFeedback({
             cby,
             type,
@@ -601,7 +580,7 @@ function openFeedbackDialog(mode: FeedbackFormMode, row?: FeedbackItem): void {
             env,
             images: model.images.length ? model.images : undefined
           });
-          if (!res?.id) {
+          if (!res?.feedbackId) {
             message("新增失败", { type: "error" });
             closeLoading();
             return;
@@ -613,21 +592,22 @@ function openFeedbackDialog(mode: FeedbackFormMode, row?: FeedbackItem): void {
           return;
         }
 
-        if (!model.id) {
+        if (!model.feedbackId) {
           message("反馈信息异常", { type: "error" });
           closeLoading();
           return;
         }
 
         const res = await updateFeedback({
-          id: model.id,
+          feedbackId: model.feedbackId,
+          cby,
           type,
           description,
           contact: model.contact.trim() ? model.contact.trim() : null,
           env,
           images: model.images
         });
-        if (!res?.id) {
+        if (!res?.feedbackId) {
           message("更新失败", { type: "error" });
           closeLoading();
           return;
@@ -644,7 +624,7 @@ function openFeedbackDialog(mode: FeedbackFormMode, row?: FeedbackItem): void {
 
 async function onDeleteRow(row: FeedbackItem): Promise<void> {
   try {
-    const res = await deleteFeedback({ id: row.id });
+    const res = await deleteFeedback({ feedbackId: row.feedbackId });
     if (!res?.ok) {
       message("删除失败", { type: "error" });
       return;
@@ -712,14 +692,15 @@ fetchFeedbacks();
       <el-table
         :data="tableData"
         :loading="loading"
-        row-key="id"
+        row-key="feedbackId"
         class="w-full"
       >
-        <el-table-column label="操作人" width="160">
-          <template #default="{ row }">
-            {{ (row.cby ?? row.userId) || "-" }}
-          </template>
-        </el-table-column>
+        <el-table-column
+          prop="feedbackId"
+          label="编码"
+          width="160"
+          show-overflow-tooltip
+        />
         <el-table-column prop="type" label="类型" width="140">
           <template #default="{ row }">
             <el-tag effect="plain">{{ row.type }}</el-tag>
@@ -754,6 +735,11 @@ fetchFeedbacks();
           </template>
         </el-table-column>
         <el-table-column prop="createdAt" label="创建时间" width="170" />
+        <el-table-column label="操作人" width="160">
+          <template #default="{ row }">
+            {{ (row.cby ?? row.userId) || "-" }}
+          </template>
+        </el-table-column>
         <el-table-column label="操作" fixed="right" width="160">
           <template #default="{ row }">
             <el-space>

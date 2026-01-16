@@ -6,7 +6,7 @@ export type FeedbackImage = {
 };
 
 export type FeedbackItem = {
-  id: string;
+  feedbackId: string;
   userId: string;
   cby?: string;
   type: string;
@@ -28,7 +28,8 @@ export type CreateFeedbackPayload = {
 };
 
 export type UpdateFeedbackPayload = {
-  id: string;
+  feedbackId: string;
+  cby?: string;
   type?: string;
   description?: string;
   contact?: string | null;
@@ -52,7 +53,7 @@ export const updateFeedback = (data: UpdateFeedbackPayload) => {
   return http.request<FeedbackItem>("post", "/feedbacks/update", { data });
 };
 
-export const deleteFeedback = (data: { id: string }) => {
+export const deleteFeedback = (data: { feedbackId: string }) => {
   return http.request<DeleteFeedbackResult>("post", "/feedbacks/delete", {
     data
   });
