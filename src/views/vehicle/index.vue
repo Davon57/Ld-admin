@@ -139,7 +139,7 @@ function onCurrentChange(page: number): void {
 }
 
 function onSelectionChange(rows: Car[]): void {
-  selectionIds.value = rows.map(r => r.id);
+  selectionIds.value = rows.map(r => r.carId);
 }
 
 async function onExportList(): Promise<void> {
@@ -293,17 +293,13 @@ function openVehicleDialog(mode: VehicleFormMode, row?: Car): void {
           return;
         }
 
-        if (!model.id && !model.carId) {
+        if (!model.carId) {
           message("车型信息异常", { type: "error" });
           closeLoading();
           return;
         }
 
-        if (model.id) {
-          await updateCar({ id: model.id, ...payload });
-        } else if (model.carId) {
-          await updateCar({ carId: model.carId, ...payload });
-        }
+        await updateCar({ carId: model.carId, ...payload });
         message("更新成功", { type: "success" });
         done();
         fetchCars();
@@ -319,7 +315,7 @@ function openVehicleDialog(mode: VehicleFormMode, row?: Car): void {
 
 async function onDeleteRow(row: Car): Promise<void> {
   try {
-    const res = await deleteCar({ id: row.id });
+    const res = await deleteCar({ carId: row.carId });
     if (!res.ok) {
       message("删除失败", { type: "error" });
       return;
@@ -364,8 +360,8 @@ async function onBatchDelete(): Promise<void> {
     contentRenderer: () => h(BatchDeleteContent),
     beforeSure: async (done, { closeLoading }) => {
       try {
-        const ids = [...selectionIds.value];
-        const res = await batchDeleteCars({ ids });
+        const carIds = [...selectionIds.value];
+        const res = await batchDeleteCars({ carIds });
         if (!res.ok) {
           message(
             res.failedCount > 0
@@ -464,7 +460,7 @@ fetchCars();
       <el-table
         :data="tableData"
         :loading="loading"
-        row-key="id"
+        row-key="carId"
         class="w-full"
         @selection-change="onSelectionChange"
       >

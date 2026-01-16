@@ -185,7 +185,7 @@ fetchOwners();
       <el-table
         :data="tableData"
         :loading="loading"
-        row-key="id"
+        row-key="carFriendId"
         class="w-full"
       >
         <el-table-column prop="username" label="用户名" min-width="140">

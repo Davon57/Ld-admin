@@ -25,9 +25,7 @@ export type CreateCarPayload = {
   remark?: string;
 };
 
-export type UpdateCarPayload =
-  | ({ id: string } & Partial<CreateCarPayload>)
-  | ({ carId: string } & Partial<CreateCarPayload>);
+export type UpdateCarPayload = { carId: string } & Partial<CreateCarPayload>;
 
 export type OkResult = {
   ok: boolean;
@@ -63,7 +61,7 @@ export const updateCar = async (data: UpdateCarPayload) => {
   return unwrapApiResult(res);
 };
 
-export const deleteCar = async (data: { id?: string; carId?: string }) => {
+export const deleteCar = async (data: { carId: string }) => {
   const res = await http.request<OkResult | ApiError>("post", "/cars/delete", {
     data
   });
@@ -71,13 +69,9 @@ export const deleteCar = async (data: { id?: string; carId?: string }) => {
 };
 
 export const batchDeleteCars = async (data: {
-  ids?: string[];
-  carIds?: string[];
+  carIds: string[];
 }): Promise<{ ok: boolean; failedCount: number }> => {
-  const deletePayloads = [
-    ...(data.ids ?? []).map(id => ({ id })),
-    ...(data.carIds ?? []).map(carId => ({ carId }))
-  ];
+  const deletePayloads = data.carIds.map(carId => ({ carId }));
 
   if (deletePayloads.length === 0) {
     return { ok: true, failedCount: 0 };
@@ -98,7 +92,7 @@ export const batchDeleteCars = async (data: {
 };
 
 export type CarFriend = {
-  id: string;
+  carFriendId: string;
   userId: string;
   username?: string;
   carId: string;
@@ -139,14 +133,15 @@ export const getCarFriendList = async (data: CarFriendListParams) => {
 export type CreateCarFriendPayload = {
   userId: string;
   carId: string;
-  vin: string;
-  carModel: string;
-  carVersion: string;
-  remark?: string;
+  vin?: string | null;
+  carModel?: string | null;
+  carVersion?: string | null;
+  remark?: string | null;
 };
 
-export type UpdateCarFriendPayload = Pick<CarFriend, "id"> &
-  Partial<CreateCarFriendPayload>;
+export type UpdateCarFriendPayload = {
+  carFriendId: string;
+} & Partial<CreateCarFriendPayload>;
 
 export const createCarFriend = async (data: CreateCarFriendPayload) => {
   const res = await http.request<CarFriend | ApiError>(
@@ -170,7 +165,7 @@ export const updateCarFriend = async (data: UpdateCarFriendPayload) => {
   return unwrapApiResult(res);
 };
 
-export const deleteCarFriend = async (data: { id: string }) => {
+export const deleteCarFriend = async (data: { carFriendId: string }) => {
   const res = await http.request<OkResult | ApiError>(
     "post",
     "/car-friends/delete",

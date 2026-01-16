@@ -144,7 +144,7 @@ function onCurrentChange(page: number): void {
 }
 
 function onSelectionChange(rows: UserItem[]): void {
-  selectionIds.value = rows.map(r => r.id);
+  selectionIds.value = rows.map(r => r.userId);
 }
 
 async function onExportList(): Promise<void> {
@@ -165,7 +165,7 @@ async function onExportList(): Promise<void> {
 type UserFormMode = "create" | "edit";
 
 type UserFormModel = {
-  id?: string;
+  userId?: string;
   username: string;
   nickname: string;
   avatar: string;
@@ -323,7 +323,7 @@ function openUserDialog(mode: UserFormMode, row?: UserItem): void {
   }
 
   const model = reactive<UserFormModel>({
-    id: mode === "edit" ? row?.id : undefined,
+    userId: mode === "edit" ? row?.userId : undefined,
     username: mode === "edit" ? (row?.username ?? "") : "",
     nickname: mode === "edit" ? (row?.nickname ?? "") : "",
     avatar: mode === "edit" ? (row?.avatar ?? "") : "",
@@ -506,14 +506,14 @@ function openUserDialog(mode: UserFormMode, row?: UserItem): void {
           return;
         }
 
-        if (!model.id) {
+        if (!model.userId) {
           message("用户信息异常", { type: "error" });
           closeLoading();
           return;
         }
 
         await updateUser({
-          id: model.id,
+          userId: model.userId,
           nickname: model.nickname.trim(),
           avatar: model.avatar.trim() ? model.avatar.trim() : undefined,
           city: model.city.trim(),
@@ -533,7 +533,7 @@ function openUserDialog(mode: UserFormMode, row?: UserItem): void {
 
 async function onDeleteRow(row: UserItem): Promise<void> {
   try {
-    await deleteUser({ id: row.id });
+    await deleteUser({ userId: row.userId });
     if (queryState.page > 1 && tableData.value.length === 1) {
       queryState.page -= 1;
     }
@@ -569,8 +569,8 @@ async function onBatchDelete(): Promise<void> {
     contentRenderer: () => h(BatchDeleteContent),
     beforeSure: async (done, { closeLoading }) => {
       try {
-        const ids = [...selectionIds.value];
-        const res = await batchDeleteUsers({ ids });
+        const userIds = [...selectionIds.value];
+        const res = await batchDeleteUsers({ userIds });
         if (res.failedCount > 0) {
           message(`删除失败 ${res.failedCount} 个用户`, { type: "warning" });
         } else {
@@ -657,7 +657,7 @@ fetchUsers();
       <el-table
         :data="tableData"
         :loading="loading"
-        row-key="id"
+        row-key="userId"
         class="w-full"
         @selection-change="onSelectionChange"
       >

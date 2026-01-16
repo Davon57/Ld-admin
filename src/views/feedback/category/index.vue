@@ -193,7 +193,7 @@ const typeFormRules: FormRules<FeedbackTypeFormModel> = {
 
 function openTypeDialog(mode: TypeFormMode, row?: FeedbackTypeItem): void {
   const formRef = ref<FormInstance>();
-  const originalId = mode === "edit" ? (row?.id ?? "") : "";
+  const originalId = mode === "edit" ? (row?.feedbackTypeId ?? "") : "";
   const model = reactive<FeedbackTypeFormModel>({
     name: mode === "edit" ? (row?.name ?? "") : "",
     description: mode === "edit" ? (row?.description ?? "") : ""
@@ -271,7 +271,7 @@ function openTypeDialog(mode: TypeFormMode, row?: FeedbackTypeItem): void {
         const name = model.name.trim();
         const description = model.description.trim();
         const exists = tableData.value.some(
-          item => item.name === name && item.id !== originalId
+          item => item.name === name && item.feedbackTypeId !== originalId
         );
         if (exists) {
           message("类别已存在", { type: "warning" });
@@ -291,7 +291,7 @@ function openTypeDialog(mode: TypeFormMode, row?: FeedbackTypeItem): void {
         }
 
         await updateFeedbackType({
-          id: originalId,
+          feedbackTypeId: originalId,
           name,
           description: description ? description : undefined
         });
@@ -308,7 +308,7 @@ function openTypeDialog(mode: TypeFormMode, row?: FeedbackTypeItem): void {
 
 async function onDeleteRow(row: FeedbackTypeItem): Promise<void> {
   try {
-    await deleteFeedbackType({ id: row.id });
+    await deleteFeedbackType({ feedbackTypeId: row.feedbackTypeId });
     await refresh();
     message("删除成功", { type: "success" });
   } catch (error) {
@@ -365,9 +365,14 @@ void refresh();
     </el-card>
 
     <PureTableBar class="mt-2" title="类别列表" @refresh="refresh">
-      <el-table :data="tableData" row-key="id" border :loading="loading">
+      <el-table
+        :data="tableData"
+        row-key="feedbackTypeId"
+        border
+        :loading="loading"
+      >
         <el-table-column type="index" label="#" width="70" />
-        <el-table-column prop="code" label="编码" min-width="120" />
+        <el-table-column prop="feedbackTypeId" label="编码" min-width="160" />
         <el-table-column prop="name" label="类别" min-width="200" />
         <el-table-column prop="description" label="描述" min-width="280" />
         <el-table-column prop="updatedAt" label="更新时间" width="180" />

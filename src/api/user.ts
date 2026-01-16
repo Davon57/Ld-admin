@@ -64,6 +64,7 @@ export type UserStatus = "active" | "inactive" | "banned";
 
 export type UserItem = {
   id: string;
+  userId: string;
   username: string;
   nickname: string;
   avatar: string;
@@ -186,7 +187,7 @@ export const createUser = async (
 };
 
 export type UpdateUserPayload = {
-  id?: string;
+  userId: string;
   avatar?: string;
   nickname?: string;
   city?: string;
@@ -208,7 +209,7 @@ export const updateUser = async (
 };
 
 export const deleteUser = async (data: {
-  id: string;
+  userId: string;
 }): Promise<{ ok: boolean }> => {
   return http.request<{ ok: boolean }>(
     "post",
@@ -223,14 +224,14 @@ export type BatchDeleteUsersResult = {
 };
 
 export const batchDeleteUsers = async (data: {
-  ids: string[];
+  userIds: string[];
 }): Promise<BatchDeleteUsersResult> => {
   const results = await Promise.allSettled(
-    data.ids.map(id =>
+    data.userIds.map(userId =>
       http.request<{ ok: boolean }>(
         "post",
         "/users/delete",
-        { data: { id } },
+        { data: { userId } },
         { showSuccessMessage: false }
       )
     )
@@ -242,4 +243,8 @@ export const batchDeleteUsers = async (data: {
     .filter(r => !r.value?.ok).length;
 
   return { failedCount: rejectedCount + okFalseCount };
+};
+
+export const getUserDetail = (data: { userId: string }) => {
+  return http.request<UserItem>("post", "/users/detail", { data });
 };

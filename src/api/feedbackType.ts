@@ -1,8 +1,7 @@
 import { http } from "@/utils/http";
 
 export type FeedbackTypeItem = {
-  id: string;
-  code: string;
+  feedbackTypeId: string;
   name: string;
   description: string;
   createdAt: string;
@@ -15,7 +14,7 @@ export type CreateFeedbackTypePayload = {
 };
 
 export type UpdateFeedbackTypePayload = {
-  id: string;
+  feedbackTypeId: string;
   name?: string;
   description?: string;
 };
@@ -40,7 +39,7 @@ export const updateFeedbackType = (data: UpdateFeedbackTypePayload) => {
   });
 };
 
-export const deleteFeedbackType = (data: { id: string }) => {
+export const deleteFeedbackType = (data: { feedbackTypeId: string }) => {
   return http.request<DeleteFeedbackTypeResult>(
     "post",
     "/feedback-types/delete",
