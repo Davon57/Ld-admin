@@ -1,5 +1,18 @@
 export const DEFAULT_PAGE_SIZES: number[] = [10, 20, 50, 100, 1000, 2000, 3000];
 
+export type PageData<T> = {
+  list: T[];
+  total: number;
+  page?: number;
+  pageSize?: number;
+};
+
+export function isPageData<T>(value: unknown): value is PageData<T> {
+  if (!value || typeof value !== "object") return false;
+  const v = value as Record<string, unknown>;
+  return Array.isArray(v.list) && typeof v.total === "number";
+}
+
 export type CsvColumn<Row extends Record<string, unknown>> = {
   label: string;
   key: keyof Row;

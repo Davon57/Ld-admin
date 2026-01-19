@@ -7,6 +7,7 @@ import { message } from "@/utils/message";
 import {
   DEFAULT_PAGE_SIZES,
   exportToXlsx,
+  isPageData,
   type CsvColumn
 } from "@/utils/table";
 import {
@@ -38,49 +39,24 @@ const enabledOptions: EnabledOption[] = [
 const queryState = reactive<{
   page: number;
   pageSize: number;
-  keyword: string;
-  status: "" | CarStatus;
-  isEnabled: "" | boolean;
+  includeDisabled: boolean;
 }>({
   page: 1,
   pageSize: 10,
-  keyword: "",
-  status: "",
-  isEnabled: ""
+  includeDisabled: false
 });
 
 const loading = ref(false);
 const exporting = ref(false);
 const allCars = ref<Car[]>([]);
+const serverCars = ref<Car[]>([]);
 const selectionIds = ref<string[]>([]);
+const paginationEnabled = ref(false);
+const total = ref(0);
 
-function normalizeText(text: string): string {
-  return text.trim().toLowerCase();
-}
-
-const filteredCars = computed((): Car[] => {
-  const keyword = normalizeText(queryState.keyword);
-  const status = queryState.status;
-  const isEnabled = queryState.isEnabled;
-
-  return allCars.value
-    .filter(c => (status ? c.status === status : true))
-    .filter(c => (isEnabled === "" ? true : c.isEnabled === isEnabled))
-    .filter(c => {
-      if (!keyword) return true;
-      const values = [c.carId, String(c.year), c.model, c.version, c.remark];
-      return values.some(v => normalizeText(String(v)).includes(keyword));
-    });
-});
-
-const total = computed((): number => filteredCars.value.length);
-
-const tableData = computed((): Car[] => {
-  const page = Math.max(1, Number(queryState.page || 1));
-  const pageSize = Math.max(1, Number(queryState.pageSize || 10));
-  const start = (page - 1) * pageSize;
-  return filteredCars.value.slice(start, start + pageSize);
-});
+const tableData = computed((): Car[] =>
+  paginationEnabled.value ? serverCars.value : allCars.value
+);
 
 const exportColumns: CsvColumn<Car>[] = [
   { label: "车辆标识", key: "carId" },
@@ -105,10 +81,26 @@ const exportColumns: CsvColumn<Car>[] = [
 async function fetchCars(): Promise<void> {
   loading.value = true;
   try {
-    const list = await getCarList({});
-    allCars.value = list;
+    const res = await getCarList({
+      includeDisabled: queryState.includeDisabled,
+      page: queryState.page,
+      pageSize: queryState.pageSize
+    });
+
+    if (isPageData<Car>(res)) {
+      paginationEnabled.value = true;
+      serverCars.value = res.list;
+      total.value = res.total;
+      return;
+    }
+
+    paginationEnabled.value = false;
+    allCars.value = res;
   } catch (err) {
     allCars.value = [];
+    serverCars.value = [];
+    paginationEnabled.value = false;
+    total.value = 0;
     message(err instanceof Error ? err.message : "网络异常，请稍后重试", {
       type: "error"
     });
@@ -119,23 +111,25 @@ async function fetchCars(): Promise<void> {
 
 function onSearch(): void {
   queryState.page = 1;
+  fetchCars();
 }
 
 function onReset(): void {
   queryState.page = 1;
   queryState.pageSize = 10;
-  queryState.keyword = "";
-  queryState.status = "";
-  queryState.isEnabled = "";
+  queryState.includeDisabled = false;
+  fetchCars();
 }
 
 function onSizeChange(size: number): void {
   queryState.pageSize = size;
   queryState.page = 1;
+  fetchCars();
 }
 
 function onCurrentChange(page: number): void {
   queryState.page = page;
+  fetchCars();
 }
 
 function onSelectionChange(rows: Car[]): void {
@@ -321,7 +315,11 @@ async function onDeleteRow(row: Car): Promise<void> {
       return;
     }
     message("删除成功", { type: "success" });
-    if (queryState.page > 1 && tableData.value.length === 1) {
+    if (
+      paginationEnabled.value &&
+      queryState.page > 1 &&
+      tableData.value.length === 1
+    ) {
       queryState.page -= 1;
     }
     fetchCars();
@@ -374,7 +372,11 @@ async function onBatchDelete(): Promise<void> {
         }
         message("删除成功", { type: "success" });
         done();
-        if (queryState.page > 1 && deletingCount >= currentRows) {
+        if (
+          paginationEnabled.value &&
+          queryState.page > 1 &&
+          deletingCount >= currentRows
+        ) {
           queryState.page -= 1;
         }
         selectionIds.value = [];
@@ -396,40 +398,13 @@ fetchCars();
   <div>
     <el-card shadow="never">
       <el-form inline>
-        <el-form-item label="关键词">
-          <el-input
-            v-model="queryState.keyword"
-            placeholder="年份/车型/版本"
-            clearable
-            class="w-[260px]!"
-            @keyup.enter="onSearch"
+        <el-form-item label="包含停用">
+          <el-switch
+            v-model="queryState.includeDisabled"
+            inline-prompt
+            active-text="是"
+            inactive-text="否"
           />
-        </el-form-item>
-        <el-form-item label="状态">
-          <el-select v-model="queryState.status" clearable class="w-[160px]!">
-            <el-option label="全部" value="" />
-            <el-option
-              v-for="opt in statusOptions"
-              :key="opt.value"
-              :label="opt.label"
-              :value="opt.value"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="启用">
-          <el-select
-            v-model="queryState.isEnabled"
-            clearable
-            class="w-[160px]!"
-          >
-            <el-option label="全部" value="" />
-            <el-option
-              v-for="opt in enabledOptions"
-              :key="String(opt.value)"
-              :label="opt.label"
-              :value="opt.value"
-            />
-          </el-select>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="onSearch">查询</el-button>
@@ -510,7 +485,7 @@ fetchCars();
         </el-table-column>
       </el-table>
 
-      <div class="flex justify-end pt-4">
+      <div v-if="paginationEnabled" class="flex justify-end pt-4">
         <el-pagination
           background
           layout="total, sizes, prev, pager, next, jumper"

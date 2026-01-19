@@ -12,9 +12,11 @@ import type { FormInstance, FormRules } from "element-plus";
 import { addDialog } from "@/components/ReDialog";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { message } from "@/utils/message";
+import { DEFAULT_PAGE_SIZES, isPageData } from "@/utils/table";
 import {
   type FeedbackTypeItem,
   getFeedbackTypeList,
+  getAllFeedbackTypes,
   createFeedbackType,
   updateFeedbackType,
   deleteFeedbackType
@@ -95,6 +97,28 @@ const tableData = ref<FeedbackTypeItem[]>([]);
 const initing = ref(false);
 const hasRows = computed((): boolean => tableData.value.length > 0);
 
+type QueryState = {
+  page: number;
+  pageSize: number;
+};
+
+const queryState = reactive<QueryState>({
+  page: 1,
+  pageSize: 10
+});
+
+const paginationEnabled = ref(false);
+const total = ref(0);
+
+async function syncAllTypeNamesToLocalStorage(): Promise<void> {
+  try {
+    const all = await getAllFeedbackTypes({});
+    syncTypeNamesToLocalStorage(all);
+  } catch {
+    void 0;
+  }
+}
+
 const presetTypes = [
   {
     name: "系统问题",
@@ -113,14 +137,38 @@ const presetTypes = [
 async function refresh(): Promise<void> {
   loading.value = true;
   try {
-    const list = await getFeedbackTypeList({});
-    tableData.value = list;
-    syncTypeNamesToLocalStorage(list);
+    const result = await getFeedbackTypeList({
+      page: queryState.page,
+      pageSize: queryState.pageSize
+    });
+
+    if (isPageData<FeedbackTypeItem>(result)) {
+      paginationEnabled.value = true;
+      total.value = result.total;
+      tableData.value = result.list;
+    } else {
+      paginationEnabled.value = false;
+      total.value = result.length;
+      tableData.value = result;
+    }
+
+    void syncAllTypeNamesToLocalStorage();
   } catch (error) {
     message(getErrorMessage(error), { type: "error" });
   } finally {
     loading.value = false;
   }
+}
+
+async function onSizeChange(nextSize: number): Promise<void> {
+  queryState.page = 1;
+  queryState.pageSize = nextSize;
+  await refresh();
+}
+
+async function onCurrentChange(nextPage: number): Promise<void> {
+  queryState.page = nextPage;
+  await refresh();
 }
 
 async function onInitPresetTypes(): Promise<void> {
@@ -145,6 +193,7 @@ async function onInitPresetTypes(): Promise<void> {
       }
     }
 
+    queryState.page = 1;
     await refresh();
 
     if (failCount === 0) {
@@ -284,6 +333,7 @@ function openTypeDialog(mode: TypeFormMode, row?: FeedbackTypeItem): void {
             name,
             description: description ? description : undefined
           });
+          queryState.page = 1;
           await refresh();
           message("新增成功", { type: "success" });
           done();
@@ -309,6 +359,13 @@ function openTypeDialog(mode: TypeFormMode, row?: FeedbackTypeItem): void {
 async function onDeleteRow(row: FeedbackTypeItem): Promise<void> {
   try {
     await deleteFeedbackType({ feedbackTypeId: row.feedbackTypeId });
+    if (
+      paginationEnabled.value &&
+      tableData.value.length <= 1 &&
+      queryState.page > 1
+    ) {
+      queryState.page -= 1;
+    }
     await refresh();
     message("删除成功", { type: "success" });
   } catch (error) {
@@ -401,6 +458,19 @@ void refresh();
           </template>
         </el-table-column>
       </el-table>
+
+      <div v-if="paginationEnabled" class="flex justify-end pt-4">
+        <el-pagination
+          background
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="total"
+          :current-page="queryState.page"
+          :page-size="queryState.pageSize"
+          :page-sizes="DEFAULT_PAGE_SIZES"
+          @size-change="onSizeChange"
+          @current-change="onCurrentChange"
+        />
+      </div>
     </PureTableBar>
   </div>
 </template>

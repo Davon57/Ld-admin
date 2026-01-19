@@ -7,6 +7,7 @@ import { message } from "@/utils/message";
 import {
   DEFAULT_PAGE_SIZES,
   exportToXlsx,
+  isPageData,
   type CsvColumn
 } from "@/utils/table";
 import {
@@ -19,6 +20,7 @@ import {
   updateUser,
   deleteUser
 } from "@/api/user";
+import { type AvatarItem, getAvatarList } from "@/api/avatar";
 
 defineOptions({
   name: "SystemUser"
@@ -39,13 +41,13 @@ const statusOptions: StatusOption[] = [
   { label: "封禁", value: "banned" }
 ];
 
-const queryState = reactive<
-  Required<Pick<UserListParams, "page" | "pageSize">> & {
-    keyword: string;
-    role: "" | UserRole;
-    status: "" | UserStatus;
-  }
->({
+const queryState = reactive<{
+  page: number;
+  pageSize: number;
+  keyword: string;
+  role: "" | UserRole;
+  status: "" | UserStatus;
+}>({
   page: 1,
   pageSize: 10,
   keyword: "",
@@ -54,8 +56,107 @@ const queryState = reactive<
 });
 
 const loading = ref(false);
-const tableData = ref<UserItem[]>([]);
+const allUsers = ref<UserItem[]>([]);
+const serverUsers = ref<UserItem[]>([]);
+const paginationEnabled = ref(false);
 const total = ref(0);
+
+function normalizeText(text: string): string {
+  return text.trim().toLowerCase();
+}
+
+function matchKeyword(user: UserItem, keyword: string): boolean {
+  const k = normalizeText(keyword);
+  if (!k) return true;
+  const values = [
+    user.username,
+    user.nickname,
+    user.email,
+    user.phone ?? "",
+    user.city
+  ];
+  return values.some(v => normalizeText(String(v)).includes(k));
+}
+
+function inferMimeFromBase64(base64: string): string {
+  const v = (base64 ?? "").trim();
+  if (!v) return "image/png";
+  if (v.startsWith("iVBORw0KGgo")) return "image/png";
+  if (v.startsWith("/9j/")) return "image/jpeg";
+  if (v.startsWith("R0lGOD")) return "image/gif";
+  if (v.startsWith("UklGR")) return "image/webp";
+  if (v.startsWith("PHN2Zy")) return "image/svg+xml";
+  return "image/png";
+}
+
+function toImageDataUrl(base64: string): string {
+  const v = (base64 ?? "").trim();
+  if (!v) return "";
+  if (v.startsWith("data:")) return v;
+  return `data:${inferMimeFromBase64(v)};base64,${v}`;
+}
+
+const avatarLoading = ref(false);
+const avatarList = ref<AvatarItem[]>([]);
+
+async function fetchAllAvatars(): Promise<void> {
+  if (avatarLoading.value) return;
+  avatarLoading.value = true;
+  try {
+    const pageSize = 100;
+    const first = await getAvatarList({
+      page: 1,
+      pageSize,
+      includeDisabled: true
+    });
+    const total = Math.max(0, Number(first.total || 0));
+    const maxPage = Math.max(1, Math.ceil(total / pageSize));
+    const all: AvatarItem[] = [...first.list];
+
+    for (let page = 2; page <= maxPage; page += 1) {
+      const res = await getAvatarList({
+        page,
+        pageSize,
+        includeDisabled: true
+      });
+      all.push(...res.list);
+    }
+
+    avatarList.value = all;
+  } catch {
+    avatarList.value = [];
+  } finally {
+    avatarLoading.value = false;
+  }
+}
+
+const avatarSrcById = computed((): Record<string, string> => {
+  const out: Record<string, string> = {};
+  for (const item of avatarList.value) {
+    out[item.avatarId] = toImageDataUrl(item.imageBase64);
+  }
+  return out;
+});
+
+function resolveAvatarSrc(avatarId: string): string {
+  const id = (avatarId ?? "").trim();
+  if (!id) return "";
+  return avatarSrcById.value[id] ?? "";
+}
+
+const filteredUsers = computed((): UserItem[] => {
+  const keyword = queryState.keyword.trim();
+  const role = queryState.role;
+  const status = queryState.status;
+  return allUsers.value
+    .filter(u => matchKeyword(u, keyword))
+    .filter(u => (role ? u.role === role : true))
+    .filter(u => (status ? u.status === status : true));
+});
+
+const tableData = computed((): UserItem[] => {
+  return paginationEnabled.value ? serverUsers.value : filteredUsers.value;
+});
 
 const exporting = ref(false);
 
@@ -107,10 +208,19 @@ async function fetchUsers(): Promise<void> {
   loading.value = true;
   try {
     const res = await getUserList(listParams.value);
-    tableData.value = res.list;
-    total.value = res.total;
+    if (isPageData<UserItem>(res)) {
+      paginationEnabled.value = true;
+      serverUsers.value = res.list;
+      total.value = res.total;
+      return;
+    }
+
+    paginationEnabled.value = false;
+    allUsers.value = res;
   } catch {
-    tableData.value = [];
+    paginationEnabled.value = false;
+    serverUsers.value = [];
+    allUsers.value = [];
     total.value = 0;
   } finally {
     loading.value = false;
@@ -191,15 +301,8 @@ const userFormRules: FormRules<UserFormModel> = {
       validator: (_rule, value: string, callback) => {
         const v = (value ?? "").trim();
         if (!v) return callback();
-        try {
-          const url = new URL(v);
-          if (url.protocol !== "http:" && url.protocol !== "https:") {
-            return callback(new Error("头像链接需为 http/https"));
-          }
-          return callback();
-        } catch {
-          return callback(new Error("头像链接格式不正确"));
-        }
+        const ok = /^LD\d{4}[A-Z]{4}$/.test(v);
+        return ok ? callback() : callback(new Error("头像 ID 格式不正确"));
       },
       trigger: "blur"
     }
@@ -299,6 +402,124 @@ function openUserDialog(mode: UserFormMode, row?: UserItem): void {
   const cityLoading = ref(false);
   const cityCodePath = ref<CascaderValue>([]);
 
+  function openAvatarPicker(): void {
+    const keyword = ref("");
+
+    async function ensureAvatars(): Promise<void> {
+      if (avatarList.value.length > 0) return;
+      await fetchAllAvatars();
+    }
+
+    const filtered = computed(() => {
+      const k = keyword.value.trim().toLowerCase();
+      if (!k) return avatarList.value;
+      return avatarList.value.filter(a => {
+        const description = (a.description ?? "").toLowerCase();
+        const avatarId = (a.avatarId ?? "").toLowerCase();
+        return description.includes(k) || avatarId.includes(k);
+      });
+    });
+
+    const AvatarPicker = defineComponent({
+      name: "UserAvatarPicker",
+      emits: ["close"],
+      setup(_props, { emit }) {
+        nextTick(() => {
+          void ensureAvatars();
+        });
+
+        return () => (
+          <div class="w-full">
+            <div class="flex items-center gap-3 pb-3">
+              <el-input
+                v-model={keyword.value}
+                placeholder="搜索描述/ID"
+                clearable
+              />
+              <el-button
+                plain
+                loading={avatarLoading.value}
+                onClick={() => {
+                  void fetchAllAvatars();
+                }}
+              >
+                刷新
+              </el-button>
+            </div>
+
+            <div
+              class={[
+                "grid",
+                "grid-cols-2",
+                "gap-3",
+                "sm:grid-cols-3",
+                "md:grid-cols-4",
+                "lg:grid-cols-5"
+              ]}
+            >
+              {filtered.value.length === 0 ? (
+                <div class="col-span-full py-8 text-center text-[13px] text-[var(--el-text-color-secondary)]">
+                  {avatarLoading.value ? "加载中..." : "暂无可用头像"}
+                </div>
+              ) : (
+                filtered.value.map(item => {
+                  const url = resolveAvatarSrc(item.avatarId);
+                  const selected = model.avatar.trim() === item.avatarId;
+                  return (
+                    <button
+                      type="button"
+                      class={[
+                        "flex",
+                        "items-center",
+                        "gap-3",
+                        "rounded-lg",
+                        "border",
+                        "p-3",
+                        "text-left",
+                        "transition-colors",
+                        selected
+                          ? "border-[var(--el-color-primary)] bg-[var(--el-color-primary-light-9)]"
+                          : "border-[var(--el-border-color)] hover:bg-[var(--el-fill-color-light)]"
+                      ]}
+                      aria-label={`选择头像：${item.description || item.avatarId}`}
+                      onClick={() => {
+                        model.avatar = item.avatarId;
+                        emit("close", { command: "close" });
+                      }}
+                    >
+                      <el-image
+                        src={url}
+                        fit="cover"
+                        class="h-9 w-9 shrink-0 rounded-full"
+                      />
+                      <div class="min-w-0 flex-1">
+                        <div class="truncate text-[14px] text-[var(--el-text-color-primary)]">
+                          {item.description || "-"}
+                        </div>
+                        <div class="truncate text-[12px] text-[var(--el-text-color-secondary)]">
+                          {item.avatarId}
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        );
+      }
+    });
+
+    addDialog({
+      title: "选择预设头像",
+      width: "860px",
+      fullscreenIcon: true,
+      closeOnClickModal: false,
+      hideFooter: true,
+      contentRenderer: () => h(AvatarPicker)
+    });
+  }
+
   async function ensureCityOptions(): Promise<void> {
     if (cityOptions.value.length > 0 || cityLoading.value) return;
     cityLoading.value = true;
@@ -334,6 +555,7 @@ function openUserDialog(mode: UserFormMode, row?: UserItem): void {
     name: "UserFormDialog",
     setup() {
       const isEdit = computed(() => mode === "edit");
+      const avatarPreviewSrc = computed(() => resolveAvatarSrc(model.avatar));
       const rules = computed(() => {
         const base: FormRules<UserFormModel> = { ...userFormRules };
         if (isEdit.value) {
@@ -353,6 +575,10 @@ function openUserDialog(mode: UserFormMode, row?: UserItem): void {
 
       nextTick(() => {
         formRef.value?.clearValidate();
+      });
+
+      nextTick(() => {
+        void fetchAllAvatars();
       });
 
       void ensureCityOptions().then(() => {
@@ -387,11 +613,44 @@ function openUserDialog(mode: UserFormMode, row?: UserItem): void {
             />
           </el-form-item>
           <el-form-item label="头像" prop="avatar">
-            <el-input
-              v-model={model.avatar}
-              placeholder="请输入头像 URL"
-              clearable
-            />
+            <div class="w-full">
+              <div class="flex items-center gap-3">
+                {avatarPreviewSrc.value ? (
+                  <el-image
+                    src={avatarPreviewSrc.value}
+                    fit="cover"
+                    class="h-9 w-9 rounded-full"
+                    preview-src-list={[avatarPreviewSrc.value]}
+                    preview-teleported
+                  />
+                ) : (
+                  <div class="h-9 w-9 rounded-full bg-[var(--el-fill-color-light)]" />
+                )}
+                <el-input
+                  v-model={model.avatar}
+                  placeholder="请选择系统头像"
+                  readonly
+                  class="flex-1"
+                />
+              </div>
+              <div class="pt-2">
+                <el-space wrap>
+                  <el-button plain onClick={openAvatarPicker}>
+                    选择头像
+                  </el-button>
+                  <el-button
+                    plain
+                    type="danger"
+                    disabled={!model.avatar.trim()}
+                    onClick={() => {
+                      model.avatar = "";
+                    }}
+                  >
+                    清空
+                  </el-button>
+                </el-space>
+              </div>
+            </div>
           </el-form-item>
           <el-form-item label="角色" prop="role">
             <el-select v-model={model.role} class="w-full" clearable={false}>
@@ -496,7 +755,6 @@ function openUserDialog(mode: UserFormMode, row?: UserItem): void {
             password: model.password
           });
           done();
-          queryState.page = 1;
           fetchUsers();
           return;
         }
@@ -529,7 +787,11 @@ function openUserDialog(mode: UserFormMode, row?: UserItem): void {
 async function onDeleteRow(row: UserItem): Promise<void> {
   try {
     await deleteUser({ userId: row.userId });
-    if (queryState.page > 1 && tableData.value.length === 1) {
+    if (
+      paginationEnabled.value &&
+      queryState.page > 1 &&
+      tableData.value.length === 1
+    ) {
       queryState.page -= 1;
     }
     fetchUsers();
@@ -618,11 +880,11 @@ fetchUsers();
                   </div>
                   <div class="flex items-center">
                     <el-image
-                      v-if="row.avatar"
-                      :src="row.avatar"
+                      v-if="resolveAvatarSrc(row.avatar)"
+                      :src="resolveAvatarSrc(row.avatar)"
                       fit="cover"
                       class="h-8 w-8 rounded-full"
-                      :preview-src-list="[row.avatar]"
+                      :preview-src-list="[resolveAvatarSrc(row.avatar)]"
                       preview-teleported
                     />
                     <div
@@ -730,7 +992,7 @@ fetchUsers();
         </el-table-column>
       </el-table>
 
-      <div class="flex justify-end pt-4">
+      <div v-if="paginationEnabled" class="flex justify-end pt-4">
         <el-pagination
           background
           layout="total, sizes, prev, pager, next, jumper"

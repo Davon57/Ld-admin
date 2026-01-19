@@ -97,19 +97,19 @@
 
 `data` 字段结构（LoginResult）：
 
-| 字段                         | 类型          | 说明                            | 示例                                    |
-| ---------------------------- | ------------- | ------------------------------- | --------------------------------------- |
-| data.token                   | string        | JWT token                       | eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9... |
-| data.user                    | object        | 用户信息                        | -                                       |
-| data.user.userId             | string        | 用户业务 ID（格式：LD####AAAA） | LD0001ABCD                              |
-| data.user.username           | string        | 用户名                          | 张三                                    |
-| data.user.nickname           | string        | 昵称                            | 三哥                                    |
-| data.user.avatar             | string        | 头像 URL                        | https://example.com/avatar.png          |
-| data.user.city               | string        | 所在城市                        | 北京                                    |
-| data.user.email              | string \ null | 邮箱                            | zhangsan@example.com                    |
-| data.user.phone              | string \ null | 手机号                          | 13800138000                             |
-| data.user.role               | string        | 角色（user/admin/moderator）    | user                                    |
-| data.user.mustChangePassword | boolean       | 是否需要改密（首次登录/自举）   | false                                   |
+| 字段                         | 类型          | 说明                                  | 示例                                    |
+| ---------------------------- | ------------- | ------------------------------------- | --------------------------------------- |
+| data.token                   | string        | JWT token                             | eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9... |
+| data.user                    | object        | 用户信息                              | -                                       |
+| data.user.userId             | string        | 用户业务 ID（格式：LD####AAAA）       | LD0001ABCD                              |
+| data.user.username           | string        | 用户名                                | 张三                                    |
+| data.user.nickname           | string        | 昵称                                  | 三哥                                    |
+| data.user.avatar             | string        | 头像 ID（avatarId，格式：LD####AAAA） | LD0002EFGH                              |
+| data.user.city               | string        | 所在城市                              | 北京                                    |
+| data.user.email              | string \ null | 邮箱                                  | zhangsan@example.com                    |
+| data.user.phone              | string \ null | 手机号                                | 13800138000                             |
+| data.user.role               | string        | 角色（user/admin/moderator）          | user                                    |
+| data.user.mustChangePassword | boolean       | 是否需要改密（首次登录/自举）         | false                                   |
 
 ---
 
@@ -182,7 +182,7 @@
 
 **接口标题**：用户列表
 
-**功能描述**：获取用户列表（当前无分页/筛选逻辑，直接返回全部用户基础字段）。
+**功能描述**：获取用户列表，支持分页与筛选。
 
 **接口路由**：`POST /users`
 
@@ -192,31 +192,44 @@
 
 **参数（Body）**：
 
-- 无（可传 `{}`，当前不会被使用）
+- `page`（number，可选）：页码（从 1 开始，默认 1）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 100）
+- `keyword`（string，可选）：关键词（对 username/nickname/city 做模糊匹配）
+- `role`（string，可选）：角色（user/admin/moderator）
+- `status`（string，可选）：状态（active/inactive/banned）
 
-**返回值（Success 200）**：数组 `User[]`
+**返回值（Success 200）**：对象
 
-| 字段    | 类型   | 说明           | 示例      |
-| ------- | ------ | -------------- | --------- |
-| code    | string | 状态码         | '0'       |
-| message | string | 状态描述       | 'success' |
-| data    | array  | 数据（User[]） | -         |
+| 字段    | 类型   | 说明                   | 示例      |
+| ------- | ------ | ---------------------- | --------- |
+| code    | string | 状态码                 | '0'       |
+| message | string | 状态描述               | 'success' |
+| data    | object | 数据（UserListResult） | -         |
 
-`data` 字段结构（User[]）：
+`data` 字段结构（UserListResult）：
 
-| 字段             | 类型          | 说明                            | 示例                           |
-| ---------------- | ------------- | ------------------------------- | ------------------------------ |
-| data[].userId    | string        | 用户业务 ID（格式：LD####AAAA） | LD0001ABCD                     |
-| data[].username  | string        | 用户名                          | 张三                           |
-| data[].nickname  | string        | 昵称                            | 三哥                           |
-| data[].avatar    | string        | 头像 URL                        | https://example.com/avatar.png |
-| data[].city      | string        | 所在城市                        | 北京                           |
-| data[].email     | string \ null | 邮箱                            | zhangsan@example.com           |
-| data[].phone     | string \ null | 手机号                          | 13800138000                    |
-| data[].role      | string        | 角色（user/admin/moderator）    | user                           |
-| data[].status    | string        | 状态（active/inactive/banned）  | active                         |
-| data[].createdAt | string        | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00            |
-| data[].updatedAt | string        | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00            |
+| 字段          | 类型   | 说明               | 示例 |
+| ------------- | ------ | ------------------ | ---- |
+| data.list     | array  | 用户列表（User[]） | -    |
+| data.page     | number | 当前页码           | 1    |
+| data.pageSize | number | 每页条数           | 10   |
+| data.total    | number | 总条数             | 100  |
+
+`data.list` 字段结构（User[]）：
+
+| 字段                  | 类型          | 说明                                  | 示例                 |
+| --------------------- | ------------- | ------------------------------------- | -------------------- |
+| data.list[].userId    | string        | 用户业务 ID（格式：LD####AAAA）       | LD0001ABCD           |
+| data.list[].username  | string        | 用户名                                | 张三                 |
+| data.list[].nickname  | string        | 昵称                                  | 三哥                 |
+| data.list[].avatar    | string        | 头像 ID（avatarId，格式：LD####AAAA） | LD0002EFGH           |
+| data.list[].city      | string        | 所在城市                              | 北京                 |
+| data.list[].email     | string \ null | 邮箱                                  | zhangsan@example.com |
+| data.list[].phone     | string \ null | 手机号                                | 13800138000          |
+| data.list[].role      | string        | 角色（user/admin/moderator）          | user                 |
+| data.list[].status    | string        | 状态（active/inactive/banned）        | active               |
+| data.list[].createdAt | string        | 创建时间（YYYY-MM-DD HH:mm:ss）       | 2026-01-10 00:00:00  |
+| data.list[].updatedAt | string        | 更新时间（YYYY-MM-DD HH:mm:ss）       | 2026-01-10 00:00:00  |
 
 ---
 
@@ -246,17 +259,17 @@
 
 `data` 字段结构（User \ null）：
 
-| 字段          | 类型          | 说明                            | 示例                           |
-| ------------- | ------------- | ------------------------------- | ------------------------------ |
-| data.userId   | string        | 用户业务 ID（格式：LD####AAAA） | LD0001ABCD                     |
-| data.username | string        | 用户名                          | 张三                           |
-| data.nickname | string        | 昵称                            | 三哥                           |
-| data.avatar   | string        | 头像 URL                        | https://example.com/avatar.png |
-| data.city     | string        | 所在城市                        | 北京                           |
-| data.email    | string \ null | 邮箱                            | zhangsan@example.com           |
-| data.phone    | string \ null | 手机号                          | 13800138000                    |
-| data.role     | string        | 角色（user/admin/moderator）    | user                           |
-| data.status   | string        | 状态（active/inactive/banned）  | active                         |
+| 字段          | 类型          | 说明                                  | 示例                 |
+| ------------- | ------------- | ------------------------------------- | -------------------- |
+| data.userId   | string        | 用户业务 ID（格式：LD####AAAA）       | LD0001ABCD           |
+| data.username | string        | 用户名                                | 张三                 |
+| data.nickname | string        | 昵称                                  | 三哥                 |
+| data.avatar   | string        | 头像 ID（avatarId，格式：LD####AAAA） | LD0002EFGH           |
+| data.city     | string        | 所在城市                              | 北京                 |
+| data.email    | string \ null | 邮箱                                  | zhangsan@example.com |
+| data.phone    | string \ null | 手机号                                | 13800138000          |
+| data.role     | string        | 角色（user/admin/moderator）          | user                 |
+| data.status   | string        | 状态（active/inactive/banned）        | active               |
 
 ---
 
@@ -286,18 +299,18 @@
 
 `data` 字段结构（User）：
 
-| 字段                    | 类型          | 说明                            | 示例                           |
-| ----------------------- | ------------- | ------------------------------- | ------------------------------ |
-| data.userId             | string        | 用户业务 ID（格式：LD####AAAA） | LD0001ABCD                     |
-| data.username           | string        | 用户名                          | 张三                           |
-| data.nickname           | string        | 昵称                            | 三哥                           |
-| data.avatar             | string        | 头像 URL                        | https://example.com/avatar.png |
-| data.city               | string        | 所在城市                        | 北京                           |
-| data.email              | string \ null | 邮箱                            | zhangsan@example.com           |
-| data.phone              | string \ null | 手机号                          | 13800138000                    |
-| data.role               | string        | 角色（user/admin/moderator）    | user                           |
-| data.status             | string        | 状态（active/inactive/banned）  | active                         |
-| data.mustChangePassword | boolean       | 是否需要改密（首次登录/自举）   | false                          |
+| 字段                    | 类型          | 说明                                  | 示例                 |
+| ----------------------- | ------------- | ------------------------------------- | -------------------- |
+| data.userId             | string        | 用户业务 ID（格式：LD####AAAA）       | LD0001ABCD           |
+| data.username           | string        | 用户名                                | 张三                 |
+| data.nickname           | string        | 昵称                                  | 三哥                 |
+| data.avatar             | string        | 头像 ID（avatarId，格式：LD####AAAA） | LD0002EFGH           |
+| data.city               | string        | 所在城市                              | 北京                 |
+| data.email              | string \ null | 邮箱                                  | zhangsan@example.com |
+| data.phone              | string \ null | 手机号                                | 13800138000          |
+| data.role               | string        | 角色（user/admin/moderator）          | user                 |
+| data.status             | string        | 状态（active/inactive/banned）        | active               |
+| data.mustChangePassword | boolean       | 是否需要改密（首次登录/自举）         | false                |
 
 ---
 
@@ -318,7 +331,7 @@
 - `username`（string，必填）：用户名，长度 3-50
 - `password`（string，必填）：密码，长度 6-100
 - `email`（string \ null，可选）：邮箱
-- `avatar`（string，可选）：头像 URL
+- `avatar`（string，可选）：头像 ID（avatarId，格式：LD####AAAA）
 - `nickname`（string，可选）：昵称
 - `city`（string，可选）：所在城市
 - `phone`（string \ null，可选）：手机号
@@ -335,18 +348,18 @@
 
 `data` 字段结构（User）：
 
-| 字段                    | 类型          | 说明                            | 示例                           |
-| ----------------------- | ------------- | ------------------------------- | ------------------------------ |
-| data.userId             | string        | 用户业务 ID（格式：LD####AAAA） | LD0001ABCD                     |
-| data.username           | string        | 用户名                          | 张三                           |
-| data.nickname           | string        | 昵称                            | 三哥                           |
-| data.avatar             | string        | 头像 URL                        | https://example.com/avatar.png |
-| data.city               | string        | 所在城市                        | 北京                           |
-| data.email              | string \ null | 邮箱                            | zhangsan@example.com           |
-| data.phone              | string \ null | 手机号                          | 13800138000                    |
-| data.role               | string        | 角色（user/admin/moderator）    | user                           |
-| data.status             | string        | 状态（active/inactive/banned）  | active                         |
-| data.mustChangePassword | boolean       | 是否需要改密（首次登录/自举）   | false                          |
+| 字段                    | 类型          | 说明                                  | 示例                 |
+| ----------------------- | ------------- | ------------------------------------- | -------------------- |
+| data.userId             | string        | 用户业务 ID（格式：LD####AAAA）       | LD0001ABCD           |
+| data.username           | string        | 用户名                                | 张三                 |
+| data.nickname           | string        | 昵称                                  | 三哥                 |
+| data.avatar             | string        | 头像 ID（avatarId，格式：LD####AAAA） | LD0002EFGH           |
+| data.city               | string        | 所在城市                              | 北京                 |
+| data.email              | string \ null | 邮箱                                  | zhangsan@example.com |
+| data.phone              | string \ null | 手机号                                | 13800138000          |
+| data.role               | string        | 角色（user/admin/moderator）          | user                 |
+| data.status             | string        | 状态（active/inactive/banned）        | active               |
+| data.mustChangePassword | boolean       | 是否需要改密（首次登录/自举）         | false                |
 
 ---
 
@@ -365,7 +378,7 @@
 **参数（Body）**：
 
 - `userId`（string，必填）：用户业务 ID（格式：LD####AAAA）
-- `avatar`（string，可选）：头像 URL
+- `avatar`（string，可选）：头像 ID（avatarId，格式：LD####AAAA）
 - `nickname`（string，可选）：昵称
 - `city`（string，可选）：所在城市
 - `email`（string，可选）：邮箱
@@ -383,18 +396,18 @@
 
 `data` 字段结构（User）：
 
-| 字段                    | 类型          | 说明                            | 示例                           |
-| ----------------------- | ------------- | ------------------------------- | ------------------------------ |
-| data.userId             | string        | 用户业务 ID（格式：LD####AAAA） | LD0001ABCD                     |
-| data.username           | string        | 用户名                          | 张三                           |
-| data.nickname           | string        | 昵称                            | 三哥                           |
-| data.avatar             | string        | 头像 URL                        | https://example.com/avatar.png |
-| data.city               | string        | 所在城市                        | 北京                           |
-| data.email              | string \ null | 邮箱                            | zhangsan@example.com           |
-| data.phone              | string \ null | 手机号                          | 13800138000                    |
-| data.role               | string        | 角色（user/admin/moderator）    | user                           |
-| data.status             | string        | 状态（active/inactive/banned）  | active                         |
-| data.mustChangePassword | boolean       | 是否需要改密（首次登录/自举）   | false                          |
+| 字段                    | 类型          | 说明                                  | 示例                 |
+| ----------------------- | ------------- | ------------------------------------- | -------------------- |
+| data.userId             | string        | 用户业务 ID（格式：LD####AAAA）       | LD0001ABCD           |
+| data.username           | string        | 用户名                                | 张三                 |
+| data.nickname           | string        | 昵称                                  | 三哥                 |
+| data.avatar             | string        | 头像 ID（avatarId，格式：LD####AAAA） | LD0002EFGH           |
+| data.city               | string        | 所在城市                              | 北京                 |
+| data.email              | string \ null | 邮箱                                  | zhangsan@example.com |
+| data.phone              | string \ null | 手机号                                | 13800138000          |
+| data.role               | string        | 角色（user/admin/moderator）          | user                 |
+| data.status             | string        | 状态（active/inactive/banned）        | active               |
+| data.mustChangePassword | boolean       | 是否需要改密（首次登录/自举）         | false                |
 
 ---
 
@@ -402,7 +415,7 @@
 
 **接口标题**：删除用户
 
-**功能描述**：删除用户（软删除，仅 admin/moderator 可用）。
+**功能描述**：删除用户（软删除，仅 admin/moderator 可用）；删除时会同步清理该用户的车辆与车友绑定记录。
 
 **接口路由**：`POST /users/delete`
 
@@ -463,11 +476,162 @@
 
 ---
 
+## 9.2 获取头像列表（需登录）
+
+**接口标题**：头像列表
+
+**功能描述**：返回系统头像列表（需登录）。普通用户仅返回启用头像；admin/moderator 可通过参数控制是否包含禁用/按启用状态筛选。
+
+**接口路由**：`POST /avatars`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `page`（number，可选）：页码（从 1 开始，默认 1）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 100）
+- `includeDisabled`（boolean，可选，默认 false）：是否包含禁用头像（仅 admin/moderator 生效）
+- `isEnabled`（boolean，可选）：是否启用（仅 admin/moderator 生效；与 includeDisabled 同时使用时以 isEnabled 为准）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                     | 示例      |
+| ------- | ------ | ------------------------ | --------- |
+| code    | string | 状态码                   | '0'       |
+| message | string | 状态描述                 | 'success' |
+| data    | object | 数据（AvatarListResult） | -         |
+
+`data` 字段结构（AvatarListResult）：
+
+| 字段          | 类型   | 说明                 | 示例 |
+| ------------- | ------ | -------------------- | ---- |
+| data.list     | array  | 头像列表（Avatar[]） | -    |
+| data.page     | number | 当前页码             | 1    |
+| data.pageSize | number | 每页条数             | 10   |
+| data.total    | number | 总条数               | 100  |
+
+`data.list` 字段结构（Avatar[]）：
+
+| 字段                    | 类型    | 说明                            | 示例                |
+| ----------------------- | ------- | ------------------------------- | ------------------- |
+| data.list[].avatarId    | string  | 头像业务 ID（格式：LD####AAAA） | LD0002EFGH          |
+| data.list[].imageBase64 | string  | base64 图片内容                 | iVBORw0KGgoAAA...   |
+| data.list[].description | string  | 描述（最长 50）                 | 默认头像-1          |
+| data.list[].isEnabled   | boolean | 是否启用                        | true                |
+| data.list[].createdAt   | string  | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00 |
+| data.list[].updatedAt   | string  | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00 |
+
+---
+
+## 9.3 新增头像（需登录）
+
+**接口标题**：新增头像
+
+**功能描述**：新增一条系统头像记录（仅 admin/moderator 可用）。
+
+**接口路由**：`POST /avatars/create`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `imageBase64`（string，必填）：base64 图片内容
+- `description`（string，可选）：描述（最长 50，默认空字符串）
+- `isEnabled`（boolean，可选）：是否启用（默认 true）
+
+**返回值（Success 201）**：对象 `Avatar`
+
+| 字段    | 类型   | 说明           | 示例      |
+| ------- | ------ | -------------- | --------- |
+| code    | string | 状态码         | '0'       |
+| message | string | 状态描述       | 'success' |
+| data    | object | 数据（Avatar） | -         |
+
+`data` 字段结构（Avatar）：
+
+| 字段             | 类型    | 说明                            | 示例                |
+| ---------------- | ------- | ------------------------------- | ------------------- |
+| data.avatarId    | string  | 头像业务 ID（格式：LD####AAAA） | LD0002EFGH          |
+| data.imageBase64 | string  | base64 图片内容                 | iVBORw0KGgoAAA...   |
+| data.description | string  | 描述（最长 50）                 | 默认头像-1          |
+| data.isEnabled   | boolean | 是否启用                        | true                |
+| data.createdAt   | string  | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00 |
+| data.updatedAt   | string  | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00 |
+
+---
+
+## 9.4 修改头像（需登录）
+
+**接口标题**：修改头像
+
+**功能描述**：更新一条系统头像记录（仅 admin/moderator 可用）。
+
+**接口路由**：`POST /avatars/update`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `avatarId`（string，必填）：头像业务 ID（格式：LD####AAAA）
+- `imageBase64`（string，可选）：base64 图片内容
+- `description`（string，可选）：描述（最长 50）
+- `isEnabled`（boolean，可选）：是否启用
+
+**返回值（Success 200）**：对象 `Avatar`
+
+| 字段    | 类型   | 说明           | 示例      |
+| ------- | ------ | -------------- | --------- |
+| code    | string | 状态码         | '0'       |
+| message | string | 状态描述       | 'success' |
+| data    | object | 数据（Avatar） | -         |
+
+`data` 字段结构（Avatar）：同「9.3 新增头像」
+
+---
+
+## 9.5 删除头像（需登录）
+
+**接口标题**：删除头像
+
+**功能描述**：删除一条系统头像记录（仅 admin/moderator 可用）。
+
+**接口路由**：`POST /avatars/delete`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `avatarId`（string，必填）：头像业务 ID（格式：LD####AAAA）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                 | 示例      |
+| ------- | ------ | -------------------- | --------- |
+| code    | string | 状态码               | '0'       |
+| message | string | 状态描述             | 'success' |
+| data    | object | 数据（DeleteResult） | -         |
+
+`data` 字段结构（DeleteResult）：
+
+| 字段    | 类型    | 说明     | 示例 |
+| ------- | ------- | -------- | ---- |
+| data.ok | boolean | 是否成功 | true |
+
+---
+
 ## 10. 获取车辆列表（需登录）
 
 **接口标题**：车辆列表
 
-**功能描述**：返回当前登录用户的车辆列表（按 token 内 userId 过滤）。
+**功能描述**：返回车辆列表（需登录），默认仅返回启用数据，可通过参数控制是否包含禁用。
 
 **接口路由**：`POST /cars`
 
@@ -477,30 +641,43 @@
 
 **参数（Body）**：
 
-- 无（可传 `{}`，当前不会被使用）
+- `page`（number，可选）：页码（从 1 开始，默认 1）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 100）
+- `includeDisabled`（boolean，可选，默认 false）：是否包含禁用车辆
+- `status`（string，可选）：状态（on_sale/discontinued）
+- `modelKeyword`（string，可选）：车型关键词（对 model 做模糊匹配）
 
-**返回值（Success 200）**：数组 `Car[]`
+**返回值（Success 200）**：对象
 
-| 字段    | 类型   | 说明          | 示例      |
-| ------- | ------ | ------------- | --------- |
-| code    | string | 状态码        | '0'       |
-| message | string | 状态描述      | 'success' |
-| data    | array  | 数据（Car[]） | -         |
+| 字段    | 类型   | 说明                  | 示例      |
+| ------- | ------ | --------------------- | --------- |
+| code    | string | 状态码                | '0'       |
+| message | string | 状态描述              | 'success' |
+| data    | object | 数据（CarListResult） | -         |
 
-`data` 字段结构（Car[]）：
+`data` 字段结构（CarListResult）：
 
-| 字段             | 类型    | 说明                                | 示例                |
-| ---------------- | ------- | ----------------------------------- | ------------------- |
-| data[].carId     | string  | 车辆业务 ID（格式：LD####AAAA）     | LD0002EFGH          |
-| data[].userId    | string  | 归属用户业务 ID（格式：LD####AAAA） | LD0001ABCD          |
-| data[].year      | number  | 年份                                | 2022                |
-| data[].model     | string  | 型号                                | A4L                 |
-| data[].version   | string  | 版本号                              | 2.0T-2022           |
-| data[].status    | string  | 状态（on_sale/discontinued）        | on_sale             |
-| data[].isEnabled | boolean | 是否启用                            | true                |
-| data[].remark    | string  | 备注                                | 试驾车              |
-| data[].createdAt | string  | 创建时间（YYYY-MM-DD HH:mm:ss）     | 2026-01-10 00:00:00 |
-| data[].updatedAt | string  | 更新时间（YYYY-MM-DD HH:mm:ss）     | 2026-01-10 00:00:00 |
+| 字段          | 类型   | 说明              | 示例 |
+| ------------- | ------ | ----------------- | ---- |
+| data.list     | array  | 车辆列表（Car[]） | -    |
+| data.page     | number | 当前页码          | 1    |
+| data.pageSize | number | 每页条数          | 10   |
+| data.total    | number | 总条数            | 100  |
+
+`data.list` 字段结构（Car[]）：
+
+| 字段                  | 类型    | 说明                                | 示例                |
+| --------------------- | ------- | ----------------------------------- | ------------------- |
+| data.list[].carId     | string  | 车辆业务 ID（格式：LD####AAAA）     | LD0002EFGH          |
+| data.list[].userId    | string  | 归属用户业务 ID（格式：LD####AAAA） | LD0001ABCD          |
+| data.list[].year      | number  | 年份                                | 2022                |
+| data.list[].model     | string  | 型号                                | A4L                 |
+| data.list[].version   | string  | 版本号                              | 2.0T-2022           |
+| data.list[].status    | string  | 状态（on_sale/discontinued）        | on_sale             |
+| data.list[].isEnabled | boolean | 是否启用                            | true                |
+| data.list[].remark    | string  | 备注                                | 试驾车              |
+| data.list[].createdAt | string  | 创建时间（YYYY-MM-DD HH:mm:ss）     | 2026-01-10 00:00:00 |
+| data.list[].updatedAt | string  | 更新时间（YYYY-MM-DD HH:mm:ss）     | 2026-01-10 00:00:00 |
 
 ---
 
@@ -508,7 +685,7 @@
 
 **接口标题**：新增车辆
 
-**功能描述**：为当前登录用户新增一条车辆记录。
+**功能描述**：新增一条车辆记录（仅 admin/moderator 可用）。
 
 **接口路由**：`POST /cars/create`
 
@@ -554,7 +731,7 @@
 
 **接口标题**：修改车辆
 
-**功能描述**：更新一条车辆记录（仅允许操作当前登录用户自己的车辆）。
+**功能描述**：更新一条车辆记录（仅 admin/moderator 可用）。
 
 **接口路由**：`POST /cars/update`
 
@@ -601,7 +778,7 @@
 
 **接口标题**：删除车辆
 
-**功能描述**：删除一条车辆记录（物理删除，仅允许操作当前登录用户自己的车辆）。
+**功能描述**：删除一条车辆记录（物理删除，仅 admin/moderator 可用）。
 
 **接口路由**：`POST /cars/delete`
 
@@ -812,7 +989,7 @@
 
 **接口标题**：帖子列表
 
-**功能描述**：获取帖子列表（当前无分页/筛选逻辑，直接返回全部）。
+**功能描述**：获取帖子列表，支持分页与筛选。
 
 **接口路由**：`POST /posts`
 
@@ -822,28 +999,41 @@
 
 **参数（Body）**：
 
-- 无（可传 `{}`，当前不会被使用）
+- `page`（number，可选）：页码（从 1 开始，默认 1）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 100）
+- `status`（string，可选）：状态（draft/published/hidden）
+- `userId`（string，可选）：作者用户业务 ID（格式：LD####AAAA）
+- `carId`（string，可选）：关联车辆业务 ID（格式：LD####AAAA）
 
-**返回值（Success 200）**：数组 `Post[]`
+**返回值（Success 200）**：对象
 
-| 字段    | 类型   | 说明           | 示例      |
-| ------- | ------ | -------------- | --------- |
-| code    | string | 状态码         | '0'       |
-| message | string | 状态描述       | 'success' |
-| data    | array  | 数据（Post[]） | -         |
+| 字段    | 类型   | 说明                   | 示例      |
+| ------- | ------ | ---------------------- | --------- |
+| code    | string | 状态码                 | '0'       |
+| message | string | 状态描述               | 'success' |
+| data    | object | 数据（PostListResult） | -         |
 
-`data` 字段结构（Post[]）：
+`data` 字段结构（PostListResult）：
 
-| 字段             | 类型           | 说明                                | 示例                |
-| ---------------- | -------------- | ----------------------------------- | ------------------- |
-| data[].postId    | string         | 帖子业务 ID（格式：LD####AAAA）     | LD0003IJKL          |
-| data[].userId    | string         | 作者用户业务 ID（格式：LD####AAAA） | LD0001ABCD          |
-| data[].carId     | string \\ null | 关联车辆业务 ID（格式：LD####AAAA） | LD0002EFGH          |
-| data[].title     | string         | 标题                                | 我的第一台车        |
-| data[].content   | string         | 内容                                | ...                 |
-| data[].status    | string         | 状态（draft/published/hidden）      | published           |
-| data[].createdAt | string         | 创建时间（YYYY-MM-DD HH:mm:ss）     | 2026-01-10 00:00:00 |
-| data[].updatedAt | string         | 更新时间（YYYY-MM-DD HH:mm:ss）     | 2026-01-10 00:00:00 |
+| 字段          | 类型   | 说明               | 示例 |
+| ------------- | ------ | ------------------ | ---- |
+| data.list     | array  | 帖子列表（Post[]） | -    |
+| data.page     | number | 当前页码           | 1    |
+| data.pageSize | number | 每页条数           | 10   |
+| data.total    | number | 总条数             | 100  |
+
+`data.list` 字段结构（Post[]）：
+
+| 字段                  | 类型           | 说明                                | 示例                |
+| --------------------- | -------------- | ----------------------------------- | ------------------- |
+| data.list[].postId    | string         | 帖子业务 ID（格式：LD####AAAA）     | LD0003IJKL          |
+| data.list[].userId    | string         | 作者用户业务 ID（格式：LD####AAAA） | LD0001ABCD          |
+| data.list[].carId     | string \\ null | 关联车辆业务 ID（格式：LD####AAAA） | LD0002EFGH          |
+| data.list[].title     | string         | 标题                                | 我的第一台车        |
+| data.list[].content   | string         | 内容                                | ...                 |
+| data.list[].status    | string         | 状态（draft/published/hidden）      | published           |
+| data.list[].createdAt | string         | 创建时间（YYYY-MM-DD HH:mm:ss）     | 2026-01-10 00:00:00 |
+| data.list[].updatedAt | string         | 更新时间（YYYY-MM-DD HH:mm:ss）     | 2026-01-10 00:00:00 |
 
 ---
 
@@ -851,7 +1041,7 @@
 
 **接口标题**：反馈列表
 
-**功能描述**：获取反馈列表（当前无分页/筛选逻辑，按创建时间倒序返回）。
+**功能描述**：获取反馈列表，支持分页与筛选（按创建时间倒序）。
 
 **接口路由**：`POST /feedbacks`
 
@@ -861,31 +1051,44 @@
 
 **参数（Body）**：
 
-- 无（可传 `{}`，当前不会被使用）
+- `page`（number，可选）：页码（从 1 开始，默认 1）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 100）
+- `type`（string，可选）：反馈问题类型
+- `cbyKeyword`（string，可选）：创建人关键词（对 cby 做模糊匹配）
+- `createdAtStart`（string，可选）：开始时间（ISO 字符串，createdAt >=）
 
-**返回值（Success 200）**：数组 `Feedback[]`
+**返回值（Success 200）**：对象
 
-| 字段    | 类型   | 说明               | 示例      |
-| ------- | ------ | ------------------ | --------- |
-| code    | string | 状态码             | '0'       |
-| message | string | 状态描述           | 'success' |
-| data    | array  | 数据（Feedback[]） | -         |
+| 字段    | 类型   | 说明                       | 示例      |
+| ------- | ------ | -------------------------- | --------- |
+| code    | string | 状态码                     | '0'       |
+| message | string | 状态描述                   | 'success' |
+| data    | object | 数据（FeedbackListResult） | -         |
 
-`data` 字段结构（Feedback[]）：
+`data` 字段结构（FeedbackListResult）：
 
-| 字段                       | 类型          | 说明                            | 示例                             |
-| -------------------------- | ------------- | ------------------------------- | -------------------------------- |
-| data[].feedbackId          | string        | 反馈业务 ID（格式：LD####AAAA） | LD0006UVWX                       |
-| data[].cby                 | string        | 用户名（创建人）                | 张三                             |
-| data[].type                | string        | 反馈问题类型                    | bug                              |
-| data[].description         | string        | 反馈描述                        | 页面无法加载                     |
-| data[].contact             | string \ null | 联系方式（可选）                | 13800138000                      |
-| data[].env                 | string        | 环境信息（字符串）              | Windows 11 / Chrome 120          |
-| data[].images              | array         | 图片数组                        | -                                |
-| data[].images[].url        | string        | 图片 base64（或 dataURL）       | data:image/png;base64,iVBORw0... |
-| data[].images[].uploadTime | string        | 上传时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00              |
-| data[].createdAt           | string        | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00              |
-| data[].updatedAt           | string        | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00              |
+| 字段          | 类型   | 说明                   | 示例 |
+| ------------- | ------ | ---------------------- | ---- |
+| data.list     | array  | 反馈列表（Feedback[]） | -    |
+| data.page     | number | 当前页码               | 1    |
+| data.pageSize | number | 每页条数               | 10   |
+| data.total    | number | 总条数                 | 100  |
+
+`data.list` 字段结构（Feedback[]）：
+
+| 字段                            | 类型          | 说明                            | 示例                             |
+| ------------------------------- | ------------- | ------------------------------- | -------------------------------- |
+| data.list[].feedbackId          | string        | 反馈业务 ID（格式：LD####AAAA） | LD0006UVWX                       |
+| data.list[].cby                 | string        | 用户名（创建人）                | 张三                             |
+| data.list[].type                | string        | 反馈问题类型                    | bug                              |
+| data.list[].description         | string        | 反馈描述                        | 页面无法加载                     |
+| data.list[].contact             | string \ null | 联系方式（可选）                | 13800138000                      |
+| data.list[].env                 | string        | 环境信息（字符串）              | Windows 11 / Chrome 120          |
+| data.list[].images              | array         | 图片数组                        | -                                |
+| data.list[].images[].url        | string        | 图片 base64（或 dataURL）       | data:image/png;base64,iVBORw0... |
+| data.list[].images[].uploadTime | string        | 上传时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00              |
+| data.list[].createdAt           | string        | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00              |
+| data.list[].updatedAt           | string        | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00              |
 
 ---
 
@@ -1021,7 +1224,7 @@
 
 **接口标题**：反馈类型列表
 
-**功能描述**：获取反馈类型列表（按创建时间倒序返回）。
+**功能描述**：获取反馈类型列表，支持分页与筛选（按创建时间倒序）。
 
 **接口路由**：`POST /feedback-types`
 
@@ -1031,25 +1234,37 @@
 
 **参数（Body）**：
 
-- 无（可传 `{}`，当前不会被使用）
+- `page`（number，可选）：页码（从 1 开始，默认 1）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 100）
+- `nameKeyword`（string，可选）：类型名关键词（对 name 做模糊匹配）
+- `createdAtStart`（string，可选）：开始时间（ISO 字符串，createdAt >=）
 
-**返回值（Success 200）**：数组 `FeedbackType[]`
+**返回值（Success 200）**：对象
 
-| 字段    | 类型   | 说明                   | 示例      |
-| ------- | ------ | ---------------------- | --------- |
-| code    | string | 状态码                 | '0'       |
-| message | string | 状态描述               | 'success' |
-| data    | array  | 数据（FeedbackType[]） | -         |
+| 字段    | 类型   | 说明                           | 示例      |
+| ------- | ------ | ------------------------------ | --------- |
+| code    | string | 状态码                         | '0'       |
+| message | string | 状态描述                       | 'success' |
+| data    | object | 数据（FeedbackTypeListResult） | -         |
 
-`data` 字段结构（FeedbackType[]）：
+`data` 字段结构（FeedbackTypeListResult）：
 
-| 字段                  | 类型   | 说明                            | 示例                 |
-| --------------------- | ------ | ------------------------------- | -------------------- |
-| data[].feedbackTypeId | string | 类型业务 ID（格式：LD####AAAA） | LD0007YZAB           |
-| data[].name           | string | 类型名                          | BUG 反馈             |
-| data[].description    | string | 类型描述                        | 影响使用的错误与异常 |
-| data[].createdAt      | string | 新增时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00  |
-| data[].updatedAt      | string | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00  |
+| 字段          | 类型   | 说明                       | 示例 |
+| ------------- | ------ | -------------------------- | ---- |
+| data.list     | array  | 类型列表（FeedbackType[]） | -    |
+| data.page     | number | 当前页码                   | 1    |
+| data.pageSize | number | 每页条数                   | 10   |
+| data.total    | number | 总条数                     | 100  |
+
+`data.list` 字段结构（FeedbackType[]）：
+
+| 字段                       | 类型   | 说明                            | 示例                 |
+| -------------------------- | ------ | ------------------------------- | -------------------- |
+| data.list[].feedbackTypeId | string | 类型业务 ID（格式：LD####AAAA） | LD0007YZAB           |
+| data.list[].name           | string | 类型名                          | BUG 反馈             |
+| data.list[].description    | string | 类型描述                        | 影响使用的错误与异常 |
+| data.list[].createdAt      | string | 新增时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00  |
+| data.list[].updatedAt      | string | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00  |
 
 ---
 

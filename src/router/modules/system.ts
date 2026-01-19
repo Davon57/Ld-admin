@@ -14,6 +14,14 @@ export default {
       meta: {
         title: "用户管理"
       }
+    },
+    {
+      path: "/system/avatar",
+      name: "SystemAvatar",
+      component: () => import("@/views/system/avatar/index.vue"),
+      meta: {
+        title: "头像管理"
+      }
     }
   ]
 } satisfies RouteConfigsTable;

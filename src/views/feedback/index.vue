@@ -19,17 +19,18 @@ import type {
 import { addDialog } from "@/components/ReDialog";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { message } from "@/utils/message";
-import { DEFAULT_PAGE_SIZES } from "@/utils/table";
+import { DEFAULT_PAGE_SIZES, isPageData } from "@/utils/table";
 import { useUserStoreHook } from "@/store/modules/user";
 import {
   type FeedbackItem,
   type FeedbackImage,
+  type FeedbackListParams,
   getFeedbackList,
   createFeedback,
   updateFeedback,
   deleteFeedback
 } from "@/api/feedback";
-import { getFeedbackTypeList } from "@/api/feedbackType";
+import { getAllFeedbackTypes } from "@/api/feedbackType";
 import Plus from "~icons/ep/plus";
 
 defineOptions({
@@ -52,6 +53,9 @@ const queryState = reactive<QueryState>({
 
 const loading = ref(false);
 const allRows = ref<FeedbackItem[]>([]);
+const serverRows = ref<FeedbackItem[]>([]);
+const paginationEnabled = ref(false);
+const total = ref(0);
 
 const FEEDBACK_TYPE_STORAGE_KEY = "pureadmin-feedback-types";
 const defaultTypePresetOptions = ["bug", "feature", "complaint", "other"];
@@ -91,7 +95,7 @@ function refreshTypePresetOptions(): void {
 
 async function syncTypePresetOptionsFromServer(): Promise<void> {
   try {
-    const list = await getFeedbackTypeList({});
+    const list = await getAllFeedbackTypes({});
     const names = uniqStringList(list.map(item => item.name));
     localStorage.setItem(FEEDBACK_TYPE_STORAGE_KEY, JSON.stringify(names));
   } catch {
@@ -130,25 +134,41 @@ const filteredRows = computed((): FeedbackItem[] => {
   });
 });
 
-const total = computed((): number => filteredRows.value.length);
+const tableData = computed((): FeedbackItem[] =>
+  paginationEnabled.value ? serverRows.value : filteredRows.value
+);
 
-const tableData = computed((): FeedbackItem[] => {
-  const start = (queryState.page - 1) * queryState.pageSize;
-  const end = start + queryState.pageSize;
-  return filteredRows.value.slice(start, end);
+const listParams = computed((): FeedbackListParams => {
+  const params: FeedbackListParams = {
+    page: queryState.page,
+    pageSize: queryState.pageSize
+  };
+  const keyword = queryState.keyword.trim();
+  const type = queryState.type.trim();
+  if (keyword) params.keyword = keyword;
+  if (type) params.type = type;
+  return params;
 });
 
 async function fetchFeedbacks(): Promise<void> {
   loading.value = true;
   try {
-    const list = await getFeedbackList({});
-    allRows.value = Array.isArray(list) ? list : [];
-    if (queryState.page > 1 && tableData.value.length === 0) {
-      queryState.page = 1;
+    const res = await getFeedbackList(listParams.value);
+    if (isPageData<FeedbackItem>(res)) {
+      paginationEnabled.value = true;
+      serverRows.value = res.list;
+      total.value = res.total;
+      return;
     }
+
+    paginationEnabled.value = false;
+    allRows.value = Array.isArray(res) ? res : [];
   } catch {
     message("网络异常，请稍后重试", { type: "error" });
     allRows.value = [];
+    serverRows.value = [];
+    paginationEnabled.value = false;
+    total.value = 0;
   } finally {
     loading.value = false;
   }
@@ -170,10 +190,12 @@ function onReset(): void {
 function onSizeChange(size: number): void {
   queryState.pageSize = size;
   queryState.page = 1;
+  fetchFeedbacks();
 }
 
 function onCurrentChange(page: number): void {
   queryState.page = page;
+  fetchFeedbacks();
 }
 
 async function readAsDataUrl(file: File): Promise<string> {
@@ -587,7 +609,6 @@ function openFeedbackDialog(mode: FeedbackFormMode, row?: FeedbackItem): void {
           }
           message("新增成功", { type: "success" });
           done();
-          queryState.page = 1;
           fetchFeedbacks();
           return;
         }
@@ -630,7 +651,11 @@ async function onDeleteRow(row: FeedbackItem): Promise<void> {
       return;
     }
     message("删除成功", { type: "success" });
-    if (queryState.page > 1 && tableData.value.length === 1) {
+    if (
+      paginationEnabled.value &&
+      queryState.page > 1 &&
+      tableData.value.length === 1
+    ) {
       queryState.page -= 1;
     }
     fetchFeedbacks();
@@ -766,7 +791,7 @@ fetchFeedbacks();
         </el-table-column>
       </el-table>
 
-      <div class="flex justify-end pt-4">
+      <div v-if="paginationEnabled" class="flex justify-end pt-4">
         <el-pagination
           background
           layout="total, sizes, prev, pager, next, jumper"

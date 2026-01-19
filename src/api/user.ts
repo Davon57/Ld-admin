@@ -1,4 +1,5 @@
 import { http } from "@/utils/http";
+import type { PageData } from "@/utils/table";
 
 export type UserResult = {
   token: string;
@@ -86,16 +87,11 @@ export type UserItem = {
 };
 
 export type UserListParams = {
-  page: number;
-  pageSize: number;
+  page?: number;
+  pageSize?: number;
   keyword?: string;
   status?: UserStatus;
   role?: UserRole;
-};
-
-export type PageResult<T> = {
-  list: T[];
-  total: number;
 };
 
 export type EmptyData = Record<string, never>;
@@ -140,39 +136,12 @@ export const getCurrentUser = (data: Record<string, never> = {}) => {
   return http.request<CurrentUser | null>("post", "/users/me", { data });
 };
 
-function normalizeText(text: string): string {
-  return text.trim().toLowerCase();
-}
-
-function matchKeyword(user: UserItem, keyword: string): boolean {
-  const k = normalizeText(keyword);
-  if (!k) return true;
-  const values = [
-    user.username,
-    user.nickname,
-    user.email,
-    user.phone ?? "",
-    user.city
-  ];
-  return values.some(v => normalizeText(String(v)).includes(k));
-}
+export type UserListResult = UserItem[] | PageData<UserItem>;
 
 export const getUserList = async (
   data: UserListParams
-): Promise<PageResult<UserItem>> => {
-  const users = await http.request<UserItem[]>("post", "/users", { data: {} });
-
-  const filtered = users
-    .filter(u => matchKeyword(u, data.keyword ?? ""))
-    .filter(u => (data.role ? u.role === data.role : true))
-    .filter(u => (data.status ? u.status === data.status : true));
-
-  const page = Math.max(1, Number(data.page || 1));
-  const pageSize = Math.max(1, Number(data.pageSize || 10));
-  const start = (page - 1) * pageSize;
-  const list = filtered.slice(start, start + pageSize);
-
-  return { list, total: filtered.length };
+): Promise<UserListResult> => {
+  return http.request<UserListResult>("post", "/users", { data });
 };
 
 export type CreateUserPayload = {

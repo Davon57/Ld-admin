@@ -1,4 +1,5 @@
 import { http } from "@/utils/http";
+import type { PageData } from "@/utils/table";
 
 export type CarStatus = "on_sale" | "discontinued";
 
@@ -31,6 +32,14 @@ export type OkResult = {
   ok: boolean;
 };
 
+export type GetCarListParams = {
+  includeDisabled?: boolean;
+  page?: number;
+  pageSize?: number;
+};
+
+export type CarListResult = Car[] | PageData<Car>;
+
 type ApiError = {
   error: string;
 };
@@ -42,8 +51,10 @@ function unwrapApiResult<T>(res: T | ApiError): T {
   return res as T;
 }
 
-export const getCarList = async (data: Record<string, never> = {}) => {
-  const res = await http.request<Car[] | ApiError>("post", "/cars", { data });
+export const getCarList = async (data: GetCarListParams = {}) => {
+  const res = await http.request<CarListResult | ApiError>("post", "/cars", {
+    data
+  });
   return unwrapApiResult(res);
 };
 
