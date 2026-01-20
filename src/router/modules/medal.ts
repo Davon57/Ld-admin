@@ -22,6 +22,14 @@ export default {
       meta: {
         title: "勋章列表"
       }
+    },
+    {
+      path: "/medal/grant-log",
+      name: "MedalGrantLog",
+      component: () => import("@/views/medal/grant-log/index.vue"),
+      meta: {
+        title: "发放记录"
+      }
     }
   ]
 } satisfies RouteConfigsTable;

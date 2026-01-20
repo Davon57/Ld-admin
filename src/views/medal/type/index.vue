@@ -4,20 +4,14 @@ import type { FormInstance, FormRules } from "element-plus";
 import { addDialog } from "@/components/ReDialog";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { message } from "@/utils/message";
+import { exportToXlsx, type CsvColumn } from "@/utils/table";
 import {
-  DEFAULT_PAGE_SIZES,
-  exportToXlsx,
-  type CsvColumn
-} from "@/utils/table";
-import {
-  type MedalTypeItem,
-  type Status,
+  type MedalType,
   type MedalTypeListParams,
   getMedalTypeList,
   createMedalType,
   updateMedalType,
-  deleteMedalType,
-  batchDeleteMedalTypes
+  deleteMedalType
 } from "@/api/medal";
 
 defineOptions({
@@ -43,50 +37,50 @@ const spacing = {
   6: "24px"
 } as const;
 
-type StatusOption = { label: string; value: Status };
-const statusOptions: StatusOption[] = [
-  { label: "启用", value: 1 },
-  { label: "禁用", value: 0 }
+const codeTagStyle = {
+  borderColor: colors.primary,
+  color: colors.primary
+} as const;
+
+type EnabledOption = { label: string; value: boolean };
+const enabledOptions: EnabledOption[] = [
+  { label: "启用", value: true },
+  { label: "禁用", value: false }
 ];
 
-const queryState = reactive<
-  Required<Pick<MedalTypeListParams, "page" | "pageSize">> & {
-    keyword: string;
-    status: "" | Status;
-  }
->({
-  page: 1,
-  pageSize: 10,
-  keyword: "",
-  status: ""
+const queryState = reactive<{
+  medalTypeId: string;
+  nameKeyword: string;
+  isEnabled: "" | boolean;
+}>({
+  medalTypeId: "",
+  nameKeyword: "",
+  isEnabled: ""
 });
 
 const loading = ref(false);
-const tableData = ref<MedalTypeItem[]>([]);
-const total = ref(0);
-const selectionIds = ref<number[]>([]);
-
+const tableData = ref<MedalType[]>([]);
 const exporting = ref(false);
 
-const exportColumns: CsvColumn<MedalTypeItem>[] = [
+const exportColumns: CsvColumn<MedalType>[] = [
+  { label: "编码", key: "medalTypeId" },
   { label: "名称", key: "name" },
-  { label: "标识", key: "code" },
+  { label: "描述", key: "description" },
   {
     label: "状态",
-    key: "status",
-    format: (_value, row) => (row.status === 1 ? "启用" : "禁用")
+    key: "isEnabled",
+    format: (_value, row) => (row.isEnabled ? "启用" : "禁用")
   },
-  { label: "创建时间", key: "createdAt" }
+  { label: "修改时间", key: "updatedAt" }
 ];
 
 const listParams = computed((): MedalTypeListParams => {
-  const params: MedalTypeListParams = {
-    page: queryState.page,
-    pageSize: queryState.pageSize
-  };
-  const keyword = queryState.keyword.trim();
-  if (keyword) params.keyword = keyword;
-  if (queryState.status !== "") params.status = queryState.status;
+  const params: MedalTypeListParams = {};
+  const id = queryState.medalTypeId.trim();
+  const keyword = queryState.nameKeyword.trim();
+  if (id) params.medalTypeId = id;
+  if (keyword) params.nameKeyword = keyword;
+  if (queryState.isEnabled !== "") params.isEnabled = queryState.isEnabled;
   return params;
 });
 
@@ -95,41 +89,22 @@ async function fetchTypes(): Promise<void> {
   try {
     const res = await getMedalTypeList(listParams.value);
     tableData.value = res.list;
-    total.value = res.total;
   } catch {
     tableData.value = [];
-    total.value = 0;
   } finally {
     loading.value = false;
   }
 }
 
 function onSearch(): void {
-  queryState.page = 1;
   fetchTypes();
 }
 
 function onReset(): void {
-  queryState.page = 1;
-  queryState.pageSize = 10;
-  queryState.keyword = "";
-  queryState.status = "";
+  queryState.medalTypeId = "";
+  queryState.nameKeyword = "";
+  queryState.isEnabled = "";
   fetchTypes();
-}
-
-function onSizeChange(size: number): void {
-  queryState.pageSize = size;
-  queryState.page = 1;
-  fetchTypes();
-}
-
-function onCurrentChange(page: number): void {
-  queryState.page = page;
-  fetchTypes();
-}
-
-function onSelectionChange(rows: MedalTypeItem[]): void {
-  selectionIds.value = rows.map(r => r.id);
 }
 
 async function onExportList(): Promise<void> {
@@ -139,7 +114,7 @@ async function onExportList(): Promise<void> {
   }
   exporting.value = true;
   try {
-    await exportToXlsx(tableData.value, exportColumns, "类型列表");
+    await exportToXlsx(tableData.value, exportColumns, "勋章类型列表");
   } catch {
     message("导出失败", { type: "error" });
   } finally {
@@ -150,24 +125,24 @@ async function onExportList(): Promise<void> {
 type TypeFormMode = "create" | "edit";
 
 type TypeFormModel = {
-  id?: number;
+  medalTypeId?: string;
   name: string;
-  code: string;
-  status: Status;
+  description: string;
+  isEnabled: boolean;
 };
 
 const typeFormRules: FormRules<TypeFormModel> = {
   name: [{ required: true, message: "请输入类型名称", trigger: "blur" }],
-  status: [{ required: true, message: "请选择状态", trigger: "change" }]
+  isEnabled: [{ required: true, message: "请选择状态", trigger: "change" }]
 };
 
-function openTypeDialog(mode: TypeFormMode, row?: MedalTypeItem): void {
+function openTypeDialog(mode: TypeFormMode, row?: MedalType): void {
   const formRef = ref<FormInstance>();
   const model = reactive<TypeFormModel>({
-    id: mode === "edit" ? row?.id : undefined,
+    medalTypeId: mode === "edit" ? row?.medalTypeId : undefined,
     name: mode === "edit" ? (row?.name ?? "") : "",
-    code: mode === "edit" ? (row?.code ?? "") : "",
-    status: mode === "edit" ? (row?.status ?? 1) : 1
+    description: mode === "edit" ? (row?.description ?? "") : "",
+    isEnabled: mode === "edit" ? (row?.isEnabled ?? true) : true
   });
 
   const TypeFormDialog = defineComponent({
@@ -184,24 +159,27 @@ function openTypeDialog(mode: TypeFormMode, row?: MedalTypeItem): void {
           rules={typeFormRules}
           label-width="90px"
         >
+          {mode === "edit" ? (
+            <el-form-item label="编码">
+              <el-input model-value={model.medalTypeId ?? ""} disabled />
+            </el-form-item>
+          ) : null}
           <el-form-item label="名称" prop="name">
+            <el-input v-model={model.name} placeholder="例如：新手" clearable />
+          </el-form-item>
+          <el-form-item label="描述" prop="description">
             <el-input
-              v-model={model.name}
-              placeholder="例如：OTA升级"
-              clearable
+              v-model={model.description}
+              type="textarea"
+              rows={5}
+              resize="vertical"
+              placeholder="可选"
             />
           </el-form-item>
-          <el-form-item label="标识" prop="code">
-            <el-input
-              v-model={model.code}
-              placeholder="例如：ota（留空将自动使用名称）"
-              clearable
-            />
-          </el-form-item>
-          <el-form-item label="状态" prop="status">
+          <el-form-item label="状态" prop="isEnabled">
             <el-segmented
-              v-model={model.status}
-              options={statusOptions.map(s => ({
+              v-model={model.isEnabled}
+              options={enabledOptions.map(s => ({
                 label: s.label,
                 value: s.value
               }))}
@@ -213,7 +191,7 @@ function openTypeDialog(mode: TypeFormMode, row?: MedalTypeItem): void {
   });
 
   addDialog({
-    title: mode === "create" ? "新增类型" : "编辑类型",
+    title: mode === "create" ? "新增勋章类型" : "编辑勋章类型",
     width: "640px",
     fullscreenIcon: true,
     sureBtnLoading: true,
@@ -222,33 +200,32 @@ function openTypeDialog(mode: TypeFormMode, row?: MedalTypeItem): void {
     beforeSure: async (done, { closeLoading }) => {
       try {
         await formRef.value?.validate();
-
         const name = model.name.trim();
-        const code = model.code.trim() || name;
+        const description = model.description.trim();
 
         if (mode === "create") {
           await createMedalType({
             name,
-            code,
-            status: model.status
+            description: description ? description : undefined,
+            isEnabled: model.isEnabled
           });
           done();
-          queryState.page = 1;
           fetchTypes();
           return;
         }
 
-        if (!model.id) {
+        const medalTypeId = model.medalTypeId?.trim() ?? "";
+        if (!medalTypeId) {
           message("类型信息异常", { type: "error" });
           closeLoading();
           return;
         }
 
         await updateMedalType({
-          id: model.id,
+          medalTypeId,
           name,
-          code,
-          status: model.status
+          description: description ? description : undefined,
+          isEnabled: model.isEnabled
         });
         done();
         fetchTypes();
@@ -259,57 +236,11 @@ function openTypeDialog(mode: TypeFormMode, row?: MedalTypeItem): void {
   });
 }
 
-async function onDeleteRow(row: MedalTypeItem): Promise<void> {
+async function onDeleteRow(row: MedalType): Promise<void> {
   try {
-    await deleteMedalType({ id: row.id });
-    if (queryState.page > 1 && tableData.value.length === 1) {
-      queryState.page -= 1;
-    }
+    await deleteMedalType({ medalTypeId: row.medalTypeId });
     fetchTypes();
   } catch {}
-}
-
-async function onBatchDelete(): Promise<void> {
-  if (selectionIds.value.length === 0) {
-    message("请选择要删除的类型", { type: "warning" });
-    return;
-  }
-
-  const deletingCount = selectionIds.value.length;
-  const currentRows = tableData.value.length;
-
-  const BatchDeleteContent = defineComponent({
-    name: "MedalTypeBatchDeleteContent",
-    setup() {
-      return () => (
-        <div class="text-[14px] leading-6">
-          确认删除选中的 {deletingCount} 个类型？
-        </div>
-      );
-    }
-  });
-
-  addDialog({
-    title: "批量删除",
-    width: "420px",
-    closeOnClickModal: false,
-    sureBtnLoading: true,
-    contentRenderer: () => h(BatchDeleteContent),
-    beforeSure: async (done, { closeLoading }) => {
-      try {
-        const ids = [...selectionIds.value];
-        await batchDeleteMedalTypes({ ids });
-        done();
-        if (queryState.page > 1 && deletingCount >= currentRows) {
-          queryState.page -= 1;
-        }
-        selectionIds.value = [];
-        fetchTypes();
-      } catch {
-        closeLoading();
-      }
-    }
-  });
 }
 
 fetchTypes();
@@ -327,26 +258,39 @@ fetchTypes();
             padding: `${spacing[1]} ${spacing[2]}`
           }"
         >
-          类型用于区分不同业务场景的勋章（如OTA升级、发文章、提问）
+          类型用于对勋章做分组（如活动/成长/运营），便于筛选与管理
         </span>
       </div>
 
       <el-form inline>
-        <el-form-item label="关键词">
+        <el-form-item label="类型编码">
           <el-input
-            v-model="queryState.keyword"
-            placeholder="名称/标识"
+            v-model="queryState.medalTypeId"
+            placeholder="例如：LD0001ABCD"
+            clearable
+            class="w-[240px]!"
+            @keyup.enter="onSearch"
+          />
+        </el-form-item>
+        <el-form-item label="名称关键词">
+          <el-input
+            v-model="queryState.nameKeyword"
+            placeholder="例如：新手"
             clearable
             class="w-[240px]!"
             @keyup.enter="onSearch"
           />
         </el-form-item>
         <el-form-item label="状态">
-          <el-select v-model="queryState.status" clearable class="w-[160px]!">
+          <el-select
+            v-model="queryState.isEnabled"
+            clearable
+            class="w-[160px]!"
+          >
             <el-option label="全部" value="" />
             <el-option
-              v-for="opt in statusOptions"
-              :key="opt.value"
+              v-for="opt in enabledOptions"
+              :key="String(opt.value)"
               :label="opt.label"
               :value="opt.value"
             />
@@ -373,38 +317,36 @@ fetchTypes();
           >
             导出列表
           </el-button>
-          <el-button type="danger" plain @click="onBatchDelete">
-            批量删除
-          </el-button>
         </el-space>
       </template>
 
       <el-table
         :data="tableData"
         :loading="loading"
-        row-key="id"
+        row-key="medalTypeId"
         class="w-full"
-        @selection-change="onSelectionChange"
       >
-        <el-table-column type="selection" width="46" />
-        <el-table-column prop="name" label="名称" min-width="160" />
-        <el-table-column prop="code" label="标识" min-width="140">
+        <el-table-column prop="medalTypeId" label="编码" min-width="140">
           <template #default="{ row }">
-            <el-tag
-              :style="{ borderColor: colors.primary, color: colors.primary }"
-              effect="plain"
-            >
-              {{ row.code }}
+            <el-tag :style="codeTagStyle" effect="plain">
+              {{ row.medalTypeId }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="status" label="状态" width="90">
+        <el-table-column prop="name" label="名称" min-width="160" />
+        <el-table-column
+          prop="description"
+          label="描述"
+          min-width="280"
+          show-overflow-tooltip
+        />
+        <el-table-column prop="isEnabled" label="状态" width="90">
           <template #default="{ row }">
-            <el-tag v-if="row.status === 1" type="success">启用</el-tag>
+            <el-tag v-if="row.isEnabled" type="success">启用</el-tag>
             <el-tag v-else type="info">禁用</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createdAt" label="创建时间" min-width="170" />
+        <el-table-column prop="updatedAt" label="修改时间" min-width="170" />
         <el-table-column label="操作" fixed="right" width="160">
           <template #default="{ row }">
             <el-space>
@@ -430,19 +372,6 @@ fetchTypes();
           </template>
         </el-table-column>
       </el-table>
-
-      <div class="flex justify-end pt-4">
-        <el-pagination
-          background
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="total"
-          :current-page="queryState.page"
-          :page-size="queryState.pageSize"
-          :page-sizes="DEFAULT_PAGE_SIZES"
-          @size-change="onSizeChange"
-          @current-change="onCurrentChange"
-        />
-      </div>
     </PureTableBar>
   </div>
 </template>

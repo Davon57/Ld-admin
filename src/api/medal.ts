@@ -1,137 +1,189 @@
 import { http } from "@/utils/http";
+import type { PageData } from "@/utils/table";
 
-export type Status = 0 | 1;
-
-export type EmptyData = Record<string, never>;
-
-export type PageResult<T> = {
-  list: T[];
-  total: number;
+export type DeleteResult = {
+  ok: boolean;
 };
 
-export type MedalTypeItem = {
-  id: number;
+export type MedalType = {
+  id: string;
+  medalTypeId: string;
   name: string;
-  code: string;
-  status: Status;
-  createdAt: string;
-};
-
-export type MedalItem = {
-  id: number;
-  typeId: number;
-  name: string;
-  code: string;
   description: string;
-  status: Status;
-  createdAt: string;
+  isEnabled: boolean;
+  updatedAt: string;
 };
 
 export type MedalTypeListParams = {
-  page: number;
-  pageSize: number;
-  keyword?: string;
-  status?: Status;
+  medalTypeId?: string;
+  nameKeyword?: string;
+  isEnabled?: boolean;
 };
 
-export type MedalItemListParams = {
-  page: number;
-  pageSize: number;
-  keyword?: string;
-  status?: Status;
-  typeId?: number;
+export type MedalTypeListResult = {
+  list: MedalType[];
 };
 
-export type CreateMedalTypePayload = Omit<MedalTypeItem, "id" | "createdAt">;
+export type CreateMedalTypePayload = {
+  name: string;
+  description?: string;
+  isEnabled?: boolean;
+};
 
-export type UpdateMedalTypePayload = Pick<MedalTypeItem, "id"> &
-  Partial<Omit<MedalTypeItem, "id" | "createdAt">>;
+export type UpdateMedalTypePayload = {
+  medalTypeId: string;
+  name?: string;
+  description?: string;
+  isEnabled?: boolean;
+};
 
-export const getMedalTypeList = (data: MedalTypeListParams) => {
-  return http.request<PageResult<MedalTypeItem>>("post", "/medal/type/list", {
-    data
-  });
+export const getMedalTypeList = (data: MedalTypeListParams = {}) => {
+  return http.request<MedalTypeListResult>("post", "/medal-types", { data });
 };
 
 export const createMedalType = (data: CreateMedalTypePayload) => {
-  return http.request<MedalTypeItem | EmptyData>(
+  return http.request<MedalType>(
     "post",
-    "/medal/type/create",
+    "/medal-types/create",
     { data },
     { showSuccessMessage: true }
   );
 };
 
 export const updateMedalType = (data: UpdateMedalTypePayload) => {
-  return http.request<MedalTypeItem | EmptyData>(
+  return http.request<MedalType>(
     "post",
-    "/medal/type/update",
+    "/medal-types/update",
     { data },
     { showSuccessMessage: true }
   );
 };
 
-export const deleteMedalType = (data: { id: number }) => {
-  return http.request<EmptyData>(
+export const deleteMedalType = (data: { medalTypeId: string }) => {
+  return http.request<DeleteResult>(
     "post",
-    "/medal/type/delete",
+    "/medal-types/delete",
     { data },
     { showSuccessMessage: true }
   );
 };
 
-export const batchDeleteMedalTypes = (data: { ids: number[] }) => {
-  return http.request<EmptyData>(
+export type Medal = {
+  id: string;
+  medalId: string;
+  medalTypeId: string;
+  name: string;
+  description: string;
+  iconBase64: string;
+  isEnabled: boolean;
+  updatedAt: string;
+};
+
+export type MedalListParams = {
+  page?: number;
+  pageSize?: number;
+  medalTypeId?: string;
+  nameKeyword?: string;
+  isEnabled?: boolean;
+};
+
+export type CreateMedalPayload = {
+  medalTypeId: string;
+  name: string;
+  description?: string;
+  iconBase64: string;
+  isEnabled?: boolean;
+};
+
+export type UpdateMedalPayload = {
+  medalId: string;
+  medalTypeId?: string;
+  name?: string;
+  description?: string;
+  iconBase64?: string;
+  isEnabled?: boolean;
+};
+
+export const getMedalList = (data: MedalListParams) => {
+  return http.request<PageData<Medal>>("post", "/medals", { data });
+};
+
+export const createMedal = (data: CreateMedalPayload) => {
+  return http.request<Medal>(
     "post",
-    "/medal/type/batchDelete",
+    "/medals/create",
     { data },
-    { showSuccessMessage: true }
+    {
+      showSuccessMessage: true
+    }
   );
 };
 
-export type CreateMedalItemPayload = Omit<MedalItem, "id" | "createdAt">;
+export const updateMedal = (data: UpdateMedalPayload) => {
+  return http.request<Medal>(
+    "post",
+    "/medals/update",
+    { data },
+    {
+      showSuccessMessage: true
+    }
+  );
+};
 
-export type UpdateMedalItemPayload = Pick<MedalItem, "id"> &
-  Partial<Omit<MedalItem, "id" | "createdAt">>;
+export const deleteMedal = (data: { medalId: string }) => {
+  return http.request<DeleteResult>(
+    "post",
+    "/medals/delete",
+    { data },
+    {
+      showSuccessMessage: true
+    }
+  );
+};
 
-export const getMedalItemList = (data: MedalItemListParams) => {
-  return http.request<PageResult<MedalItem>>("post", "/medal/item/list", {
+export type GrantMedalPayload = {
+  userId: string;
+  medalId: string;
+  reason?: string;
+};
+
+export type GrantResult = {
+  ok: boolean;
+  granted: boolean;
+  alreadyOwned: boolean;
+};
+
+export const grantMedal = (data: GrantMedalPayload) => {
+  return http.request<GrantResult>(
+    "post",
+    "/medals/grant",
+    { data },
+    {
+      showSuccessMessage: true
+    }
+  );
+};
+
+export type MedalGrantLog = {
+  id: string;
+  userId: string;
+  medalId: string;
+  operatorUserId: string | null;
+  sourceType: string;
+  reason: string;
+  createdAt: string;
+};
+
+export type MedalGrantLogListParams = {
+  page?: number;
+  pageSize?: number;
+  userId?: string;
+  medalId?: string;
+  sourceType?: string;
+};
+
+export const getMedalGrantLogs = (data: MedalGrantLogListParams) => {
+  return http.request<PageData<MedalGrantLog>>("post", "/medal-grant-logs", {
     data
   });
-};
-
-export const createMedalItem = (data: CreateMedalItemPayload) => {
-  return http.request<MedalItem | EmptyData>(
-    "post",
-    "/medal/item/create",
-    { data },
-    { showSuccessMessage: true }
-  );
-};
-
-export const updateMedalItem = (data: UpdateMedalItemPayload) => {
-  return http.request<MedalItem | EmptyData>(
-    "post",
-    "/medal/item/update",
-    { data },
-    { showSuccessMessage: true }
-  );
-};
-
-export const deleteMedalItem = (data: { id: number }) => {
-  return http.request<EmptyData>(
-    "post",
-    "/medal/item/delete",
-    { data },
-    { showSuccessMessage: true }
-  );
-};
-
-export const batchDeleteMedalItems = (data: { ids: number[] }) => {
-  return http.request<EmptyData>(
-    "post",
-    "/medal/item/batchDelete",
-    { data },
-    { showSuccessMessage: true }
-  );
 };

@@ -19,6 +19,7 @@ import type {
 import { addDialog } from "@/components/ReDialog";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { message } from "@/utils/message";
+import { compressImageToDataUrl } from "@/utils/image";
 import { DEFAULT_PAGE_SIZES, isPageData } from "@/utils/table";
 import { useUserStoreHook } from "@/store/modules/user";
 import {
@@ -196,134 +197,6 @@ function onSizeChange(size: number): void {
 function onCurrentChange(page: number): void {
   queryState.page = page;
   fetchFeedbacks();
-}
-
-async function readAsDataUrl(file: File): Promise<string> {
-  return await new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === "string") resolve(reader.result);
-      else reject(new Error("Invalid file result"));
-    };
-    reader.onerror = () => reject(new Error("Read file failed"));
-    reader.readAsDataURL(file);
-  });
-}
-
-async function blobToDataUrl(blob: Blob): Promise<string> {
-  return await new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === "string") resolve(reader.result);
-      else reject(new Error("Invalid blob result"));
-    };
-    reader.onerror = () => reject(new Error("Read blob failed"));
-    reader.readAsDataURL(blob);
-  });
-}
-
-async function loadImageBitmap(
-  file: File
-): Promise<
-  | { kind: "bitmap"; bitmap: ImageBitmap; width: number; height: number }
-  | { kind: "img"; img: HTMLImageElement; width: number; height: number }
-> {
-  if (typeof createImageBitmap === "function") {
-    try {
-      const bitmap = await createImageBitmap(file);
-      return {
-        kind: "bitmap",
-        bitmap,
-        width: bitmap.width,
-        height: bitmap.height
-      };
-    } catch {}
-  }
-
-  const objectUrl = URL.createObjectURL(file);
-  try {
-    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
-      const el = new Image();
-      el.onload = () => resolve(el);
-      el.onerror = () => reject(new Error("Load image failed"));
-      el.src = objectUrl;
-    });
-    return {
-      kind: "img",
-      img,
-      width: img.naturalWidth,
-      height: img.naturalHeight
-    };
-  } finally {
-    URL.revokeObjectURL(objectUrl);
-  }
-}
-
-async function canvasToBlob(
-  canvas: HTMLCanvasElement,
-  mimeType: string,
-  quality?: number
-): Promise<Blob | null> {
-  return await new Promise(resolve => {
-    canvas.toBlob(
-      blob => resolve(blob),
-      mimeType,
-      typeof quality === "number" ? quality : undefined
-    );
-  });
-}
-
-async function compressImageToDataUrl(file: File): Promise<string> {
-  if (!file.type.startsWith("image/")) return await readAsDataUrl(file);
-
-  const maxWidth = 1600;
-  const maxHeight = 1600;
-  const maxBytes = 350 * 1024;
-  const qualityStart = 0.82;
-  const qualityMin = 0.55;
-  const qualityStep = 0.07;
-
-  const source = await loadImageBitmap(file);
-  const scale = Math.min(
-    1,
-    maxWidth / Math.max(1, source.width),
-    maxHeight / Math.max(1, source.height)
-  );
-  const targetWidth = Math.max(1, Math.round(source.width * scale));
-  const targetHeight = Math.max(1, Math.round(source.height * scale));
-
-  const canvas = document.createElement("canvas");
-  canvas.width = targetWidth;
-  canvas.height = targetHeight;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return await readAsDataUrl(file);
-
-  if (source.kind === "bitmap") {
-    ctx.drawImage(source.bitmap, 0, 0, targetWidth, targetHeight);
-    if (typeof source.bitmap.close === "function") source.bitmap.close();
-  } else {
-    ctx.drawImage(source.img, 0, 0, targetWidth, targetHeight);
-  }
-
-  let mimeType = "image/webp";
-  let quality = qualityStart;
-  let blob = await canvasToBlob(canvas, mimeType, quality);
-
-  if (!blob) {
-    mimeType = "image/jpeg";
-    blob = await canvasToBlob(canvas, mimeType, quality);
-  }
-
-  if (!blob) return await readAsDataUrl(file);
-
-  while (blob.size > maxBytes && quality > qualityMin) {
-    quality = Math.max(qualityMin, quality - qualityStep);
-    const next = await canvasToBlob(canvas, mimeType, quality);
-    if (!next) break;
-    blob = next;
-  }
-
-  return await blobToDataUrl(blob);
 }
 
 type FeedbackFormMode = "create" | "edit";
