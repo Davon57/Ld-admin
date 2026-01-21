@@ -83,11 +83,13 @@ export type QaQuestionItem = {
   id: string;
   qaQuestionId: string;
   authorUserId: string;
+  nickname?: string;
   title: string;
   description: string;
   images: string[];
   tagIds: string[];
   likeCount: number;
+  isLiked?: boolean;
   answerCount: number;
   viewCount: number;
   acceptedAnswerId: string | null;
@@ -200,18 +202,25 @@ export type QaAnswerItem = {
   qaAnswerId: string;
   qaQuestionId: string;
   authorUserId: string;
+  nickname?: string;
   content: string;
   likeCount: number;
+  isLiked?: boolean;
   isAccepted: boolean;
   acceptedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  modifiedAt?: string | null;
+  parentQaAnswerId?: string | null;
+  rootQaAnswerId?: string | null;
+  replyCount?: number;
 };
 
 export type QaAnswerListParams = {
   page?: number;
   pageSize?: number;
   qaQuestionId: string;
+  rootQaAnswerId?: string;
 };
 
 export type QaAnswerListResult = {

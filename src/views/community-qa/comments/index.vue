@@ -12,11 +12,12 @@ import type { FormInstance, FormRules } from "element-plus";
 import { addDialog } from "@/components/ReDialog";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { message } from "@/utils/message";
-import { DEFAULT_PAGE_SIZES, isPageData } from "@/utils/table";
+import { isPageData } from "@/utils/table";
 import {
   type QaQuestionItem,
   type QaAnswerItem,
   getQaQuestionList,
+  getQaQuestionDetail,
   getQaAnswerList,
   updateQaAnswer,
   deleteQaAnswer
@@ -42,6 +43,19 @@ const questionOptions = ref<QaQuestionItem[]>([]);
 const tableData = ref<QaAnswerItem[]>([]);
 const total = ref(0);
 
+const threadDialogVisible = ref(false);
+const threadLoading = ref(false);
+const activeRootAnswer = ref<QaAnswerItem | null>(null);
+const threadTableData = ref<QaAnswerItem[]>([]);
+const threadTotal = ref(0);
+const activeQuestionAuthor = ref<string | null>(null);
+
+const QA_ANSWER_PAGE_SIZES = [10, 20, 50, 100];
+const threadQueryState = reactive({
+  page: 1,
+  pageSize: 20
+});
+
 type AnswerEditFormModel = {
   qaAnswerId: string;
   content: string;
@@ -58,6 +72,35 @@ const listParams = computed(() => {
     qaQuestionId: queryState.qaQuestionId
   };
 });
+
+const questionTitleMap = computed((): Map<string, string> => {
+  return new Map(questionOptions.value.map(q => [q.qaQuestionId, q.title]));
+});
+
+function getQuestionTitle(qaQuestionId: string): string {
+  return questionTitleMap.value.get(qaQuestionId) ?? "-";
+}
+
+function getDisplayName(name?: string | null): string {
+  const n = (name ?? "").trim();
+  return n ? n : "未设置";
+}
+
+function getReplyLogic(row: QaAnswerItem): string {
+  const root = activeRootAnswer.value;
+  if (!root) return "-";
+
+  const from = getDisplayName(row.nickname);
+  const rootAuthor = getDisplayName(root.nickname);
+  const parentId = row.parentQaAnswerId;
+
+  if (!parentId) return `${from} 回复 ${rootAuthor}`;
+  if (parentId === root.qaAnswerId) return `${from} 回复 ${rootAuthor}`;
+
+  const parent = threadTableData.value.find(r => r.qaAnswerId === parentId);
+  const to = parent ? getDisplayName(parent.nickname) : "未知";
+  return `${from} 回复 ${to}`;
+}
 
 async function fetchQuestions(): Promise<void> {
   questionLoading.value = true;
@@ -93,6 +136,76 @@ async function fetchComments(): Promise<void> {
   } finally {
     loading.value = false;
   }
+}
+
+async function fetchThreadReplies(): Promise<void> {
+  const root = activeRootAnswer.value;
+  if (!root) return;
+
+  threadLoading.value = true;
+  try {
+    const res = await getQaAnswerList({
+      qaQuestionId: root.qaQuestionId,
+      rootQaAnswerId: root.qaAnswerId,
+      page: threadQueryState.page,
+      pageSize: Math.min(threadQueryState.pageSize, 100)
+    });
+    threadTableData.value = res.list;
+    threadTotal.value = res.total;
+  } catch {
+    threadTableData.value = [];
+    threadTotal.value = 0;
+  } finally {
+    threadLoading.value = false;
+  }
+}
+
+function openThreadDialog(row: QaAnswerItem): void {
+  activeRootAnswer.value = row;
+  threadQueryState.page = 1;
+  threadQueryState.pageSize = 20;
+  threadDialogVisible.value = true;
+  activeQuestionAuthor.value = null;
+  getQaQuestionDetail({ qaQuestionId: row.qaQuestionId })
+    .then(res => {
+      activeQuestionAuthor.value = res.question.nickname ?? "";
+    })
+    .catch(() => {
+      activeQuestionAuthor.value = null;
+    });
+  fetchThreadReplies();
+}
+
+function onThreadClose(): void {
+  threadDialogVisible.value = false;
+  activeRootAnswer.value = null;
+  threadTableData.value = [];
+  threadTotal.value = 0;
+  threadQueryState.page = 1;
+  threadQueryState.pageSize = 20;
+  activeQuestionAuthor.value = null;
+}
+
+function onThreadSizeChange(size: number): void {
+  threadQueryState.pageSize = Math.min(size, 100);
+  threadQueryState.page = 1;
+  fetchThreadReplies();
+}
+
+function onThreadCurrentChange(page: number): void {
+  threadQueryState.page = page;
+  fetchThreadReplies();
+}
+
+async function onDeleteThreadReply(row: QaAnswerItem): Promise<void> {
+  try {
+    await deleteQaAnswer({ qaAnswerId: row.qaAnswerId });
+    if (threadQueryState.page > 1 && threadTableData.value.length === 1) {
+      threadQueryState.page -= 1;
+    }
+    fetchThreadReplies();
+    fetchComments();
+  } catch {}
 }
 
 function openAnswerEditDialog(row: QaAnswerItem): void {
@@ -196,7 +309,7 @@ function onQuestionChange(): void {
 }
 
 function onSizeChange(size: number): void {
-  queryState.pageSize = size;
+  queryState.pageSize = Math.min(size, 100);
   queryState.page = 1;
   fetchComments();
 }
@@ -251,11 +364,11 @@ onMounted(() => {
       >
         <el-table-column prop="qaAnswerId" label="评论ID" min-width="140" />
         <el-table-column prop="qaQuestionId" label="问题ID" min-width="140" />
-        <el-table-column
-          prop="authorUserId"
-          label="作者用户ID"
-          min-width="140"
-        />
+        <el-table-column label="作者昵称" min-width="140">
+          <template #default="{ row }">
+            {{ getDisplayName(row.nickname) }}
+          </template>
+        </el-table-column>
         <el-table-column
           prop="content"
           label="内容"
@@ -272,9 +385,12 @@ onMounted(() => {
         <el-table-column prop="acceptedAt" label="采纳时间" min-width="170" />
         <el-table-column prop="createdAt" label="创建时间" min-width="170" />
         <el-table-column prop="updatedAt" label="更新时间" min-width="170" />
-        <el-table-column label="操作" fixed="right" width="160">
+        <el-table-column label="操作" fixed="right" width="220">
           <template #default="{ row }">
             <el-space>
+              <el-button link type="primary" @click="openThreadDialog(row)">
+                查看详情
+              </el-button>
               <el-button link type="primary" @click="openAnswerEditDialog(row)">
                 编辑
               </el-button>
@@ -301,11 +417,131 @@ onMounted(() => {
           :total="total"
           :current-page="queryState.page"
           :page-size="queryState.pageSize"
-          :page-sizes="DEFAULT_PAGE_SIZES"
+          :page-sizes="QA_ANSWER_PAGE_SIZES"
           @size-change="onSizeChange"
           @current-change="onCurrentChange"
         />
       </div>
     </PureTableBar>
+
+    <el-dialog
+      v-model="threadDialogVisible"
+      width="1160px"
+      align-center
+      destroy-on-close
+      :close-on-click-modal="false"
+      @closed="onThreadClose"
+    >
+      <template #header>
+        <div class="flex items-center justify-between">
+          <div class="min-w-0">
+            <div class="truncate text-[14px] font-medium">回复详情</div>
+            <div
+              v-if="activeRootAnswer"
+              class="truncate text-[12px] text-[var(--el-text-color-secondary)]"
+            >
+              问题：{{ getQuestionTitle(activeRootAnswer.qaQuestionId) }}
+              <span class="mx-1">·</span>
+              问题作者：{{ getDisplayName(activeQuestionAuthor) }}
+              <span class="mx-1">·</span>
+              根回复作者：{{ getDisplayName(activeRootAnswer.nickname) }}
+              <span class="mx-1">·</span>
+              回复数：{{ activeRootAnswer.replyCount ?? threadTotal }}
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <el-card v-if="activeRootAnswer" shadow="never" class="mb-3">
+        <el-descriptions :column="2" border>
+          <el-descriptions-item label="问题">
+            {{ getQuestionTitle(activeRootAnswer.qaQuestionId) }}
+          </el-descriptions-item>
+          <el-descriptions-item label="问题作者">
+            {{ getDisplayName(activeQuestionAuthor) }}
+          </el-descriptions-item>
+          <el-descriptions-item label="根回复作者">
+            {{ getDisplayName(activeRootAnswer.nickname) }}
+          </el-descriptions-item>
+          <el-descriptions-item label="点赞数">
+            {{ activeRootAnswer.likeCount ?? 0 }}
+          </el-descriptions-item>
+          <el-descriptions-item label="是否采纳">
+            <el-tag v-if="activeRootAnswer.isAccepted" type="success"
+              >是</el-tag
+            >
+            <el-tag v-else type="info">否</el-tag>
+          </el-descriptions-item>
+          <el-descriptions-item label="创建时间">
+            {{ activeRootAnswer.createdAt }}
+          </el-descriptions-item>
+          <el-descriptions-item label="更新时间">
+            {{ activeRootAnswer.updatedAt }}
+          </el-descriptions-item>
+        </el-descriptions>
+
+        <div class="mt-3 text-[13px] text-[var(--el-text-color-secondary)]">
+          根回复内容
+        </div>
+        <div class="mt-2 whitespace-pre-wrap break-words text-[14px]">
+          {{ activeRootAnswer.content }}
+        </div>
+      </el-card>
+
+      <PureTableBar title="楼外楼回复" @refresh="fetchThreadReplies">
+        <el-table
+          :data="threadTableData"
+          :loading="threadLoading"
+          row-key="qaAnswerId"
+          class="w-full"
+        >
+          <el-table-column label="回复逻辑" min-width="220">
+            <template #default="{ row }">
+              {{ getReplyLogic(row) }}
+            </template>
+          </el-table-column>
+          <el-table-column label="作者" min-width="140">
+            <template #default="{ row }">
+              {{ getDisplayName(row.nickname) }}
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="content"
+            label="内容"
+            min-width="320"
+            show-overflow-tooltip
+          />
+          <el-table-column prop="createdAt" label="创建时间" min-width="170" />
+          <el-table-column label="操作" fixed="right" width="120">
+            <template #default="{ row }">
+              <el-popconfirm
+                title="确认删除该回复？"
+                confirm-button-text="删除"
+                confirm-button-type="danger"
+                cancel-button-text="取消"
+                @confirm="onDeleteThreadReply(row)"
+              >
+                <template #reference>
+                  <el-button link type="danger">删除</el-button>
+                </template>
+              </el-popconfirm>
+            </template>
+          </el-table-column>
+        </el-table>
+
+        <div class="flex justify-end pt-4">
+          <el-pagination
+            background
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="threadTotal"
+            :current-page="threadQueryState.page"
+            :page-size="threadQueryState.pageSize"
+            :page-sizes="QA_ANSWER_PAGE_SIZES"
+            @size-change="onThreadSizeChange"
+            @current-change="onThreadCurrentChange"
+          />
+        </div>
+      </PureTableBar>
+    </el-dialog>
   </div>
 </template>

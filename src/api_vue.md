@@ -2286,7 +2286,7 @@
 
 **接口标题**：采纳回答
 
-**功能描述**：问题作者采纳某条回答（同一问题只能采纳 1 条，可切换采纳）。
+**功能描述**：问题作者采纳某条回答（同一问题只能采纳 1 条，可切换采纳）。仅允许采纳根回答（楼中楼回复不可采纳）。
 
 **接口路由**：`POST /qa-questions/adopt`
 
@@ -2312,6 +2312,10 @@
 | 字段    | 类型    | 说明     | 示例 |
 | ------- | ------- | -------- | ---- |
 | data.ok | boolean | 是否成功 | true |
+
+**错误说明**：
+
+- 当 `qaAnswerId` 为楼中楼回复（非根回答）时，返回 HTTP 400，message 为 `Only root answer can be adopted`。
 
 ---
 
@@ -2409,6 +2413,9 @@
 
 **功能描述**：获取指定问题下的回答列表（支持分页，采纳回答置顶）。
 
+- 不传 `rootQaAnswerId`：返回该问题下的根回答列表；每条根回答会返回 `replyCount`（该根回答引发的回复数）。
+- 传 `rootQaAnswerId`：返回该根回答下的回复列表（包含多级回复）。
+
 **接口路由**：`POST /qa-answers`
 
 **请求头（Headers）**：
@@ -2420,6 +2427,7 @@
 - `page`（number，可选）：页码（从 1 开始，默认 1）
 - `pageSize`（number，可选）：每页条数（默认 10，最大 100）
 - `qaQuestionId`（string，必填）：问答问题业务 ID（格式：LD####AAAA）
+- `rootQaAnswerId`（string，可选）：根回答业务 ID（格式：LD####AAAA）。传入时表示拉取该根回答下的回复列表。
 
 **返回值（Success 200）**：对象
 
@@ -2440,21 +2448,24 @@
 
 `data.list` 字段结构（QaAnswer[]）：
 
-| 字段                     | 类型          | 说明                                | 示例                                 |
-| ------------------------ | ------------- | ----------------------------------- | ------------------------------------ |
-| data.list[].id           | string        | 主键 ID（UUID）                     | 550e8400-e29b-41d4-a716-446655440000 |
-| data.list[].qaAnswerId   | string        | 回答业务 ID（格式：LD####AAAA）     | LD0009WXYZ                           |
-| data.list[].qaQuestionId | string        | 问题业务 ID                         | LD0007YZAB                           |
-| data.list[].authorUserId | string        | 作者用户业务 ID                     | LD0002EFGH                           |
-| data.list[].nickname     | string        | 作者昵称（未设置时为空字符串）      | 张三                                 |
-| data.list[].content      | string        | 回答内容                            | 按住左侧按钮 3 秒                    |
-| data.list[].likeCount    | number        | 点赞数                              | 5                                    |
-| data.list[].isLiked      | boolean       | 当前登录用户是否已点赞该回答        | true                                 |
-| data.list[].isAccepted   | boolean       | 是否已采纳                          | false                                |
-| data.list[].acceptedAt   | string \ null | 采纳时间（YYYY-MM-DD HH:mm:ss）     | 2026-01-20 12:00:00                  |
-| data.list[].createdAt    | string        | 创建时间（YYYY-MM-DD HH:mm:ss）     | 2026-01-20 12:00:00                  |
-| data.list[].updatedAt    | string        | 记录更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-20 12:00:00                  |
-| data.list[].modifiedAt   | string \ null | 内容修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-20 12:00:00                  |
+| 字段                         | 类型          | 说明                                           | 示例                                 |
+| ---------------------------- | ------------- | ---------------------------------------------- | ------------------------------------ |
+| data.list[].id               | string        | 主键 ID（UUID）                                | 550e8400-e29b-41d4-a716-446655440000 |
+| data.list[].qaAnswerId       | string        | 回答业务 ID（格式：LD####AAAA）                | LD0009WXYZ                           |
+| data.list[].qaQuestionId     | string        | 问题业务 ID                                    | LD0007YZAB                           |
+| data.list[].authorUserId     | string        | 作者用户业务 ID                                | LD0002EFGH                           |
+| data.list[].nickname         | string        | 作者昵称（未设置时为空字符串）                 | 张三                                 |
+| data.list[].content          | string        | 回答内容                                       | 按住左侧按钮 3 秒                    |
+| data.list[].likeCount        | number        | 点赞数                                         | 5                                    |
+| data.list[].isLiked          | boolean       | 当前登录用户是否已点赞该回答                   | true                                 |
+| data.list[].isAccepted       | boolean       | 是否已采纳                                     | false                                |
+| data.list[].acceptedAt       | string \ null | 采纳时间（YYYY-MM-DD HH:mm:ss）                | 2026-01-20 12:00:00                  |
+| data.list[].createdAt        | string        | 创建时间（YYYY-MM-DD HH:mm:ss）                | 2026-01-20 12:00:00                  |
+| data.list[].updatedAt        | string        | 记录更新时间（YYYY-MM-DD HH:mm:ss）            | 2026-01-20 12:00:00                  |
+| data.list[].modifiedAt       | string \ null | 内容修改时间（YYYY-MM-DD HH:mm:ss）            | 2026-01-20 12:00:00                  |
+| data.list[].parentQaAnswerId | string \ null | 父回答业务 ID（根回答固定为 null）             | null                                 |
+| data.list[].rootQaAnswerId   | string \ null | 根回答业务 ID（根回答固定为 null）             | null                                 |
+| data.list[].replyCount       | number        | 该根回答引发的回复数（仅根回答列表场景有意义） | 3                                    |
 
 ---
 
@@ -2462,7 +2473,7 @@
 
 **接口标题**：新增问答回答
 
-**功能描述**：在指定问题下新增一条回答。
+**功能描述**：在指定问题下新增一条回答；也可用于对某条回答进行回复（楼中楼）。
 
 **接口路由**：`POST /qa-answers/create`
 
@@ -2474,6 +2485,7 @@
 
 - `qaQuestionId`（string，必填）：问答问题业务 ID（格式：LD####AAAA）
 - `content`（string，必填）：回答内容
+- `parentQaAnswerId`（string \ null，可选）：父回答业务 ID。不传/传 null 表示根回答；传值表示新增楼中楼回复。
 
 **返回值（Success 201）**：对象 `QaAnswer`
 
@@ -2520,7 +2532,7 @@
 
 **接口标题**：删除问答回答
 
-**功能描述**：删除回答（软删除）。若删除的是已采纳回答，会自动清除问题的采纳状态。
+**功能描述**：删除回答（软删除）。若删除的是根回答，会连带删除该根回答下所有回复。若删除涉及已采纳回答（包含线程内回复的历史采纳数据），会自动清除问题的采纳状态。
 
 **接口路由**：`POST /qa-answers/delete`
 

@@ -27,6 +27,7 @@ import {
   type QaAnswerItem,
   getQaTagList,
   getQaQuestionList,
+  getQaQuestionDetail,
   createQaQuestion,
   updateQaQuestion,
   deleteQaQuestion,
@@ -70,6 +71,9 @@ const tagOptions = ref<QaTagItem[]>([]);
 const tagNameMap = computed((): Map<string, string> => {
   return new Map(tagOptions.value.map(t => [t.qaTagId, t.name]));
 });
+
+const questionNicknameMap = ref<Map<string, string>>(new Map());
+const fetchQuestionsSeq = ref(0);
 
 const exportColumns: CsvColumn<QaQuestionItem>[] = [
   { label: "问题ID", key: "qaQuestionId" },
@@ -127,6 +131,61 @@ function normalizeQuestionListResult(res: QaQuestionListResult): {
   return { list: res, total: res.length };
 }
 
+function getDisplayName(name?: string | null): string {
+  const n = (name ?? "").trim();
+  return n ? n : "未设置";
+}
+
+function getQuestionNickname(row: QaQuestionItem): string {
+  return getDisplayName(
+    row.nickname ?? questionNicknameMap.value.get(row.qaQuestionId)
+  );
+}
+
+async function fetchQuestionNicknames(
+  list: QaQuestionItem[],
+  seq: number
+): Promise<void> {
+  const missingIds: string[] = [];
+
+  for (const q of list) {
+    const id = q.qaQuestionId;
+    if (!id) continue;
+
+    const nickname = (q.nickname ?? "").trim();
+    if (nickname) {
+      questionNicknameMap.value.set(id, nickname);
+      continue;
+    }
+
+    if (!questionNicknameMap.value.has(id)) missingIds.push(id);
+  }
+
+  if (missingIds.length === 0) return;
+
+  const settled = await Promise.allSettled(
+    missingIds.map(qaQuestionId => getQaQuestionDetail({ qaQuestionId }))
+  );
+
+  if (seq !== fetchQuestionsSeq.value) return;
+
+  let changed = false;
+  for (let i = 0; i < settled.length; i += 1) {
+    const res = settled[i];
+    if (res.status !== "fulfilled") continue;
+    const nickname = (res.value.question.nickname ?? "").trim();
+    questionNicknameMap.value.set(missingIds[i], nickname);
+    changed = true;
+  }
+
+  if (!changed) return;
+
+  tableData.value = tableData.value.map(q => {
+    const nickname = questionNicknameMap.value.get(q.qaQuestionId);
+    return nickname !== undefined ? { ...q, nickname } : q;
+  });
+}
+
 async function fetchTagOptions(): Promise<void> {
   tagOptionsLoading.value = true;
   try {
@@ -145,12 +204,14 @@ async function fetchTagOptions(): Promise<void> {
 }
 
 async function fetchQuestions(): Promise<void> {
+  const seq = (fetchQuestionsSeq.value += 1);
   loading.value = true;
   try {
     const res = await getQaQuestionList(listParams.value);
     const normalized = normalizeQuestionListResult(res);
     tableData.value = normalized.list;
     total.value = normalized.total;
+    void fetchQuestionNicknames(normalized.list, seq);
   } catch {
     tableData.value = [];
     total.value = 0;
@@ -421,6 +482,375 @@ async function onDeleteRow(row: QaQuestionItem): Promise<void> {
     }
     fetchQuestions();
   } catch {}
+}
+
+type AnswerTreeNode = QaAnswerItem & {
+  children: AnswerTreeNode[];
+};
+
+const detailLoading = ref(false);
+const detailQuestionId = ref("");
+const detailQuestion = ref<QaQuestionItem | null>(null);
+const detailAcceptedAnswer = ref<QaAnswerItem | null>(null);
+const detailRootAnswers = ref<QaAnswerItem[]>([]);
+const detailThreadAnswersMap = ref<Map<string, QaAnswerItem[]>>(new Map());
+const detailThreadTreeMap = ref<Map<string, AnswerTreeNode[]>>(new Map());
+
+function resetDetailState(): void {
+  detailLoading.value = false;
+  detailQuestionId.value = "";
+  detailQuestion.value = null;
+  detailAcceptedAnswer.value = null;
+  detailRootAnswers.value = [];
+  detailThreadAnswersMap.value = new Map();
+  detailThreadTreeMap.value = new Map();
+}
+
+function normalizeImages(images?: string[] | null): string[] {
+  if (!Array.isArray(images)) return [];
+  return images
+    .map(img => ensureImageDataUrl(String(img ?? "").trim()))
+    .filter(Boolean);
+}
+
+async function fetchAllAnswers(params: {
+  qaQuestionId: string;
+  rootQaAnswerId?: string;
+}): Promise<QaAnswerItem[]> {
+  const list: QaAnswerItem[] = [];
+  const pageSize = 100;
+  let page = 1;
+
+  while (true) {
+    const res = await getQaAnswerList({
+      qaQuestionId: params.qaQuestionId,
+      rootQaAnswerId: params.rootQaAnswerId,
+      page,
+      pageSize
+    });
+    list.push(...res.list);
+    if (list.length >= res.total || res.list.length === 0) break;
+    page += 1;
+  }
+
+  return list;
+}
+
+function buildReplyTree(replies: QaAnswerItem[]): AnswerTreeNode[] {
+  const nodeMap = new Map<string, AnswerTreeNode>();
+  for (const r of replies) {
+    nodeMap.set(r.qaAnswerId, { ...r, children: [] });
+  }
+
+  const roots: AnswerTreeNode[] = [];
+  for (const r of replies) {
+    const node = nodeMap.get(r.qaAnswerId);
+    if (!node) continue;
+
+    const parentId = r.parentQaAnswerId ?? "";
+    const parent = parentId ? nodeMap.get(parentId) : undefined;
+    if (parent) {
+      parent.children.push(node);
+    } else {
+      roots.push(node);
+    }
+  }
+
+  return roots;
+}
+
+async function loadQuestionDetail(qaQuestionId: string): Promise<void> {
+  detailLoading.value = true;
+  try {
+    const res = await getQaQuestionDetail({ qaQuestionId });
+    detailQuestion.value = res.question;
+    detailAcceptedAnswer.value = res.acceptedAnswer;
+
+    const roots = await fetchAllAnswers({ qaQuestionId });
+    detailRootAnswers.value = roots;
+
+    const settled = await Promise.allSettled(
+      roots.map(r =>
+        fetchAllAnswers({ qaQuestionId, rootQaAnswerId: r.qaAnswerId })
+      )
+    );
+
+    const repliesMap = new Map<string, QaAnswerItem[]>();
+    const treeMap = new Map<string, AnswerTreeNode[]>();
+
+    for (let i = 0; i < roots.length; i += 1) {
+      const root = roots[i];
+      const resItem = settled[i];
+      if (resItem.status !== "fulfilled") {
+        repliesMap.set(root.qaAnswerId, []);
+        treeMap.set(root.qaAnswerId, []);
+        continue;
+      }
+      repliesMap.set(root.qaAnswerId, resItem.value);
+      treeMap.set(root.qaAnswerId, buildReplyTree(resItem.value));
+    }
+
+    detailThreadAnswersMap.value = repliesMap;
+    detailThreadTreeMap.value = treeMap;
+  } catch {
+    resetDetailState();
+  } finally {
+    detailLoading.value = false;
+  }
+}
+
+function openDetailDialog(row: QaQuestionItem): void {
+  resetDetailState();
+  detailQuestionId.value = row.qaQuestionId;
+  void loadQuestionDetail(row.qaQuestionId);
+
+  const DetailDialog = defineComponent({
+    name: "QaQuestionDetailDialog",
+    setup() {
+      const renderMetaLine = (answer: QaAnswerItem) => {
+        const nickname = getDisplayName(answer.nickname);
+        const liked = Boolean(answer.isLiked);
+
+        return (
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="min-w-0">
+              <span class="text-[13px] font-medium">{nickname}</span>
+              <span class="mx-2 text-[12px] text-[var(--el-text-color-secondary)]">
+                {answer.authorUserId}
+              </span>
+              <span class="text-[12px] text-[var(--el-text-color-secondary)]">
+                {answer.createdAt}
+              </span>
+            </div>
+            <div class="flex items-center gap-2">
+              {answer.isAccepted ? (
+                <el-tag type="success" effect="plain">
+                  已采纳
+                </el-tag>
+              ) : null}
+              <el-tag type={liked ? "success" : "info"} effect="plain">
+                {liked ? "已点赞" : "未点赞"}
+              </el-tag>
+              <span class="text-[12px] text-[var(--el-text-color-secondary)]">
+                点赞 {answer.likeCount ?? 0}
+              </span>
+            </div>
+          </div>
+        );
+      };
+
+      const renderAnswerTree = (nodes: AnswerTreeNode[], depth: number) => {
+        if (!nodes || nodes.length === 0) return null;
+        return (
+          <div class="space-y-3">
+            {nodes.map(node => {
+              const style =
+                depth > 0
+                  ? {
+                      marginLeft: `${depth * 16}px`,
+                      borderLeft: "1px solid var(--el-border-color-lighter)",
+                      paddingLeft: "12px"
+                    }
+                  : undefined;
+
+              return (
+                <div key={node.qaAnswerId} style={style} class="pt-1">
+                  {renderMetaLine(node)}
+                  <div class="mt-2 whitespace-pre-wrap break-words text-[14px]">
+                    {node.content}
+                  </div>
+                  {node.children && node.children.length > 0 ? (
+                    <div class="mt-3">
+                      {renderAnswerTree(node.children, depth + 1)}
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+        );
+      };
+
+      return () => {
+        const q = detailQuestion.value;
+        const images = normalizeImages(q?.images);
+        const liked = Boolean(q?.isLiked);
+        const accepted = detailAcceptedAnswer.value;
+
+        return (
+          <div class="px-4 py-3" style={{ minHeight: "360px" }}>
+            <el-scrollbar maxHeight="calc(100vh - 220px)">
+              {detailLoading.value ? (
+                <div class="px-1 py-2">
+                  {detailQuestionId.value ? (
+                    <div class="mb-2 text-[12px] text-[var(--el-text-color-secondary)]">
+                      问题ID：{detailQuestionId.value}
+                    </div>
+                  ) : null}
+                  <el-skeleton rows={12} animated />
+                </div>
+              ) : (
+                <div class="space-y-3">
+                  {q ? (
+                    <el-card shadow="never">
+                      <div class="flex items-start justify-between gap-4">
+                        <div class="min-w-0">
+                          <div class="flex flex-wrap items-center gap-2">
+                            <span class="text-[16px] font-semibold">
+                              {q.title}
+                            </span>
+                            <el-tag
+                              type={q.isSolved ? "success" : "info"}
+                              effect="plain"
+                            >
+                              {q.isSolved ? "已解决" : "未解决"}
+                            </el-tag>
+                            <el-tag
+                              type={q.isEnabled ? "success" : "info"}
+                              effect="plain"
+                            >
+                              {q.isEnabled ? "启用" : "禁用"}
+                            </el-tag>
+                          </div>
+                          <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] text-[var(--el-text-color-secondary)]">
+                            <span>问题ID：{q.qaQuestionId}</span>
+                            <span>作者：{getDisplayName(q.nickname)}</span>
+                            <span>作者ID：{q.authorUserId}</span>
+                            <span>浏览 {q.viewCount}</span>
+                            <span>回答 {q.answerCount}</span>
+                            <span>点赞 {q.likeCount}</span>
+                            <el-tag
+                              type={liked ? "success" : "info"}
+                              effect="plain"
+                            >
+                              {liked ? "已点赞" : "未点赞"}
+                            </el-tag>
+                            <span>创建 {q.createdAt}</span>
+                            <span>更新 {q.updatedAt}</span>
+                          </div>
+                          {q.tagIds && q.tagIds.length > 0 ? (
+                            <div class="mt-3">
+                              <el-space wrap>
+                                {q.tagIds.map(tid => (
+                                  <el-tag key={tid} effect="plain" type="info">
+                                    {tagNameMap.value.get(tid) ?? tid}
+                                  </el-tag>
+                                ))}
+                              </el-space>
+                            </div>
+                          ) : null}
+                          {q.description ? (
+                            <div class="mt-3 whitespace-pre-wrap break-words text-[14px]">
+                              {q.description}
+                            </div>
+                          ) : null}
+                          {images.length > 0 ? (
+                            <div class="mt-3 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
+                              {images.map(url => (
+                                <el-image
+                                  key={url}
+                                  src={url}
+                                  fit="cover"
+                                  previewSrcList={images}
+                                  previewTeleported
+                                  class="h-[96px] w-full overflow-hidden rounded"
+                                />
+                              ))}
+                            </div>
+                          ) : null}
+                        </div>
+                        <div class="shrink-0 text-right text-[12px] text-[var(--el-text-color-secondary)]">
+                          {accepted ? (
+                            <div>
+                              <el-tag type="success" effect="plain">
+                                已采纳回答
+                              </el-tag>
+                              <div class="mt-2">{accepted.qaAnswerId}</div>
+                            </div>
+                          ) : (
+                            <el-tag type="info" effect="plain">
+                              暂无采纳回答
+                            </el-tag>
+                          )}
+                        </div>
+                      </div>
+                    </el-card>
+                  ) : null}
+
+                  <el-card shadow="never">
+                    <div class="flex items-center justify-between">
+                      <div class="text-[14px] font-medium">回答与楼外楼</div>
+                      <div class="text-[12px] text-[var(--el-text-color-secondary)]">
+                        根回答 {detailRootAnswers.value.length}
+                      </div>
+                    </div>
+                    {detailRootAnswers.value.length === 0 ? (
+                      <el-empty description="暂无回答" imageSize={60} />
+                    ) : (
+                      <div class="mt-3 space-y-4">
+                        {detailRootAnswers.value.map(root => {
+                          const tree =
+                            detailThreadTreeMap.value.get(root.qaAnswerId) ??
+                            [];
+                          const repliesTotal =
+                            detailThreadAnswersMap.value.get(root.qaAnswerId)
+                              ?.length ?? 0;
+                          return (
+                            <el-card key={root.qaAnswerId} shadow="never">
+                              <div class="flex items-center justify-between gap-2">
+                                <div class="min-w-0">
+                                  <div class="text-[12px] text-[var(--el-text-color-secondary)]">
+                                    根回答：{root.qaAnswerId}
+                                    <span class="mx-2">·</span>
+                                    楼外楼 {repliesTotal}
+                                  </div>
+                                </div>
+                                {root.qaAnswerId === accepted?.qaAnswerId ||
+                                root.isAccepted ? (
+                                  <el-tag type="success" effect="plain">
+                                    已采纳
+                                  </el-tag>
+                                ) : null}
+                              </div>
+                              <div class="mt-3">
+                                {renderMetaLine(root)}
+                                <div class="mt-2 whitespace-pre-wrap break-words text-[14px]">
+                                  {root.content}
+                                </div>
+                              </div>
+                              {tree.length > 0 ? (
+                                <div class="mt-4">
+                                  {renderAnswerTree(tree, 1)}
+                                </div>
+                              ) : null}
+                            </el-card>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </el-card>
+                </div>
+              )}
+            </el-scrollbar>
+          </div>
+        );
+      };
+    }
+  });
+
+  addDialog({
+    title: "详情",
+    width: "1160px",
+    fullscreenIcon: true,
+    alignCenter: true,
+    destroyOnClose: true,
+    closeOnClickModal: false,
+    hideFooter: true,
+    contentRenderer: () => h(DetailDialog),
+    closeCallBack: () => {
+      resetDetailState();
+    }
+  });
 }
 
 fetchTagOptions();
@@ -722,6 +1152,11 @@ async function onUnlikeAnswer(row: QaAnswerItem): Promise<void> {
           label="作者用户ID"
           min-width="140"
         />
+        <el-table-column label="作者昵称" min-width="200">
+          <template #default="{ row }">
+            {{ getQuestionNickname(row) }}
+          </template>
+        </el-table-column>
         <el-table-column label="标签" min-width="220">
           <template #default="{ row }">
             <el-space wrap>
@@ -752,11 +1187,14 @@ async function onUnlikeAnswer(row: QaAnswerItem): Promise<void> {
           </template>
         </el-table-column>
         <el-table-column prop="updatedAt" label="更新时间" min-width="170" />
-        <el-table-column label="操作" fixed="right" width="220">
+        <el-table-column label="操作" fixed="right" width="280">
           <template #default="{ row }">
             <el-space>
               <el-button link type="primary" @click="openAnswersDialog(row)">
                 回答
+              </el-button>
+              <el-button link type="primary" @click="openDetailDialog(row)">
+                详情
               </el-button>
               <el-button
                 link
