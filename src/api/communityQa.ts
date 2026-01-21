@@ -284,6 +284,7 @@ export type QaCommentItem = {
 export type QaCommentListParams = {
   page?: number;
   pageSize?: number;
+  qaQuestionId?: string;
   qaAnswerId?: string;
 };
 

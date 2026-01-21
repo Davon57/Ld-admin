@@ -4,6 +4,7 @@ import type { FormInstance, FormRules } from "element-plus";
 import { addDialog } from "@/components/ReDialog";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { message } from "@/utils/message";
+import { compressImageToDataUrl } from "@/utils/image";
 import {
   DEFAULT_PAGE_SIZES,
   exportToXlsx,
@@ -172,18 +173,6 @@ function toImageDataUrl(base64: string): string {
   return `data:${inferMimeFromBase64(v)};base64,${v}`;
 }
 
-async function readAsDataUrl(file: File): Promise<string> {
-  return await new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === "string") resolve(reader.result);
-      else reject(new Error("Invalid file result"));
-    };
-    reader.onerror = () => reject(new Error("Read file failed"));
-    reader.readAsDataURL(file);
-  });
-}
-
 const avatarFormRules: FormRules<AvatarFormModel> = {
   imageBase64: [
     {
@@ -265,7 +254,16 @@ function openAvatarDialog(mode: AvatarFormMode, row?: AvatarItem): void {
                       input.value = "";
                       if (!file) return;
                       try {
-                        const dataUrl = await readAsDataUrl(file);
+                        const dataUrl = await compressImageToDataUrl(file, {
+                          maxWidth: 512,
+                          maxHeight: 512,
+                          maxBytes: 120 * 1024,
+                          preferMimeTypes: [
+                            "image/webp",
+                            "image/png",
+                            "image/jpeg"
+                          ]
+                        });
                         const commaIndex = dataUrl.indexOf(",");
                         const base64 =
                           commaIndex >= 0
