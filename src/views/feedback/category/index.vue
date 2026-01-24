@@ -9,7 +9,7 @@ import {
   resolveComponent
 } from "vue";
 import type { FormInstance, FormRules } from "element-plus";
-import { addDialog } from "@/components/ReDialog";
+import { addDialog, closeDialog } from "@/components/ReDialog";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { message } from "@/utils/message";
 import { DEFAULT_PAGE_SIZES, isPageData } from "@/utils/table";
@@ -133,6 +133,138 @@ const presetTypes = [
     description: "如文章/问答信息错误、过期等"
   }
 ] as const;
+
+const initExplainItems = computed(() => {
+  return presetTypes.map(t => {
+    return {
+      title: t.name,
+      description: t.description
+    };
+  });
+});
+
+function openInitExplainDialog(): void {
+  const InitExplainDialog = defineComponent({
+    name: "FeedbackCategoryInitExplainDialog",
+    setup() {
+      const ElAlert = resolveComponent("ElAlert");
+      const ElDivider = resolveComponent("ElDivider");
+      const ElTag = resolveComponent("ElTag");
+
+      return () =>
+        h(
+          "div",
+          {
+            style: {
+              padding: `${spacing[4]} ${spacing[5]}`
+            }
+          },
+          [
+            h(ElAlert as any, {
+              title: "该操作用于快速创建默认反馈类别，仅在列表为空时可用。",
+              type: "info",
+              showIcon: true,
+              closable: false
+            }),
+            h(ElDivider as any, { style: { margin: `${spacing[4]} 0` } }),
+            h("div", { class: "text-sm", style: { color: colors.gray[700] } }, [
+              h(
+                "div",
+                { class: "font-medium", style: { color: colors.gray[900] } },
+                "将创建的默认类别"
+              ),
+              h(
+                "div",
+                {
+                  class: "mt-2 space-y-2",
+                  style: { marginTop: spacing[2] }
+                },
+                initExplainItems.value.map(item =>
+                  h("div", { class: "flex items-start gap-2" }, [
+                    h(
+                      ElTag as any,
+                      { type: "success", effect: "plain" },
+                      () => item.title
+                    ),
+                    h(
+                      "div",
+                      {
+                        class: "leading-6",
+                        style: { color: colors.gray[700] }
+                      },
+                      item.description
+                    )
+                  ])
+                )
+              ),
+              h(ElDivider as any, { style: { margin: `${spacing[4]} 0` } }),
+              h(
+                "div",
+                { class: "font-medium", style: { color: colors.gray[900] } },
+                "执行逻辑"
+              ),
+              h(
+                "ol",
+                {
+                  class: "list-decimal pl-5 mt-2 space-y-1",
+                  style: {
+                    marginTop: spacing[2],
+                    paddingLeft: "20px"
+                  }
+                },
+                [
+                  h(
+                    "li",
+                    "依次调用接口创建上述默认类别（逐条创建，失败不影响后续）。"
+                  ),
+                  h("li", "创建结束后刷新列表数据。"),
+                  h("li", "弹出消息提示：成功/失败条数及部分失败原因。")
+                ]
+              ),
+              h(ElDivider as any, { style: { margin: `${spacing[4]} 0` } }),
+              h(
+                "div",
+                { class: "font-medium", style: { color: colors.gray[900] } },
+                "不可用条件"
+              ),
+              h(
+                "ul",
+                {
+                  class: "list-disc pl-5 mt-2 space-y-1",
+                  style: {
+                    marginTop: spacing[2],
+                    paddingLeft: "20px"
+                  }
+                },
+                [
+                  h("li", "列表已有数据（为避免重复创建）。"),
+                  h("li", "列表正在加载或初始化进行中。")
+                ]
+              )
+            ])
+          ]
+        );
+    }
+  });
+
+  addDialog({
+    title: "初始化说明",
+    width: "560px",
+    closeOnClickModal: true,
+    closeOnPressEscape: true,
+    footerButtons: [
+      {
+        label: "我知道了",
+        type: "primary",
+        btnClick: ({ dialog: { options, index } }) => {
+          if (!options || typeof index !== "number") return;
+          closeDialog(options, index, { command: "close" });
+        }
+      }
+    ],
+    contentRenderer: () => h(InitExplainDialog)
+  });
+}
 
 async function refresh(): Promise<void> {
   loading.value = true;
@@ -395,6 +527,7 @@ void refresh();
           </div>
         </div>
         <el-space wrap>
+          <el-button plain @click="openInitExplainDialog">说明</el-button>
           <el-popconfirm
             title="确认初始化三个默认类别？"
             confirm-button-text="初始化"

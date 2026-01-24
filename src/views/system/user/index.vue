@@ -21,6 +21,7 @@ import {
   deleteUser
 } from "@/api/user";
 import { type AvatarItem, getAvatarList } from "@/api/avatar";
+import { getRoleList, type RoleItem } from "@/api/role";
 
 defineOptions({
   name: "SystemUser"
@@ -29,11 +30,58 @@ defineOptions({
 type RoleOption = { label: string; value: UserRole };
 type StatusOption = { label: string; value: UserStatus };
 
-const roleOptions: RoleOption[] = [
-  { label: "管理员", value: "admin" },
-  { label: "版主", value: "moderator" },
-  { label: "普通用户", value: "user" }
-];
+const roleLoading = ref(false);
+const roleList = ref<RoleItem[]>([]);
+
+async function fetchRoles(): Promise<void> {
+  if (roleLoading.value) return;
+  roleLoading.value = true;
+  try {
+    const res = await getRoleList({});
+    roleList.value = Array.isArray(res?.list) ? res.list : [];
+  } catch {
+    roleList.value = [];
+  } finally {
+    roleLoading.value = false;
+  }
+}
+
+const roleNameByCode = computed((): Record<string, string> => {
+  const out: Record<string, string> = {};
+  for (const item of roleList.value) {
+    out[item.code] = item.name ? item.name : item.code;
+  }
+  return out;
+});
+
+const roleEnabledByCode = computed((): Record<string, boolean> => {
+  const out: Record<string, boolean> = {};
+  for (const item of roleList.value) {
+    out[item.code] = Boolean(item.isEnabled);
+  }
+  return out;
+});
+
+const defaultRoleCode = computed((): string => {
+  const enabledFirst = roleList.value.find(r => r.isEnabled)?.code;
+  if (enabledFirst) return enabledFirst;
+  return roleList.value[0]?.code ?? "";
+});
+
+const roleOptions = computed((): RoleOption[] => {
+  return roleList.value.map(r => ({
+    label: r.name ? `${r.name}（${r.code}）` : r.code,
+    value: r.code
+  }));
+});
+
+function resolveRoleLabel(roleCode: string): string {
+  const code = (roleCode ?? "").trim();
+  if (!code) return "-";
+  return roleNameByCode.value[code] ?? code;
+}
+
+fetchRoles();
 
 const statusOptions: StatusOption[] = [
   { label: "启用", value: "active" },
@@ -169,12 +217,7 @@ const exportColumns: CsvColumn<UserItem>[] = [
   {
     label: "角色",
     key: "role",
-    format: (_value, row) =>
-      row.role === "admin"
-        ? "管理员"
-        : row.role === "moderator"
-          ? "版主"
-          : "普通用户"
+    format: (_value, row) => resolveRoleLabel(row.role)
   },
   {
     label: "状态",
@@ -402,6 +445,11 @@ function openUserDialog(mode: UserFormMode, row?: UserItem): void {
   const cityLoading = ref(false);
   const cityCodePath = ref<CascaderValue>([]);
 
+  async function ensureRoles(): Promise<void> {
+    if (roleList.value.length > 0) return;
+    await fetchRoles();
+  }
+
   function openAvatarPicker(): void {
     const keyword = ref("");
 
@@ -544,7 +592,10 @@ function openUserDialog(mode: UserFormMode, row?: UserItem): void {
     nickname: mode === "edit" ? (row?.nickname ?? "") : "",
     avatar: mode === "edit" ? (row?.avatar ?? "") : "",
     city: mode === "edit" ? (row?.city ?? "") : "",
-    role: mode === "edit" ? (row?.role ?? "user") : "user",
+    role:
+      mode === "edit"
+        ? (row?.role ?? defaultRoleCode.value)
+        : defaultRoleCode.value,
     status: mode === "edit" ? (row?.status ?? "active") : "active",
     phone: mode === "edit" ? (row?.phone ?? "") : "",
     email: mode === "edit" ? (row?.email ?? "") : "",
@@ -579,6 +630,12 @@ function openUserDialog(mode: UserFormMode, row?: UserItem): void {
 
       nextTick(() => {
         void fetchAllAvatars();
+      });
+
+      nextTick(() => {
+        void ensureRoles().then(() => {
+          if (!model.role) model.role = defaultRoleCode.value;
+        });
       });
 
       void ensureCityOptions().then(() => {
@@ -654,7 +711,7 @@ function openUserDialog(mode: UserFormMode, row?: UserItem): void {
           </el-form-item>
           <el-form-item label="角色" prop="role">
             <el-select v-model={model.role} class="w-full" clearable={false}>
-              {roleOptions.map(opt => (
+              {roleOptions.value.map(opt => (
                 <el-option
                   label={opt.label}
                   value={opt.value}
@@ -948,11 +1005,15 @@ fetchUsers();
         <el-table-column prop="username" label="用户名" min-width="160" />
         <el-table-column prop="role" label="角色" width="110">
           <template #default="{ row }">
-            <el-tag v-if="row.role === 'admin'" type="warning">管理员</el-tag>
-            <el-tag v-else-if="row.role === 'moderator'" type="success">
-              版主
+            <el-tag
+              v-if="row.role && roleEnabledByCode[row.role] === false"
+              type="info"
+            >
+              {{ resolveRoleLabel(row.role) }}
             </el-tag>
-            <el-tag v-else>普通用户</el-tag>
+            <el-tag v-else>
+              {{ resolveRoleLabel(row.role) }}
+            </el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="status" label="状态" width="90">

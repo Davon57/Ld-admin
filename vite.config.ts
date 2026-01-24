@@ -23,6 +23,8 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
     ? {
         "/auth": { target: VITE_API_BASE, changeOrigin: true },
         "/system": { target: VITE_API_BASE, changeOrigin: true },
+        "/roles": { target: VITE_API_BASE, changeOrigin: true },
+        "/permissions": { target: VITE_API_BASE, changeOrigin: true },
         "/users": { target: VITE_API_BASE, changeOrigin: true },
         "/user": { target: VITE_API_BASE, changeOrigin: true },
         "/avatars": { target: VITE_API_BASE, changeOrigin: true },

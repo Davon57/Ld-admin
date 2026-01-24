@@ -11,53 +11,55 @@ import {
 } from "@/utils/table";
 import {
   type CategoryItem,
-  type Status,
   type CategoryListParams,
   getCategoryList,
   createCategory,
   updateCategory,
-  deleteCategory,
-  batchDeleteCategories
+  deleteCategory
 } from "@/api/article";
 
 defineOptions({
   name: "ArticleCategory"
 });
 
-type StatusOption = { label: string; value: Status };
-const statusOptions: StatusOption[] = [
-  { label: "启用", value: 1 },
-  { label: "禁用", value: 0 }
-];
-
 const queryState = reactive<
   Required<Pick<CategoryListParams, "page" | "pageSize">> & {
-    keyword: string;
-    status: "" | Status;
+    nameKeyword: string;
+    isEnabled: "" | boolean;
   }
 >({
   page: 1,
   pageSize: 10,
-  keyword: "",
-  status: ""
+  nameKeyword: "",
+  isEnabled: ""
 });
 
 const loading = ref(false);
 const tableData = ref<CategoryItem[]>([]);
 const total = ref(0);
-const selectionIds = ref<number[]>([]);
 
 const exporting = ref(false);
 
+const initing = ref(false);
+
+const presetCategories = [
+  { name: "教程", description: "", seq: 0, isEnabled: true },
+  { name: "改装", description: "", seq: 1, isEnabled: true },
+  { name: "保养", description: "", seq: 2, isEnabled: true },
+  { name: "原理", description: "", seq: 3, isEnabled: true }
+] as const;
+
 const exportColumns: CsvColumn<CategoryItem>[] = [
+  { label: "分类编码", key: "articleCategoryId" },
   { label: "名称", key: "name" },
-  { label: "Slug", key: "slug" },
+  { label: "描述", key: "description" },
+  { label: "排序", key: "seq" },
   {
-    label: "状态",
-    key: "status",
-    format: (_value, row) => (row.status === 1 ? "启用" : "禁用")
+    label: "启用状态",
+    key: "isEnabled",
+    format: (_value, row) => (row.isEnabled ? "启用" : "禁用")
   },
-  { label: "创建时间", key: "createdAt" }
+  { label: "更新时间", key: "updatedAt" }
 ];
 
 const listParams = computed((): CategoryListParams => {
@@ -65,9 +67,9 @@ const listParams = computed((): CategoryListParams => {
     page: queryState.page,
     pageSize: queryState.pageSize
   };
-  const keyword = queryState.keyword.trim();
-  if (keyword) params.keyword = keyword;
-  if (queryState.status !== "") params.status = queryState.status;
+  const nameKeyword = queryState.nameKeyword.trim();
+  if (nameKeyword) params.nameKeyword = nameKeyword;
+  if (queryState.isEnabled !== "") params.isEnabled = queryState.isEnabled;
   return params;
 });
 
@@ -93,8 +95,8 @@ function onSearch(): void {
 function onReset(): void {
   queryState.page = 1;
   queryState.pageSize = 10;
-  queryState.keyword = "";
-  queryState.status = "";
+  queryState.nameKeyword = "";
+  queryState.isEnabled = "";
   fetchCategories();
 }
 
@@ -107,10 +109,6 @@ function onSizeChange(size: number): void {
 function onCurrentChange(page: number): void {
   queryState.page = page;
   fetchCategories();
-}
-
-function onSelectionChange(rows: CategoryItem[]): void {
-  selectionIds.value = rows.map(r => r.id);
 }
 
 async function onExportList(): Promise<void> {
@@ -128,39 +126,61 @@ async function onExportList(): Promise<void> {
   }
 }
 
+async function onInitCategories(): Promise<void> {
+  if (initing.value) return;
+  initing.value = true;
+  try {
+    const existingNames = new Set(
+      tableData.value.map(v => v.name.trim()).filter(Boolean)
+    );
+    let created = 0;
+    let skipped = 0;
+    let failed = 0;
+
+    for (const c of presetCategories) {
+      if (existingNames.has(c.name)) {
+        skipped += 1;
+        continue;
+      }
+      try {
+        await createCategory(c, { showSuccessMessage: false });
+        created += 1;
+      } catch {
+        failed += 1;
+      }
+    }
+
+    queryState.page = 1;
+    await fetchCategories();
+    message(`初始化完成：新增${created}，跳过${skipped}，失败${failed}`, {
+      type: failed > 0 ? "warning" : "success"
+    });
+  } finally {
+    initing.value = false;
+  }
+}
+
 type CategoryFormMode = "create" | "edit";
 
 type CategoryFormModel = {
-  id?: number;
   name: string;
-  slug: string;
-  status: Status;
+  description: string;
+  seq: number;
+  isEnabled: boolean;
 };
 
 const categoryFormRules: FormRules<CategoryFormModel> = {
   name: [{ required: true, message: "请输入分类名称", trigger: "blur" }],
-  slug: [
-    {
-      validator: (_rule, value: string, callback) => {
-        if (!value) return callback(new Error("请输入 slug"));
-        const ok = /^[a-z0-9-]+$/.test(value);
-        return ok
-          ? callback()
-          : callback(new Error("slug 仅支持小写字母/数字/连字符"));
-      },
-      trigger: "blur"
-    }
-  ],
-  status: [{ required: true, message: "请选择状态", trigger: "change" }]
+  seq: [{ required: true, message: "请输入排序值", trigger: "change" }]
 };
 
 function openCategoryDialog(mode: CategoryFormMode, row?: CategoryItem): void {
   const formRef = ref<FormInstance>();
   const model = reactive<CategoryFormModel>({
-    id: mode === "edit" ? row?.id : undefined,
     name: mode === "edit" ? (row?.name ?? "") : "",
-    slug: mode === "edit" ? (row?.slug ?? "") : "",
-    status: mode === "edit" ? (row?.status ?? 1) : 1
+    description: mode === "edit" ? (row?.description ?? "") : "",
+    seq: mode === "edit" ? (row?.seq ?? 0) : 0,
+    isEnabled: mode === "edit" ? (row?.isEnabled ?? true) : true
   });
 
   const CategoryFormDialog = defineComponent({
@@ -184,21 +204,27 @@ function openCategoryDialog(mode: CategoryFormMode, row?: CategoryItem): void {
               clearable
             />
           </el-form-item>
-          <el-form-item label="Slug" prop="slug">
+          <el-form-item label="描述">
             <el-input
-              v-model={model.slug}
-              placeholder="如：beginner"
-              clearable
+              v-model={model.description}
+              type="textarea"
+              autosize={{ minRows: 2, maxRows: 4 }}
+              placeholder="可选"
+              maxlength={200}
+              show-word-limit
             />
           </el-form-item>
-          <el-form-item label="状态" prop="status">
-            <el-segmented
-              v-model={model.status}
-              options={statusOptions.map(s => ({
-                label: s.label,
-                value: s.value
-              }))}
+          <el-form-item label="排序" prop="seq">
+            <el-input-number
+              v-model={model.seq}
+              min={0}
+              step={1}
+              controls-position="right"
+              class="w-full"
             />
+          </el-form-item>
+          <el-form-item label="启用">
+            <el-switch v-model={model.isEnabled} />
           </el-form-item>
         </el-form>
       );
@@ -219,8 +245,9 @@ function openCategoryDialog(mode: CategoryFormMode, row?: CategoryItem): void {
         if (mode === "create") {
           const res = await createCategory({
             name: model.name.trim(),
-            slug: model.slug.trim(),
-            status: model.status
+            description: model.description.trim(),
+            seq: model.seq,
+            isEnabled: model.isEnabled
           });
           void res;
           done();
@@ -229,17 +256,18 @@ function openCategoryDialog(mode: CategoryFormMode, row?: CategoryItem): void {
           return;
         }
 
-        if (!model.id) {
+        if (!row?.articleCategoryId) {
           message("分类信息异常", { type: "error" });
           closeLoading();
           return;
         }
 
         const res = await updateCategory({
-          id: model.id,
+          articleCategoryId: row.articleCategoryId,
           name: model.name.trim(),
-          slug: model.slug.trim(),
-          status: model.status
+          description: model.description.trim(),
+          seq: model.seq,
+          isEnabled: model.isEnabled
         });
         void res;
         done();
@@ -253,57 +281,15 @@ function openCategoryDialog(mode: CategoryFormMode, row?: CategoryItem): void {
 
 async function onDeleteRow(row: CategoryItem): Promise<void> {
   try {
-    const res = await deleteCategory({ id: row.id });
+    const res = await deleteCategory({
+      articleCategoryId: row.articleCategoryId
+    });
     void res;
     if (queryState.page > 1 && tableData.value.length === 1) {
       queryState.page -= 1;
     }
     fetchCategories();
   } catch {}
-}
-
-async function onBatchDelete(): Promise<void> {
-  if (selectionIds.value.length === 0) {
-    message("请选择要删除的分类", { type: "warning" });
-    return;
-  }
-
-  const deletingCount = selectionIds.value.length;
-  const currentRows = tableData.value.length;
-
-  const BatchDeleteContent = defineComponent({
-    name: "BatchDeleteContent",
-    setup() {
-      return () => (
-        <div class="text-[14px] leading-6">
-          确认删除选中的 {deletingCount} 个分类？
-        </div>
-      );
-    }
-  });
-
-  addDialog({
-    title: "批量删除",
-    width: "420px",
-    closeOnClickModal: false,
-    sureBtnLoading: true,
-    contentRenderer: () => h(BatchDeleteContent),
-    beforeSure: async (done, { closeLoading }) => {
-      try {
-        const ids = [...selectionIds.value];
-        const res = await batchDeleteCategories({ ids });
-        void res;
-        done();
-        if (queryState.page > 1 && deletingCount >= currentRows) {
-          queryState.page -= 1;
-        }
-        selectionIds.value = [];
-        fetchCategories();
-      } catch {
-        closeLoading();
-      }
-    }
-  });
 }
 
 fetchCategories();
@@ -315,22 +301,22 @@ fetchCategories();
       <el-form inline>
         <el-form-item label="关键词">
           <el-input
-            v-model="queryState.keyword"
-            placeholder="名称/slug"
+            v-model="queryState.nameKeyword"
+            placeholder="分类名称"
             clearable
             class="w-[240px]!"
             @keyup.enter="onSearch"
           />
         </el-form-item>
-        <el-form-item label="状态">
-          <el-select v-model="queryState.status" clearable class="w-[160px]!">
+        <el-form-item label="启用">
+          <el-select
+            v-model="queryState.isEnabled"
+            clearable
+            class="w-[160px]!"
+          >
             <el-option label="全部" value="" />
-            <el-option
-              v-for="opt in statusOptions"
-              :key="opt.value"
-              :label="opt.label"
-              :value="opt.value"
-            />
+            <el-option label="启用" :value="true" />
+            <el-option label="禁用" :value="false" />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -343,6 +329,24 @@ fetchCategories();
     <PureTableBar class="mt-2" title="分类列表" @refresh="fetchCategories">
       <template #buttons>
         <el-space wrap>
+          <el-popconfirm
+            title="确认初始化分类？将创建：教程、改装、保养、原理"
+            confirm-button-text="初始化"
+            confirm-button-type="warning"
+            cancel-button-text="取消"
+            @confirm="onInitCategories"
+          >
+            <template #reference>
+              <el-button
+                type="warning"
+                plain
+                :loading="initing"
+                :disabled="loading || initing"
+              >
+                初始化
+              </el-button>
+            </template>
+          </el-popconfirm>
           <el-button type="primary" @click="openCategoryDialog('create')">
             新增分类
           </el-button>
@@ -354,29 +358,30 @@ fetchCategories();
           >
             导出列表
           </el-button>
-          <el-button type="danger" plain @click="onBatchDelete">
-            批量删除
-          </el-button>
         </el-space>
       </template>
 
       <el-table
         :data="tableData"
         :loading="loading"
-        row-key="id"
+        row-key="articleCategoryId"
         class="w-full"
-        @selection-change="onSelectionChange"
       >
-        <el-table-column type="selection" width="46" />
+        <el-table-column
+          prop="articleCategoryId"
+          label="编码"
+          min-width="160"
+        />
         <el-table-column prop="name" label="名称" min-width="180" />
-        <el-table-column prop="slug" label="Slug" min-width="180" />
-        <el-table-column prop="status" label="状态" width="90">
+        <el-table-column prop="description" label="描述" min-width="260" />
+        <el-table-column prop="seq" label="排序" width="90" />
+        <el-table-column prop="isEnabled" label="状态" width="90">
           <template #default="{ row }">
-            <el-tag v-if="row.status === 1" type="success">启用</el-tag>
+            <el-tag v-if="row.isEnabled" type="success">启用</el-tag>
             <el-tag v-else type="info">禁用</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createdAt" label="创建时间" min-width="170" />
+        <el-table-column prop="updatedAt" label="更新时间" min-width="170" />
         <el-table-column label="操作" fixed="right" width="160">
           <template #default="{ row }">
             <el-space>

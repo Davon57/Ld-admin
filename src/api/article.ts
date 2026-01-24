@@ -18,62 +18,71 @@ export type TagItem = {
 };
 
 export type CategoryItem = {
-  id: number;
+  id: string;
+  articleCategoryId: string;
   name: string;
-  slug: string;
-  status: Status;
-  createdAt: string;
+  description: string;
+  seq: number;
+  isEnabled: boolean;
+  updatedAt: string;
 };
 
 export type CategoryListParams = {
   page: number;
   pageSize: number;
-  keyword?: string;
-  status?: Status;
+  nameKeyword?: string;
+  isEnabled?: boolean;
 };
 
-export type CreateCategoryPayload = Omit<CategoryItem, "id" | "createdAt">;
+export type CategoryListResult = {
+  list: CategoryItem[];
+  page: number;
+  pageSize: number;
+  total: number;
+};
 
-export type UpdateCategoryPayload = Pick<CategoryItem, "id"> &
-  Partial<Omit<CategoryItem, "id" | "createdAt">>;
+export type CreateCategoryPayload = {
+  name: string;
+  description?: string;
+  seq?: number;
+  isEnabled?: boolean;
+};
+
+export type UpdateCategoryPayload = {
+  articleCategoryId: string;
+} & Partial<Omit<CategoryItem, "id" | "articleCategoryId" | "updatedAt">>;
 
 export const getCategoryList = (data: CategoryListParams) => {
-  return http.request<PageResult<CategoryItem>>("post", "/category/list", {
+  return http.request<CategoryListResult>("post", "/article-categories", {
     data
   });
 };
 
-export const createCategory = (data: CreateCategoryPayload) => {
+export const createCategory = (
+  data: CreateCategoryPayload,
+  options?: { showSuccessMessage?: boolean }
+) => {
   return http.request<CategoryItem | EmptyData>(
     "post",
-    "/category/create",
+    "/article-categories/create",
     { data },
-    { showSuccessMessage: true }
+    { showSuccessMessage: options?.showSuccessMessage ?? true }
   );
 };
 
 export const updateCategory = (data: UpdateCategoryPayload) => {
   return http.request<CategoryItem | EmptyData>(
     "post",
-    "/category/update",
+    "/article-categories/update",
     { data },
     { showSuccessMessage: true }
   );
 };
 
-export const deleteCategory = (data: { id: number }) => {
-  return http.request<EmptyData>(
+export const deleteCategory = (data: { articleCategoryId: string }) => {
+  return http.request<{ ok: boolean }>(
     "post",
-    "/category/delete",
-    { data },
-    { showSuccessMessage: true }
-  );
-};
-
-export const batchDeleteCategories = (data: { ids: number[] }) => {
-  return http.request<EmptyData>(
-    "post",
-    "/category/batchDelete",
+    "/article-categories/delete",
     { data },
     { showSuccessMessage: true }
   );

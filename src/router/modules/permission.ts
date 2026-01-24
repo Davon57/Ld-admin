@@ -4,6 +4,7 @@ export default {
   meta: {
     icon: "ri/lock-2-line",
     title: "权限管理",
+    showLink: false,
     rank: 7
   },
   children: [

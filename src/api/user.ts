@@ -12,7 +12,7 @@ export type UserResult = {
     city: string;
     email: string;
     phone: string | null;
-    role: "user" | "admin" | "moderator";
+    role: string;
     mustChangePassword: boolean;
   };
 };
@@ -64,11 +64,11 @@ export type CurrentUser = {
   city: string;
   email: string;
   phone: string | null;
-  role: "user" | "admin" | "moderator";
+  role: string;
   status: "active" | "inactive" | "banned";
 };
 
-export type UserRole = "user" | "admin" | "moderator";
+export type UserRole = string;
 export type UserStatus = "active" | "inactive" | "banned";
 
 export type UserItem = {

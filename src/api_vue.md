@@ -193,9 +193,9 @@
 **参数（Body）**：
 
 - `page`（number，可选）：页码（从 1 开始，默认 1）
-- `pageSize`（number，可选）：每页条数（默认 10，最大 100）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 1000）
 - `keyword`（string，可选）：关键词（对 username/nickname/city 做模糊匹配）
-- `role`（string，可选）：角色（user/admin/moderator）
+- `role`（string，可选）：角色 code（来自「9.6 获取角色列表」的 data.list[].code）
 - `status`（string，可选）：状态（active/inactive/banned）
 
 **返回值（Success 200）**：对象
@@ -226,7 +226,7 @@
 | data.list[].city      | string        | 所在城市                              | 北京                 |
 | data.list[].email     | string \ null | 邮箱                                  | zhangsan@example.com |
 | data.list[].phone     | string \ null | 手机号                                | 13800138000          |
-| data.list[].role      | string        | 角色（user/admin/moderator）          | user                 |
+| data.list[].role      | string        | 角色 code（来自 /roles）              | user                 |
 | data.list[].status    | string        | 状态（active/inactive/banned）        | active               |
 | data.list[].createdAt | string        | 创建时间（YYYY-MM-DD HH:mm:ss）       | 2026-01-10 00:00:00  |
 | data.list[].updatedAt | string        | 更新时间（YYYY-MM-DD HH:mm:ss）       | 2026-01-10 00:00:00  |
@@ -268,7 +268,7 @@
 | data.city     | string        | 所在城市                              | 北京                 |
 | data.email    | string \ null | 邮箱                                  | zhangsan@example.com |
 | data.phone    | string \ null | 手机号                                | 13800138000          |
-| data.role     | string        | 角色（user/admin/moderator）          | user                 |
+| data.role     | string        | 角色 code（来自 /roles）              | user                 |
 | data.status   | string        | 状态（active/inactive/banned）        | active               |
 
 ---
@@ -308,7 +308,7 @@
 | data.city               | string        | 所在城市                              | 北京                 |
 | data.email              | string \ null | 邮箱                                  | zhangsan@example.com |
 | data.phone              | string \ null | 手机号                                | 13800138000          |
-| data.role               | string        | 角色（user/admin/moderator）          | user                 |
+| data.role               | string        | 角色 code（来自 /roles）              | user                 |
 | data.status             | string        | 状态（active/inactive/banned）        | active               |
 | data.mustChangePassword | boolean       | 是否需要改密（首次登录/自举）         | false                |
 
@@ -335,7 +335,7 @@
 - `nickname`（string，可选）：昵称
 - `city`（string，可选）：所在城市
 - `phone`（string \ null，可选）：手机号
-- `role`（string，可选）：角色（user/admin/moderator）
+- `role`（string，可选）：角色 code（来自 /roles）
 - `status`（string，可选）：状态（active/inactive/banned）
 
 **返回值（Success 201）**：对象 `User`
@@ -357,7 +357,7 @@
 | data.city               | string        | 所在城市                              | 北京                 |
 | data.email              | string \ null | 邮箱                                  | zhangsan@example.com |
 | data.phone              | string \ null | 手机号                                | 13800138000          |
-| data.role               | string        | 角色（user/admin/moderator）          | user                 |
+| data.role               | string        | 角色 code（来自 /roles）              | user                 |
 | data.status             | string        | 状态（active/inactive/banned）        | active               |
 | data.mustChangePassword | boolean       | 是否需要改密（首次登录/自举）         | false                |
 
@@ -383,7 +383,7 @@
 - `city`（string，可选）：所在城市
 - `email`（string，可选）：邮箱
 - `phone`（string \ null，可选）：手机号
-- `role`（string，可选）：角色（user/admin/moderator，仅 admin/moderator 可修改）
+- `role`（string，可选）：角色 code（来自 /roles，仅 admin/moderator 可修改）
 - `status`（string，可选）：状态（active/inactive/banned，仅 admin/moderator 可修改）
 
 **返回值（Success 200）**：对象 `User`
@@ -405,7 +405,7 @@
 | data.city               | string        | 所在城市                              | 北京                 |
 | data.email              | string \ null | 邮箱                                  | zhangsan@example.com |
 | data.phone              | string \ null | 手机号                                | 13800138000          |
-| data.role               | string        | 角色（user/admin/moderator）          | user                 |
+| data.role               | string        | 角色 code（来自 /roles）              | user                 |
 | data.status             | string        | 状态（active/inactive/banned）        | active               |
 | data.mustChangePassword | boolean       | 是否需要改密（首次登录/自举）         | false                |
 
@@ -415,7 +415,7 @@
 
 **接口标题**：删除用户
 
-**功能描述**：删除用户（软删除，仅 admin/moderator 可用）；删除时会同步清理该用户的车辆与车友绑定记录。
+**功能描述**：删除用户（硬删除，仅 admin/moderator 可用）；删除时会同步清理该用户的车辆与车友绑定记录。
 
 **接口路由**：`POST /users/delete`
 
@@ -491,7 +491,7 @@
 **参数（Body）**：
 
 - `page`（number，可选）：页码（从 1 开始，默认 1）
-- `pageSize`（number，可选）：每页条数（默认 10，最大 100）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 1000）
 - `includeDisabled`（boolean，可选，默认 false）：是否包含禁用头像（仅 admin/moderator 生效）
 - `isEnabled`（boolean，可选）：是否启用（仅 admin/moderator 生效；与 includeDisabled 同时使用时以 isEnabled 为准）
 
@@ -627,6 +627,141 @@
 
 ---
 
+## 9.6 获取角色列表（需登录）
+
+**接口标题**：角色列表
+
+**功能描述**：返回系统角色列表（仅 admin/moderator 可用；不分页，支持按 code/name/isEnabled 筛选）。
+
+**接口路由**：`POST /roles`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `code`（string，可选）：角色 code（精确匹配）
+- `nameKeyword`（string，可选）：角色名称关键词（对 name 做模糊匹配）
+- `isEnabled`（boolean，可选）：是否启用
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                   | 示例      |
+| ------- | ------ | ---------------------- | --------- |
+| code    | string | 状态码                 | '0'       |
+| message | string | 状态描述               | 'success' |
+| data    | object | 数据（RoleListResult） | -         |
+
+`data` 字段结构（RoleListResult）：
+
+| 字段      | 类型  | 说明               | 示例 |
+| --------- | ----- | ------------------ | ---- |
+| data.list | array | 角色列表（Role[]） | -    |
+
+`data.list` 字段结构（Role[]）：
+
+| 字段                    | 类型    | 说明                            | 示例                                 |
+| ----------------------- | ------- | ------------------------------- | ------------------------------------ |
+| data.list[].id          | string  | 主键 ID（UUID）                 | 550e8400-e29b-41d4-a716-446655440000 |
+| data.list[].code        | string  | 角色 code（用于 users.role）    | admin                                |
+| data.list[].name        | string  | 角色名称                        | 管理员                               |
+| data.list[].description | string  | 角色描述                        | 系统管理员角色                       |
+| data.list[].isEnabled   | boolean | 是否启用                        | true                                 |
+| data.list[].updatedAt   | string  | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-22 12:00:00                  |
+
+---
+
+## 9.7 新增角色（需登录）
+
+**接口标题**：新增角色
+
+**功能描述**：新增一条角色记录（仅 admin/moderator 可用）。
+
+**接口路由**：`POST /roles/create`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `code`（string，必填）：角色 code（1-50，唯一；用于 users.role）
+- `name`（string，可选）：角色名称（默认空字符串）
+- `description`（string，可选）：角色描述（默认空字符串）
+- `isEnabled`（boolean，可选）：是否启用（默认 true）
+
+**返回值（Success 201）**：对象 `Role`
+
+| 字段    | 类型   | 说明         | 示例      |
+| ------- | ------ | ------------ | --------- |
+| code    | string | 状态码       | '0'       |
+| message | string | 状态描述     | 'success' |
+| data    | object | 数据（Role） | -         |
+
+`data` 字段结构（Role）：同「9.6 获取角色列表」的 Role 字段。
+
+---
+
+## 9.8 修改角色（需登录）
+
+**接口标题**：修改角色
+
+**功能描述**：更新一条角色记录（按 code 定位，仅 admin/moderator 可用；支持禁用）。
+
+**接口路由**：`POST /roles/update`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `code`（string，必填）：角色 code
+- `name`（string，可选）：角色名称
+- `description`（string，可选）：角色描述
+- `isEnabled`（boolean，可选）：是否启用
+
+**返回值（Success 200）**：对象 `Role`
+
+| 字段    | 类型   | 说明         | 示例      |
+| ------- | ------ | ------------ | --------- |
+| code    | string | 状态码       | '0'       |
+| message | string | 状态描述     | 'success' |
+| data    | object | 数据（Role） | -         |
+
+`data` 字段结构（Role）：同「9.6 获取角色列表」的 Role 字段。
+
+---
+
+## 9.9 删除角色（需登录）
+
+**接口标题**：删除角色
+
+**功能描述**：删除一条角色记录（硬删除，仅 admin/moderator 可用；被用户使用中的角色不允许删除）。
+
+**接口路由**：`POST /roles/delete`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `code`（string，必填）：角色 code
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                 | 示例      |
+| ------- | ------ | -------------------- | --------- |
+| code    | string | 状态码               | '0'       |
+| message | string | 状态描述             | 'success' |
+| data    | object | 数据（DeleteResult） | -         |
+
+`data` 字段结构（DeleteResult）：同「9.5 删除头像」。
+
+---
+
 ## 10. 获取车辆列表（需登录）
 
 **接口标题**：车辆列表
@@ -642,7 +777,7 @@
 **参数（Body）**：
 
 - `page`（number，可选）：页码（从 1 开始，默认 1）
-- `pageSize`（number，可选）：每页条数（默认 10，最大 100）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 1000）
 - `includeDisabled`（boolean，可选，默认 false）：是否包含禁用车辆
 - `status`（string，可选）：状态（on_sale/discontinued）
 - `modelKeyword`（string，可选）：车型关键词（对 model 做模糊匹配）
@@ -821,7 +956,7 @@
 **参数（Body）**：
 
 - `page`（number，可选）：页码（从 1 开始，默认 1）
-- `pageSize`（number，可选）：每页条数（默认 10，最大 100）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 1000）
 - `userId`（string，可选）：车友用户业务 ID（格式：LD####AAAA；用于查询 username 进行过滤，不存在则返回空列表）
 - `carId`（string，可选）：车辆业务 ID（格式：LD####AAAA）
 - `vin`（string，可选）：VIN 码（17 位）
@@ -1000,7 +1135,7 @@
 **参数（Body）**：
 
 - `page`（number，可选）：页码（从 1 开始，默认 1）
-- `pageSize`（number，可选）：每页条数（默认 10，最大 100）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 1000）
 - `status`（string，可选）：状态（draft/published/hidden）
 - `userId`（string，可选）：作者用户业务 ID（格式：LD####AAAA）
 - `carId`（string，可选）：关联车辆业务 ID（格式：LD####AAAA）
@@ -1050,7 +1185,7 @@
 **参数（Body）**：
 
 - `page`（number，可选）：页码（从 1 开始，默认 1）
-- `pageSize`（number，可选）：每页条数（默认 10，最大 100）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 1000）
 - `type`（string，可选）：反馈问题类型
 - `cbyKeyword`（string，可选）：创建人关键词（对 cby 做模糊匹配）
 - `createdAtStart`（string，可选）：开始时间（ISO 字符串，createdAt >=）
@@ -1190,7 +1325,7 @@
 
 **接口标题**：删除反馈
 
-**功能描述**：删除反馈（软删除）。
+**功能描述**：删除反馈（硬删除）。
 
 **接口路由**：`POST /feedbacks/delete`
 
@@ -1233,7 +1368,7 @@
 **参数（Body）**：
 
 - `page`（number，可选）：页码（从 1 开始，默认 1）
-- `pageSize`（number，可选）：每页条数（默认 10，最大 100）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 1000）
 - `nameKeyword`（string，可选）：类型名关键词（对 name 做模糊匹配）
 - `createdAtStart`（string，可选）：开始时间（ISO 字符串，createdAt >=）
 
@@ -1345,7 +1480,7 @@
 
 **接口标题**：删除反馈类型
 
-**功能描述**：删除反馈类型（软删除）。
+**功能描述**：删除反馈类型（硬删除）。
 
 **接口路由**：`POST /feedback-types/delete`
 
@@ -1434,7 +1569,7 @@
 
 - `name`（string，必填）：勋章名字
 - `description`（string，可选）：勋章描述
-- `isEnabled`（boolean，可选，默认 true）：是否启用
+- `isEnabled`（boolean，可选，默认 true）：是否启用（仅 admin/moderator 可设置；普通用户创建时会强制为 true）
 
 **返回值（Success 201）**：对象 `MedalType`
 
@@ -1474,7 +1609,7 @@
 - `medalTypeId`（string，必填）：勋章类型业务 ID（格式：LD####AAAA）
 - `name`（string，可选）：勋章名字
 - `description`（string，可选）：勋章描述
-- `isEnabled`（boolean，可选）：是否启用
+- `isEnabled`（boolean，可选）：是否启用（仅 admin/moderator 可修改）
 
 **返回值（Success 200）**：对象 `MedalType`
 
@@ -1544,7 +1679,7 @@
 **参数（Body）**：
 
 - `page`（number，可选）：页码（从 1 开始，默认 1）
-- `pageSize`（number，可选）：每页条数（默认 10，最大 100）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 1000）
 - `medalTypeId`（string，可选）：勋章类型业务 ID（格式：LD####AAAA）
 - `nameKeyword`（string，可选）：勋章名字关键词（对 name 做模糊匹配）
 - `isEnabled`（boolean，可选）：是否启用
@@ -1691,7 +1826,7 @@
 **参数（Body）**：
 
 - `page`（number，可选）：页码（从 1 开始，默认 1）
-- `pageSize`（number，可选）：每页条数（默认 10，最大 100）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 1000）
 - `medalTypeId`（string，可选）：勋章类型业务 ID（格式：LD####AAAA）
 - `nameKeyword`（string，可选）：勋章名字关键词（对 name 做模糊匹配）
 
@@ -1744,7 +1879,7 @@
 **参数（Body）**：
 
 - `page`（number，可选）：页码（从 1 开始，默认 1）
-- `pageSize`（number，可选）：每页条数（默认 10，最大 100）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 1000）
 - `medalTypeId`（string，可选）：勋章类型业务 ID（格式：LD####AAAA）
 - `isWorn`（boolean，可选）：是否佩戴中
 
@@ -1864,7 +1999,7 @@
 **参数（Body）**：
 
 - `page`（number，可选）：页码（从 1 开始，默认 1）
-- `pageSize`（number，可选）：每页条数（默认 10，最大 100）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 1000）
 - `userId`（string，可选）：用户业务 ID（格式：LD####AAAA）
 - `medalId`（string，可选）：勋章业务 ID（格式：LD####AAAA）
 - `sourceType`（string，可选）：来源类型（如 admin_manual）
@@ -1915,7 +2050,7 @@
 **参数（Body）**：
 
 - `page`（number，可选）：页码（从 1 开始，默认 1）
-- `pageSize`（number，可选）：每页条数（默认 10，最大 100）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 1000）
 - `qaTagId`（string，可选）：标签业务 ID（格式：LD####AAAA）
 - `nameKeyword`（string，可选）：标签名关键词（对 name 做模糊匹配）
 - `isEnabled`（boolean，可选）：是否启用
@@ -2028,7 +2163,7 @@
 
 **接口标题**：删除问答标签
 
-**功能描述**：删除问答标签（软删除）。
+**功能描述**：删除问答标签（硬删除）。
 
 **接口路由**：`POST /qa-tags/delete`
 
@@ -2060,7 +2195,7 @@
 
 **接口标题**：问答问题列表
 
-**功能描述**：获取问答问题列表（支持分页与筛选，按 publishedAt 降序）。
+**功能描述**：获取问答问题列表（支持分页与筛选）。通过 `type` 控制 4 种列表：最新 / 待解答 / 热门 / 精选。
 
 **接口路由**：`POST /qa-questions`
 
@@ -2070,8 +2205,13 @@
 
 **参数（Body）**：
 
+- `type`（string，可选）：列表类型，默认 `latest`
+  - `latest`：最新（按最后互动时间 `activityAt` 倒序；如新增回答、采纳/取消采纳、编辑问题等会刷新）
+  - `unanswered`：待解答（未采纳的问题，即 `acceptedAnswerId` 为空）
+  - `hot`：热门（已采纳 + 回答数≥5 + 点赞数≥10；按浏览量 `viewCount` 倒序）
+  - `featured`：精选（仅版主/管理员设置；按 `featuredAt` 倒序）
 - `page`（number，可选）：页码（从 1 开始，默认 1）
-- `pageSize`（number，可选）：每页条数（默认 10，最大 100）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 1000）
 - `keyword`（string，可选）：标题关键词（对 title 做模糊匹配）
 - `tagId`（string，可选）：标签业务 ID（格式：LD####AAAA）
 - `isSolved`（boolean，可选）：是否已解决（是否已采纳回答）
@@ -2110,6 +2250,8 @@
 | data.list[].acceptedAnswerId | string \ null | 已采纳回答业务 ID                                        | LD0009WXYZ                           |
 | data.list[].isSolved         | boolean       | 是否已解决                                               | true                                 |
 | data.list[].isEnabled        | boolean       | 是否启用                                                 | true                                 |
+| data.list[].isFeatured       | boolean       | 是否精选                                                 | false                                |
+| data.list[].featuredAt       | string \ null | 精选设置时间（YYYY-MM-DD HH:mm:ss）                      | 2026-01-22 12:00:00                  |
 | data.list[].publishedAt      | string        | 发布时间（YYYY-MM-DD HH:mm:ss）                          | 2026-01-20 12:00:00                  |
 | data.list[].createdAt        | string        | 创建时间（YYYY-MM-DD HH:mm:ss）                          | 2026-01-20 12:00:00                  |
 | data.list[].updatedAt        | string        | 最后互动时间（评论/采纳变更时更新，YYYY-MM-DD HH:mm:ss） | 2026-01-20 12:00:00                  |
@@ -2254,7 +2396,7 @@
 
 **接口标题**：删除问答问题
 
-**功能描述**：删除问答问题（软删除，同时会清理该问题下的回答与标签关联）。
+**功能描述**：删除问答问题（硬删除，同时会清理该问题下的回答与标签关联）。
 
 **接口路由**：`POST /qa-questions/delete`
 
@@ -2425,7 +2567,7 @@
 **参数（Body）**：
 
 - `page`（number，可选）：页码（从 1 开始，默认 1）
-- `pageSize`（number，可选）：每页条数（默认 10，最大 100）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 1000）
 - `qaQuestionId`（string，必填）：问答问题业务 ID（格式：LD####AAAA）
 - `rootQaAnswerId`（string，可选）：根回答业务 ID（格式：LD####AAAA）。传入时表示拉取该根回答下的回复列表。
 
@@ -2532,7 +2674,7 @@
 
 **接口标题**：删除问答回答
 
-**功能描述**：删除回答（软删除）。若删除的是根回答，会连带删除该根回答下所有回复。若删除涉及已采纳回答（包含线程内回复的历史采纳数据），会自动清除问题的采纳状态。
+**功能描述**：删除回答（硬删除）。若删除的是根回答，会连带删除该根回答下所有回复。若删除涉及已采纳回答（包含线程内回复的历史采纳数据），会自动清除问题的采纳状态。
 
 **接口路由**：`POST /qa-answers/delete`
 
@@ -2616,6 +2758,211 @@
 
 ---
 
+## 52. 设置问答精选（需登录）
+
+**接口标题**：设置问答精选
+
+**功能描述**：将指定问答问题设置为精选（仅版主/管理员可操作）。
+
+**接口路由**：`POST /qa-questions/feature`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `qaQuestionId`（string，必填）：问答问题业务 ID（格式：LD####AAAA）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                  | 示例      |
+| ------- | ------ | --------------------- | --------- |
+| code    | string | 状态码                | '0'       |
+| message | string | 状态描述              | 'success' |
+| data    | object | 数据（FeatureResult） | -         |
+
+`data` 字段结构（FeatureResult）：
+
+| 字段    | 类型    | 说明     | 示例 |
+| ------- | ------- | -------- | ---- |
+| data.ok | boolean | 是否成功 | true |
+
+---
+
+## 53. 取消问答精选（需登录）
+
+**接口标题**：取消问答精选
+
+**功能描述**：取消指定问答问题的精选状态（仅版主/管理员可操作）。
+
+**接口路由**：`POST /qa-questions/unfeature`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `qaQuestionId`（string，必填）：问答问题业务 ID（格式：LD####AAAA）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                  | 示例      |
+| ------- | ------ | --------------------- | --------- |
+| code    | string | 状态码                | '0'       |
+| message | string | 状态描述              | 'success' |
+| data    | object | 数据（FeatureResult） | -         |
+
+`data` 字段结构（FeatureResult）：同上 `FeatureResult` 字段。
+
+---
+
+## 54. 获取文章分类列表（需登录）
+
+**接口标题**：文章分类列表
+
+**功能描述**：获取文章分类列表，支持按分类名关键词筛选，支持分页。
+
+**接口路由**：`POST /article-categories`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `page`（number，可选）：页码（从 1 开始，默认 1）
+- `pageSize`（number，可选）：每页条数（默认 1000，最大 1000）
+- `nameKeyword`（string，可选）：分类名关键词（对 name 做模糊匹配）
+- `isEnabled`（boolean，可选）：是否启用
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                              | 示例      |
+| ------- | ------ | --------------------------------- | --------- |
+| code    | string | 状态码                            | '0'       |
+| message | string | 状态描述                          | 'success' |
+| data    | object | 数据（ArticleCategoryListResult） | -         |
+
+`data` 字段结构（ArticleCategoryListResult）：
+
+| 字段          | 类型   | 说明                      | 示例 |
+| ------------- | ------ | ------------------------- | ---- |
+| data.list     | array  | 列表（ArticleCategory[]） | -    |
+| data.page     | number | 当前页码                  | 1    |
+| data.pageSize | number | 每页条数                  | 1000 |
+| data.total    | number | 总条数                    | 20   |
+
+`data.list` 字段结构（ArticleCategory[]）：
+
+| 字段                          | 类型    | 说明                            | 示例                                 |
+| ----------------------------- | ------- | ------------------------------- | ------------------------------------ |
+| data.list[].id                | string  | 主键 ID（UUID）                 | 550e8400-e29b-41d4-a716-446655440000 |
+| data.list[].articleCategoryId | string  | 分类业务 ID（格式：LD####AAAA） | LD0001ABCD                           |
+| data.list[].name              | string  | 分类名字                        | 新闻                                 |
+| data.list[].description       | string  | 分类描述                        | 新闻类文章分类                       |
+| data.list[].seq               | number  | 排序 seq                        | 0                                    |
+| data.list[].isEnabled         | boolean | 是否启用                        | true                                 |
+| data.list[].updatedAt         | string  | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-24 12:00:00                  |
+
+---
+
+## 55. 新增文章分类（需登录）
+
+**接口标题**：新增文章分类
+
+**功能描述**：创建一条新的文章分类记录。
+
+**接口路由**：`POST /article-categories/create`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `name`（string，必填）：分类名字
+- `description`（string，可选，默认 ''）：分类描述
+- `seq`（number，可选，默认 0）：排序 seq
+- `isEnabled`（boolean，可选，默认 true）：是否启用
+
+**返回值（Success 201）**：对象 `ArticleCategory`
+
+| 字段    | 类型   | 说明                    | 示例      |
+| ------- | ------ | ----------------------- | --------- |
+| code    | string | 状态码                  | '0'       |
+| message | string | 状态描述                | 'success' |
+| data    | object | 数据（ArticleCategory） | -         |
+
+`data` 字段结构（ArticleCategory）：同上 `ArticleCategory` 字段。
+
+---
+
+## 56. 修改文章分类（需登录）
+
+**接口标题**：修改文章分类
+
+**功能描述**：更新文章分类内容（按 articleCategoryId 定位，支持部分字段更新）。
+
+**接口路由**：`POST /article-categories/update`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `articleCategoryId`（string，必填）：分类业务 ID（格式：LD####AAAA）
+- `name`（string，可选）：分类名字
+- `description`（string，可选）：分类描述
+- `seq`（number，可选）：排序 seq
+- `isEnabled`（boolean，可选）：是否启用
+
+**返回值（Success 200）**：对象 `ArticleCategory`
+
+| 字段    | 类型   | 说明                    | 示例      |
+| ------- | ------ | ----------------------- | --------- |
+| code    | string | 状态码                  | '0'       |
+| message | string | 状态描述                | 'success' |
+| data    | object | 数据（ArticleCategory） | -         |
+
+`data` 字段结构（ArticleCategory）：同上 `ArticleCategory` 字段。
+
+---
+
+## 57. 删除文章分类（需登录）
+
+**接口标题**：删除文章分类
+
+**功能描述**：删除一条文章分类记录（软删除）。
+
+**接口路由**：`POST /article-categories/delete`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `articleCategoryId`（string，必填）：分类业务 ID（格式：LD####AAAA）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                 | 示例      |
+| ------- | ------ | -------------------- | --------- |
+| code    | string | 状态码               | '0'       |
+| message | string | 状态描述             | 'success' |
+| data    | object | 数据（DeleteResult） | -         |
+
+`data` 字段结构（DeleteResult）：
+
+| 字段    | 类型    | 说明     | 示例 |
+| ------- | ------- | -------- | ---- |
+| data.ok | boolean | 是否成功 | true |
+
+---
+
 ## 通用错误响应
 
 ### 1) 业务/鉴权等错误（errorHandler 兜底）
@@ -2633,6 +2980,8 @@
 ```json
 { "code": "401", "message": "Authentication Error", "data": [] }
 ```
+
+账号状态错误（中间件校验）：当账号状态为 inactive/banned 时，HTTP 403，message 分别为 `账号已停用` / `账号已被封禁`。
 
 ### 2) 参数校验错误（validator）
 
