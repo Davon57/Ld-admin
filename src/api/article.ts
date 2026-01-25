@@ -206,3 +206,135 @@ export const batchDeletePosts = (data: { ids: number[] }) => {
     { showSuccessMessage: true }
   );
 };
+
+export type ArticleItem = {
+  id: string;
+  articleId: string;
+  authorUserId: string;
+  articleCategoryId: string;
+  title: string;
+  content: string;
+  coverScreenshotBase64: string;
+  coverPhotoBase64: string;
+  contentImages: string[];
+  isEnabled: boolean;
+  viewCount: number;
+  likeCount: number;
+  commentCount: number;
+  publishedAt: string;
+  modifiedAt: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ArticleListParams = {
+  page: number;
+  pageSize: number;
+  keyword?: string;
+  articleCategoryId?: string;
+  authorUserId?: string;
+  isEnabled?: boolean;
+};
+
+export type ArticleListResult = {
+  list: ArticleItem[];
+  page: number;
+  pageSize: number;
+  total: number;
+};
+
+export type CreateArticlePayload = {
+  articleCategoryId: string;
+  title: string;
+  content: string;
+  coverScreenshotBase64: string;
+  coverPhotoBase64: string;
+  contentImages?: string[];
+  isEnabled?: boolean;
+};
+
+export type UpdateArticlePayload = {
+  articleId: string;
+  articleCategoryId?: string;
+  title?: string;
+  content?: string;
+  coverScreenshotBase64?: string;
+  coverPhotoBase64?: string;
+  contentImages?: string[];
+  isEnabled?: boolean;
+};
+
+export const getArticleList = (data: ArticleListParams) => {
+  return http.request<ArticleListResult>("post", "/articles", { data });
+};
+
+export const getArticleDetail = (data: { articleId: string }) => {
+  return http.request<ArticleItem>("post", "/articles/detail", { data });
+};
+
+export const createArticle = (
+  data: CreateArticlePayload,
+  options?: { showSuccessMessage?: boolean }
+) => {
+  return http.request<ArticleItem | EmptyData>(
+    "post",
+    "/articles/create",
+    { data },
+    { showSuccessMessage: options?.showSuccessMessage ?? true }
+  );
+};
+
+export const updateArticle = (data: UpdateArticlePayload) => {
+  return http.request<ArticleItem | EmptyData>(
+    "post",
+    "/articles/update",
+    { data },
+    { showSuccessMessage: true }
+  );
+};
+
+export const deleteArticle = (data: { articleId: string }) => {
+  return http.request<{ ok: boolean }>(
+    "post",
+    "/articles/delete",
+    { data },
+    { showSuccessMessage: true }
+  );
+};
+
+export type ArticleCommentItem = {
+  id: string;
+  articleCommentId: string;
+  articleId: string;
+  authorUserId: string;
+  nickname: string;
+  content: string;
+  likeCount: number;
+  isLiked: boolean;
+  replyCount: number;
+  parentArticleCommentId: string | null;
+  rootArticleCommentId: string | null;
+  createdAt: string;
+  updatedAt: string;
+  modifiedAt: string | null;
+};
+
+export type ArticleCommentListParams = {
+  page: number;
+  pageSize: number;
+  articleId: string;
+  rootArticleCommentId?: string;
+};
+
+export type ArticleCommentListResult = {
+  list: ArticleCommentItem[];
+  page: number;
+  pageSize: number;
+  total: number;
+};
+
+export const getArticleCommentList = (data: ArticleCommentListParams) => {
+  return http.request<ArticleCommentListResult>("post", "/article-comments", {
+    data
+  });
+};

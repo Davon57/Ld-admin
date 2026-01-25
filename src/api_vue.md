@@ -2963,6 +2963,453 @@
 
 ---
 
+## 58. 获取文章列表（需登录）
+
+**接口标题**：文章列表
+
+**功能描述**：获取文章列表，支持分页与筛选。
+
+**接口路由**：`POST /articles`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `page`（number，可选）：页码（从 1 开始，默认 1）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 1000）
+- `keyword`（string，可选）：标题关键词（对 title 做模糊匹配）
+- `articleCategoryId`（string，可选）：文章分类业务 ID（格式：LD####AAAA）
+- `authorUserId`（string，可选）：作者用户业务 ID（格式：LD####AAAA）
+- `isEnabled`（boolean，可选）：是否启用（仅管理员/版主可用）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                      | 示例      |
+| ------- | ------ | ------------------------- | --------- |
+| code    | string | 状态码                    | '0'       |
+| message | string | 状态描述                  | 'success' |
+| data    | object | 数据（ArticleListResult） | -         |
+
+`data` 字段结构（ArticleListResult）：
+
+| 字段          | 类型   | 说明              | 示例 |
+| ------------- | ------ | ----------------- | ---- |
+| data.list     | array  | 列表（Article[]） | -    |
+| data.page     | number | 当前页码          | 1    |
+| data.pageSize | number | 每页条数          | 10   |
+| data.total    | number | 总条数            | 100  |
+
+`data.list` 字段结构（Article[]）：
+
+| 字段                              | 类型    | 说明                                           | 示例                                 |
+| --------------------------------- | ------- | ---------------------------------------------- | ------------------------------------ |
+| data.list[].id                    | string  | 主键 ID（UUID）                                | 550e8400-e29b-41d4-a716-446655440000 |
+| data.list[].articleId             | string  | 文章业务 ID（格式：LD####AAAA）                | LD0001ABCD                           |
+| data.list[].authorUserId          | string  | 作者用户业务 ID                                | LD0002EFGH                           |
+| data.list[].articleCategoryId     | string  | 分类业务 ID                                    | LD0003IJKL                           |
+| data.list[].title                 | string  | 标题                                           | 标题示例                             |
+| data.list[].content               | string  | 正文（textarea 纯文本）                        | ...                                  |
+| data.list[].coverScreenshotBase64 | string  | 封面截图（base64/dataURL）                     | data:image/png;base64,...            |
+| data.list[].coverPhotoBase64      | string  | 封面图（base64/dataURL）                       | data:image/jpeg;base64,...           |
+| data.list[].contentImages         | array   | 正文图片 base64/dataURL 数组                   | []                                   |
+| data.list[].isEnabled             | boolean | 是否启用                                       | true                                 |
+| data.list[].viewCount             | number  | 浏览量                                         | 0                                    |
+| data.list[].likeCount             | number  | 点赞数                                         | 0                                    |
+| data.list[].commentCount          | number  | 评论数（含楼中楼回复，口径同问答 answerCount） | 0                                    |
+| data.list[].publishedAt           | string  | 发布时间（YYYY-MM-DD HH:mm:ss）                | 2026-01-25 12:00:00                  |
+| data.list[].modifiedAt            | string  | 最近评论更新时间（YYYY-MM-DD HH:mm:ss）        | 2026-01-25 12:00:00                  |
+| data.list[].createdAt             | string  | 创建时间（YYYY-MM-DD HH:mm:ss）                | 2026-01-25 12:00:00                  |
+| data.list[].updatedAt             | string  | 更新时间（YYYY-MM-DD HH:mm:ss）                | 2026-01-25 12:00:00                  |
+
+---
+
+## 59. 获取文章详情（需登录）
+
+**接口标题**：文章详情
+
+**功能描述**：获取文章详情（按 articleId）。
+
+**接口路由**：`POST /articles/detail`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `articleId`（string，必填）：文章业务 ID（格式：LD####AAAA）
+
+**返回值（Success 200）**：对象 `Article`
+
+| 字段    | 类型   | 说明            | 示例      |
+| ------- | ------ | --------------- | --------- |
+| code    | string | 状态码          | '0'       |
+| message | string | 状态描述        | 'success' |
+| data    | object | 数据（Article） | -         |
+
+`data` 字段结构（Article）：同上 `Article[]` 的字段结构。
+
+补充字段（计数）：
+
+| 字段         | 类型    | 说明                         | 示例 |
+| ------------ | ------- | ---------------------------- | ---- |
+| data.isLiked | boolean | 当前登录用户是否已点赞该文章 | true |
+
+---
+
+## 60. 新增文章（需登录）
+
+**接口标题**：新增文章
+
+**功能描述**：创建一篇新文章，图片字段均为 base64/dataURL。
+
+**接口路由**：`POST /articles/create`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `articleCategoryId`（string，必填）：分类业务 ID（格式：LD####AAAA）
+- `title`（string，必填）：标题
+- `content`（string，必填）：正文内容（textarea 纯文本）
+- `coverScreenshotBase64`（string，必填）：封面截图 base64/dataURL
+- `coverPhotoBase64`（string，必填）：封面图 base64/dataURL
+- `contentImages`（array，可选，默认 []）：正文图片 base64/dataURL 数组
+- `isEnabled`（boolean，可选，默认 true）：是否启用（仅管理员/版主可关闭）
+
+**返回值（Success 201）**：对象 `Article`
+
+| 字段    | 类型   | 说明            | 示例      |
+| ------- | ------ | --------------- | --------- |
+| code    | string | 状态码          | '0'       |
+| message | string | 状态描述        | 'success' |
+| data    | object | 数据（Article） | -         |
+
+`data` 字段结构（Article）：同「58. 获取文章列表」的 `Article[]` 字段结构。
+
+## 61. 修改文章（需登录）
+
+**接口标题**：修改文章
+
+**功能描述**：更新文章内容（不修改 publishedAt；modifiedAt 仅由评论变更触发）。
+
+**接口路由**：`POST /articles/update`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `articleId`（string，必填）：文章业务 ID（格式：LD####AAAA）
+- `articleCategoryId`（string，可选）：分类业务 ID
+- `title`（string，可选）：标题
+- `content`（string，可选）：正文内容（textarea 纯文本）
+- `coverScreenshotBase64`（string，可选）：封面截图 base64/dataURL
+- `coverPhotoBase64`（string，可选）：封面图 base64/dataURL
+- `contentImages`（array，可选）：正文图片 base64/dataURL 数组
+- `isEnabled`（boolean，可选）：是否启用（仅管理员/版主可修改）
+
+**返回值（Success 200）**：对象 `Article`
+
+| 字段    | 类型   | 说明            | 示例      |
+| ------- | ------ | --------------- | --------- |
+| code    | string | 状态码          | '0'       |
+| message | string | 状态描述        | 'success' |
+| data    | object | 数据（Article） | -         |
+
+---
+
+## 62. 删除文章（需登录）
+
+**接口标题**：删除文章
+
+**功能描述**：删除一篇文章（软删除）。
+
+**接口路由**：`POST /articles/delete`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `articleId`（string，必填）：文章业务 ID（格式：LD####AAAA）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                 | 示例      |
+| ------- | ------ | -------------------- | --------- |
+| code    | string | 状态码               | '0'       |
+| message | string | 状态描述             | 'success' |
+| data    | object | 数据（DeleteResult） | -         |
+
+`data` 字段结构（DeleteResult）：
+
+| 字段    | 类型    | 说明     | 示例 |
+| ------- | ------- | -------- | ---- |
+| data.ok | boolean | 是否成功 | true |
+
+---
+
+## 63. 获取文章评论列表（需登录）
+
+**接口标题**：文章评论列表
+
+**功能描述**：获取文章评论列表，支持楼外楼（不传 rootArticleCommentId 获取根评论；传 rootArticleCommentId 获取该根评论的回复列表）。
+
+**接口路由**：`POST /article-comments`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `page`（number，可选）：页码（从 1 开始，默认 1）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 1000）
+- `articleId`（string，必填）：文章业务 ID（格式：LD####AAAA）
+- `rootArticleCommentId`（string，可选）：根评论业务 ID（格式：LD####AAAA）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                             | 示例      |
+| ------- | ------ | -------------------------------- | --------- |
+| code    | string | 状态码                           | '0'       |
+| message | string | 状态描述                         | 'success' |
+| data    | object | 数据（ArticleCommentListResult） | -         |
+
+`data` 字段结构（ArticleCommentListResult）：
+
+| 字段          | 类型   | 说明                     | 示例 |
+| ------------- | ------ | ------------------------ | ---- |
+| data.list     | array  | 列表（ArticleComment[]） | -    |
+| data.page     | number | 当前页码                 | 1    |
+| data.pageSize | number | 每页条数                 | 10   |
+| data.total    | number | 总条数                   | 100  |
+
+`data.list` 字段结构（ArticleComment[]）：
+
+| 字段                               | 类型          | 说明                            | 示例                                 |
+| ---------------------------------- | ------------- | ------------------------------- | ------------------------------------ |
+| data.list[].id                     | string        | 主键 ID（UUID）                 | 550e8400-e29b-41d4-a716-446655440000 |
+| data.list[].articleCommentId       | string        | 评论业务 ID（格式：LD####AAAA） | LD0001ABCD                           |
+| data.list[].articleId              | string        | 文章业务 ID                     | LD0002EFGH                           |
+| data.list[].authorUserId           | string        | 作者用户业务 ID                 | LD0003IJKL                           |
+| data.list[].nickname               | string        | 作者昵称                        | 张三                                 |
+| data.list[].content                | string        | 评论内容                        | ...                                  |
+| data.list[].likeCount              | number        | 点赞数                          | 0                                    |
+| data.list[].isLiked                | boolean       | 当前用户是否已点赞              | false                                |
+| data.list[].replyCount             | number        | 回复数（仅根评论列表返回有效）  | 0                                    |
+| data.list[].parentArticleCommentId | string \ null | 父评论业务 ID                   | null                                 |
+| data.list[].rootArticleCommentId   | string \ null | 根评论业务 ID                   | null                                 |
+| data.list[].createdAt              | string        | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-25 12:00:00                  |
+| data.list[].updatedAt              | string        | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-25 12:00:00                  |
+| data.list[].modifiedAt             | string \ null | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-25 12:00:00                  |
+
+---
+
+## 64. 新增文章评论（需登录）
+
+**接口标题**：新增文章评论
+
+**功能描述**：新增一条评论或回复（parentArticleCommentId 不传/为空则为根评论）。
+
+**接口路由**：`POST /article-comments/create`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `articleId`（string，必填）：文章业务 ID（格式：LD####AAAA）
+- `content`（string，必填）：评论内容
+- `parentArticleCommentId`（string \ null，可选）：父评论业务 ID（格式：LD####AAAA）
+
+**返回值（Success 201）**：对象 `ArticleComment`
+
+| 字段    | 类型   | 说明                   | 示例      |
+| ------- | ------ | ---------------------- | --------- |
+| code    | string | 状态码                 | '0'       |
+| message | string | 状态描述               | 'success' |
+| data    | object | 数据（ArticleComment） | -         |
+
+---
+
+## 65. 修改文章评论（需登录）
+
+**接口标题**：修改文章评论
+
+**功能描述**：修改评论内容。
+
+**接口路由**：`POST /article-comments/update`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `articleCommentId`（string，必填）：评论业务 ID（格式：LD####AAAA）
+- `content`（string，必填）：评论内容
+
+**返回值（Success 200）**：对象 `ArticleComment`
+
+| 字段    | 类型   | 说明                   | 示例      |
+| ------- | ------ | ---------------------- | --------- |
+| code    | string | 状态码                 | '0'       |
+| message | string | 状态描述               | 'success' |
+| data    | object | 数据（ArticleComment） | -         |
+
+---
+
+## 66. 删除文章评论（需登录）
+
+**接口标题**：删除文章评论
+
+**功能描述**：删除评论（根评论删除时会一并删除该楼全部回复）。
+
+**接口路由**：`POST /article-comments/delete`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `articleCommentId`（string，必填）：评论业务 ID（格式：LD####AAAA）
+
+**返回值（Success 200）**：对象 `DeleteResult`
+
+| 字段    | 类型   | 说明                 | 示例      |
+| ------- | ------ | -------------------- | --------- |
+| code    | string | 状态码               | '0'       |
+| message | string | 状态描述             | 'success' |
+| data    | object | 数据（DeleteResult） | -         |
+
+---
+
+## 67. 点赞文章评论（需登录）
+
+**接口标题**：点赞文章评论
+
+**功能描述**：对评论点赞。
+
+**接口路由**：`POST /article-comments/like`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `articleCommentId`（string，必填）：评论业务 ID（格式：LD####AAAA）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明               | 示例      |
+| ------- | ------ | ------------------ | --------- |
+| code    | string | 状态码             | '0'       |
+| message | string | 状态描述           | 'success' |
+| data    | object | 数据（LikeResult） | -         |
+
+`data` 字段结构（LikeResult）：
+
+| 字段           | 类型   | 说明       | 示例 |
+| -------------- | ------ | ---------- | ---- |
+| data.likeCount | number | 最新点赞数 | 10   |
+
+---
+
+## 68. 取消点赞文章评论（需登录）
+
+**接口标题**：取消点赞文章评论
+
+**功能描述**：取消对评论的点赞。
+
+**接口路由**：`POST /article-comments/unlike`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `articleCommentId`（string，必填）：评论业务 ID（格式：LD####AAAA）
+
+**返回值（Success 200）**：对象 `LikeResult`
+
+| 字段    | 类型   | 说明               | 示例      |
+| ------- | ------ | ------------------ | --------- |
+| code    | string | 状态码             | '0'       |
+| message | string | 状态描述           | 'success' |
+| data    | object | 数据（LikeResult） | -         |
+
+---
+
+## 69. 文章点赞（需登录）
+
+**接口标题**：文章点赞
+
+**功能描述**：对文章点赞（同一用户对同一文章只能点赞一次）。
+
+**接口路由**：`POST /articles/like`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `articleId`（string，必填）：文章业务 ID（格式：LD####AAAA）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明               | 示例      |
+| ------- | ------ | ------------------ | --------- |
+| code    | string | 状态码             | '0'       |
+| message | string | 状态描述           | 'success' |
+| data    | object | 数据（LikeResult） | -         |
+
+`data` 字段结构（LikeResult）：
+
+| 字段           | 类型   | 说明       | 示例 |
+| -------------- | ------ | ---------- | ---- |
+| data.likeCount | number | 最新点赞数 | 12   |
+
+---
+
+## 70. 文章取消点赞（需登录）
+
+**接口标题**：文章取消点赞
+
+**功能描述**：取消对文章的点赞。
+
+**接口路由**：`POST /articles/unlike`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `articleId`（string，必填）：文章业务 ID（格式：LD####AAAA）
+
+**返回值（Success 200）**：对象 `LikeResult`
+
+| 字段    | 类型   | 说明               | 示例      |
+| ------- | ------ | ------------------ | --------- |
+| code    | string | 状态码             | '0'       |
+| message | string | 状态描述           | 'success' |
+| data    | object | 数据（LikeResult） | -         |
+
+`data` 字段结构（LikeResult）：同上 `LikeResult` 字段。
+
 ## 通用错误响应
 
 ### 1) 业务/鉴权等错误（errorHandler 兜底）
