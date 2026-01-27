@@ -30,6 +30,7 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
         "/avatars": { target: VITE_API_BASE, changeOrigin: true },
         "/cars": { target: VITE_API_BASE, changeOrigin: true },
         "/car-friends": { target: VITE_API_BASE, changeOrigin: true },
+        "/community-guides": { target: VITE_API_BASE, changeOrigin: true },
         "/qa-tags": { target: VITE_API_BASE, changeOrigin: true },
         "/qa-questions": { target: VITE_API_BASE, changeOrigin: true },
         "/qa-answers": { target: VITE_API_BASE, changeOrigin: true },

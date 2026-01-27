@@ -1,4 +1,3 @@
-
 # 接口清单（Vue 对接版）
 
 基础信息：
@@ -31,16 +30,16 @@
 
 **返回值（Success 200）**：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（Health） | - |
+| 字段    | 类型   | 说明           | 示例      |
+| ------- | ------ | -------------- | --------- |
+| code    | string | 状态码         | '0'       |
+| message | string | 状态描述       | 'success' |
+| data    | object | 数据（Health） | -         |
 
 `data` 字段结构（Health）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
+| 字段    | 类型    | 说明         | 示例 |
+| ------- | ------- | ------------ | ---- |
 | data.ok | boolean | 服务是否正常 | true |
 
 ---
@@ -60,18 +59,18 @@
 
 **返回值（Success 201）**：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（User） | - |
+| 字段    | 类型   | 说明         | 示例      |
+| ------- | ------ | ------------ | --------- |
+| code    | string | 状态码       | '0'       |
+| message | string | 状态描述     | 'success' |
+| data    | object | 数据（User） | -         |
 
 `data` 字段结构（User）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.userId | string | 用户业务 ID（格式：LD####AAAA） | LD0001ABCD |
-| data.username | string | 用户名 | 张三 |
+| 字段          | 类型   | 说明                            | 示例       |
+| ------------- | ------ | ------------------------------- | ---------- |
+| data.userId   | string | 用户业务 ID（格式：LD####AAAA） | LD0001ABCD |
+| data.username | string | 用户名                          | 张三       |
 
 ---
 
@@ -90,27 +89,27 @@
 
 **返回值（Success 200）**：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（LoginResult） | - |
+| 字段    | 类型   | 说明                | 示例      |
+| ------- | ------ | ------------------- | --------- |
+| code    | string | 状态码              | '0'       |
+| message | string | 状态描述            | 'success' |
+| data    | object | 数据（LoginResult） | -         |
 
 `data` 字段结构（LoginResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.token | string | JWT token | eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9... |
-| data.user | object | 用户信息 | - |
-| data.user.userId | string | 用户业务 ID（格式：LD####AAAA） | LD0001ABCD |
-| data.user.username | string | 用户名 | 张三 |
-| data.user.nickname | string | 昵称 | 三哥 |
-| data.user.avatar | string | 头像 ID（avatarId，格式：LD####AAAA） | LD0002EFGH |
-| data.user.city | string | 所在城市 | 北京 |
-| data.user.email | string \ null | 邮箱 | zhangsan@example.com |
-| data.user.phone | string \ null | 手机号 | 13800138000 |
-| data.user.role | string | 角色（user/admin/moderator） | user |
-| data.user.mustChangePassword | boolean | 是否需要改密（首次登录/自举） | false |
+| 字段                         | 类型          | 说明                                  | 示例                                    |
+| ---------------------------- | ------------- | ------------------------------------- | --------------------------------------- |
+| data.token                   | string        | JWT token                             | eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9... |
+| data.user                    | object        | 用户信息                              | -                                       |
+| data.user.userId             | string        | 用户业务 ID（格式：LD####AAAA）       | LD0001ABCD                              |
+| data.user.username           | string        | 用户名                                | 张三                                    |
+| data.user.nickname           | string        | 昵称                                  | 三哥                                    |
+| data.user.avatar             | string        | 头像 ID（avatarId，格式：LD####AAAA） | LD0002EFGH                              |
+| data.user.city               | string        | 所在城市                              | 北京                                    |
+| data.user.email              | string \ null | 邮箱                                  | zhangsan@example.com                    |
+| data.user.phone              | string \ null | 手机号                                | 13800138000                             |
+| data.user.role               | string        | 角色（user/admin/moderator）          | user                                    |
+| data.user.mustChangePassword | boolean       | 是否需要改密（首次登录/自举）         | false                                   |
 
 ---
 
@@ -128,19 +127,19 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（BootstrapStatus） | - |
+| 字段    | 类型   | 说明                    | 示例      |
+| ------- | ------ | ----------------------- | --------- |
+| code    | string | 状态码                  | '0'       |
+| message | string | 状态描述                | 'success' |
+| data    | object | 数据（BootstrapStatus） | -         |
 
 `data` 字段结构（BootstrapStatus）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.bootstrapEnabled | boolean | 是否启用自举机制（由环境变量控制） | true |
-| data.adminExists | boolean | 是否已存在 admin | false |
-| data.needsBootstrap | boolean | 是否需要执行初始化 | true |
+| 字段                  | 类型    | 说明                               | 示例  |
+| --------------------- | ------- | ---------------------------------- | ----- |
+| data.bootstrapEnabled | boolean | 是否启用自举机制（由环境变量控制） | true  |
+| data.adminExists      | boolean | 是否已存在 admin                   | false |
+| data.needsBootstrap   | boolean | 是否需要执行初始化                 | true  |
 
 ---
 
@@ -161,21 +160,21 @@
 
 **返回值（Success 201）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（BootstrapInitResult） | - |
+| 字段    | 类型   | 说明                        | 示例      |
+| ------- | ------ | --------------------------- | --------- |
+| code    | string | 状态码                      | '0'       |
+| message | string | 状态描述                    | 'success' |
+| data    | object | 数据（BootstrapInitResult） | -         |
 
 `data` 字段结构（BootstrapInitResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.userId | string | 用户业务 ID（格式：LD####AAAA） | LD0001ABCD |
-| data.username | string | 用户名 | admin |
-| data.email | string | 邮箱 | admin@local.invalid |
-| data.role | string | 角色 | admin |
-| data.mustChangePassword | boolean | 是否需要改密 | true |
+| 字段                    | 类型    | 说明                            | 示例                |
+| ----------------------- | ------- | ------------------------------- | ------------------- |
+| data.userId             | string  | 用户业务 ID（格式：LD####AAAA） | LD0001ABCD          |
+| data.username           | string  | 用户名                          | admin               |
+| data.email              | string  | 邮箱                            | admin@local.invalid |
+| data.role               | string  | 角色                            | admin               |
+| data.mustChangePassword | boolean | 是否需要改密                    | true                |
 
 ---
 
@@ -201,36 +200,36 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（UserListResult） | - |
+| 字段    | 类型   | 说明                   | 示例      |
+| ------- | ------ | ---------------------- | --------- |
+| code    | string | 状态码                 | '0'       |
+| message | string | 状态描述               | 'success' |
+| data    | object | 数据（UserListResult） | -         |
 
 `data` 字段结构（UserListResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list | array | 用户列表（User[]） | - |
-| data.page | number | 当前页码 | 1 |
-| data.pageSize | number | 每页条数 | 10 |
-| data.total | number | 总条数 | 100 |
+| 字段          | 类型   | 说明               | 示例 |
+| ------------- | ------ | ------------------ | ---- |
+| data.list     | array  | 用户列表（User[]） | -    |
+| data.page     | number | 当前页码           | 1    |
+| data.pageSize | number | 每页条数           | 10   |
+| data.total    | number | 总条数             | 100  |
 
 `data.list` 字段结构（User[]）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list[].userId | string | 用户业务 ID（格式：LD####AAAA） | LD0001ABCD |
-| data.list[].username | string | 用户名 | 张三 |
-| data.list[].nickname | string | 昵称 | 三哥 |
-| data.list[].avatar | string | 头像 ID（avatarId，格式：LD####AAAA） | LD0002EFGH |
-| data.list[].city | string | 所在城市 | 北京 |
-| data.list[].email | string \ null | 邮箱 | zhangsan@example.com |
-| data.list[].phone | string \ null | 手机号 | 13800138000 |
-| data.list[].role | string | 角色 code（来自 /roles） | user |
-| data.list[].status | string | 状态（active/inactive/banned） | active |
-| data.list[].createdAt | string | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00 |
-| data.list[].updatedAt | string | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00 |
+| 字段                  | 类型          | 说明                                  | 示例                 |
+| --------------------- | ------------- | ------------------------------------- | -------------------- |
+| data.list[].userId    | string        | 用户业务 ID（格式：LD####AAAA）       | LD0001ABCD           |
+| data.list[].username  | string        | 用户名                                | 张三                 |
+| data.list[].nickname  | string        | 昵称                                  | 三哥                 |
+| data.list[].avatar    | string        | 头像 ID（avatarId，格式：LD####AAAA） | LD0002EFGH           |
+| data.list[].city      | string        | 所在城市                              | 北京                 |
+| data.list[].email     | string \ null | 邮箱                                  | zhangsan@example.com |
+| data.list[].phone     | string \ null | 手机号                                | 13800138000          |
+| data.list[].role      | string        | 角色 code（来自 /roles）              | user                 |
+| data.list[].status    | string        | 状态（active/inactive/banned）        | active               |
+| data.list[].createdAt | string        | 创建时间（YYYY-MM-DD HH:mm:ss）       | 2026-01-10 00:00:00  |
+| data.list[].updatedAt | string        | 更新时间（YYYY-MM-DD HH:mm:ss）       | 2026-01-10 00:00:00  |
 
 ---
 
@@ -252,25 +251,25 @@
 
 **返回值（Success 200）**：对象 `User | null`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object \ null | 数据（User \ null） | - |
+| 字段    | 类型          | 说明                | 示例      |
+| ------- | ------------- | ------------------- | --------- |
+| code    | string        | 状态码              | '0'       |
+| message | string        | 状态描述            | 'success' |
+| data    | object \ null | 数据（User \ null） | -         |
 
 `data` 字段结构（User \ null）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.userId | string | 用户业务 ID（格式：LD####AAAA） | LD0001ABCD |
-| data.username | string | 用户名 | 张三 |
-| data.nickname | string | 昵称 | 三哥 |
-| data.avatar | string | 头像 ID（avatarId，格式：LD####AAAA） | LD0002EFGH |
-| data.city | string | 所在城市 | 北京 |
-| data.email | string \ null | 邮箱 | zhangsan@example.com |
-| data.phone | string \ null | 手机号 | 13800138000 |
-| data.role | string | 角色 code（来自 /roles） | user |
-| data.status | string | 状态（active/inactive/banned） | active |
+| 字段          | 类型          | 说明                                  | 示例                 |
+| ------------- | ------------- | ------------------------------------- | -------------------- |
+| data.userId   | string        | 用户业务 ID（格式：LD####AAAA）       | LD0001ABCD           |
+| data.username | string        | 用户名                                | 张三                 |
+| data.nickname | string        | 昵称                                  | 三哥                 |
+| data.avatar   | string        | 头像 ID（avatarId，格式：LD####AAAA） | LD0002EFGH           |
+| data.city     | string        | 所在城市                              | 北京                 |
+| data.email    | string \ null | 邮箱                                  | zhangsan@example.com |
+| data.phone    | string \ null | 手机号                                | 13800138000          |
+| data.role     | string        | 角色 code（来自 /roles）              | user                 |
+| data.status   | string        | 状态（active/inactive/banned）        | active               |
 
 ---
 
@@ -292,26 +291,26 @@
 
 **返回值（Success 200）**：对象 `User`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（User） | - |
+| 字段    | 类型   | 说明         | 示例      |
+| ------- | ------ | ------------ | --------- |
+| code    | string | 状态码       | '0'       |
+| message | string | 状态描述     | 'success' |
+| data    | object | 数据（User） | -         |
 
 `data` 字段结构（User）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.userId | string | 用户业务 ID（格式：LD####AAAA） | LD0001ABCD |
-| data.username | string | 用户名 | 张三 |
-| data.nickname | string | 昵称 | 三哥 |
-| data.avatar | string | 头像 ID（avatarId，格式：LD####AAAA） | LD0002EFGH |
-| data.city | string | 所在城市 | 北京 |
-| data.email | string \ null | 邮箱 | zhangsan@example.com |
-| data.phone | string \ null | 手机号 | 13800138000 |
-| data.role | string | 角色 code（来自 /roles） | user |
-| data.status | string | 状态（active/inactive/banned） | active |
-| data.mustChangePassword | boolean | 是否需要改密（首次登录/自举） | false |
+| 字段                    | 类型          | 说明                                  | 示例                 |
+| ----------------------- | ------------- | ------------------------------------- | -------------------- |
+| data.userId             | string        | 用户业务 ID（格式：LD####AAAA）       | LD0001ABCD           |
+| data.username           | string        | 用户名                                | 张三                 |
+| data.nickname           | string        | 昵称                                  | 三哥                 |
+| data.avatar             | string        | 头像 ID（avatarId，格式：LD####AAAA） | LD0002EFGH           |
+| data.city               | string        | 所在城市                              | 北京                 |
+| data.email              | string \ null | 邮箱                                  | zhangsan@example.com |
+| data.phone              | string \ null | 手机号                                | 13800138000          |
+| data.role               | string        | 角色 code（来自 /roles）              | user                 |
+| data.status             | string        | 状态（active/inactive/banned）        | active               |
+| data.mustChangePassword | boolean       | 是否需要改密（首次登录/自举）         | false                |
 
 ---
 
@@ -341,26 +340,27 @@
 
 **返回值（Success 201）**：对象 `User`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（User） | - |
+| 字段    | 类型   | 说明         | 示例      |
+| ------- | ------ | ------------ | --------- |
+| code    | string | 状态码       | '0'       |
+| message | string | 状态描述     | 'success' |
+| data    | object | 数据（User） | -         |
 
 `data` 字段结构（User）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.userId | string | 用户业务 ID（格式：LD####AAAA） | LD0001ABCD |
-| data.username | string | 用户名 | 张三 |
-| data.nickname | string | 昵称 | 三哥 |
-| data.avatar | string | 头像 ID（avatarId，格式：LD####AAAA） | LD0002EFGH |
-| data.city | string | 所在城市 | 北京 |
-| data.email | string \ null | 邮箱 | zhangsan@example.com |
-| data.phone | string \ null | 手机号 | 13800138000 |
-| data.role | string | 角色 code（来自 /roles） | user |
-| data.status | string | 状态（active/inactive/banned） | active |
-| data.mustChangePassword | boolean | 是否需要改密（首次登录/自举） | false |
+| 字段                    | 类型          | 说明                                  | 示例                 |
+| ----------------------- | ------------- | ------------------------------------- | -------------------- |
+| data.userId             | string        | 用户业务 ID（格式：LD####AAAA）       | LD0001ABCD           |
+| data.username           | string        | 用户名                                | 张三                 |
+| data.nickname           | string        | 昵称                                  | 三哥                 |
+| data.avatar             | string        | 头像 ID（avatarId，格式：LD####AAAA） | LD0002EFGH           |
+| data.city               | string        | 所在城市                              | 北京                 |
+| data.email              | string \ null | 邮箱                                  | zhangsan@example.com |
+| data.phone              | string \ null | 手机号                                | 13800138000          |
+| data.role               | string        | 角色 code（来自 /roles）              | user                 |
+| data.status             | string        | 状态（active/inactive/banned）        | active               |
+| data.mustChangePassword | boolean       | 是否需要改密（首次登录/自举）         | false                |
+
 ---
 
 ## 8. 更新用户（需登录）
@@ -388,26 +388,26 @@
 
 **返回值（Success 200）**：对象 `User`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（User） | - |
+| 字段    | 类型   | 说明         | 示例      |
+| ------- | ------ | ------------ | --------- |
+| code    | string | 状态码       | '0'       |
+| message | string | 状态描述     | 'success' |
+| data    | object | 数据（User） | -         |
 
 `data` 字段结构（User）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.userId | string | 用户业务 ID（格式：LD####AAAA） | LD0001ABCD |
-| data.username | string | 用户名 | 张三 |
-| data.nickname | string | 昵称 | 三哥 |
-| data.avatar | string | 头像 ID（avatarId，格式：LD####AAAA） | LD0002EFGH |
-| data.city | string | 所在城市 | 北京 |
-| data.email | string \ null | 邮箱 | zhangsan@example.com |
-| data.phone | string \ null | 手机号 | 13800138000 |
-| data.role | string | 角色 code（来自 /roles） | user |
-| data.status | string | 状态（active/inactive/banned） | active |
-| data.mustChangePassword | boolean | 是否需要改密（首次登录/自举） | false |
+| 字段                    | 类型          | 说明                                  | 示例                 |
+| ----------------------- | ------------- | ------------------------------------- | -------------------- |
+| data.userId             | string        | 用户业务 ID（格式：LD####AAAA）       | LD0001ABCD           |
+| data.username           | string        | 用户名                                | 张三                 |
+| data.nickname           | string        | 昵称                                  | 三哥                 |
+| data.avatar             | string        | 头像 ID（avatarId，格式：LD####AAAA） | LD0002EFGH           |
+| data.city               | string        | 所在城市                              | 北京                 |
+| data.email              | string \ null | 邮箱                                  | zhangsan@example.com |
+| data.phone              | string \ null | 手机号                                | 13800138000          |
+| data.role               | string        | 角色 code（来自 /roles）              | user                 |
+| data.status             | string        | 状态（active/inactive/banned）        | active               |
+| data.mustChangePassword | boolean       | 是否需要改密（首次登录/自举）         | false                |
 
 ---
 
@@ -429,16 +429,16 @@
 
 **返回值（Success 200）**：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（DeleteResult） | - |
+| 字段    | 类型   | 说明                 | 示例      |
+| ------- | ------ | -------------------- | --------- |
+| code    | string | 状态码               | '0'       |
+| message | string | 状态描述             | 'success' |
+| data    | object | 数据（DeleteResult） | -         |
 
 `data` 字段结构（DeleteResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
+| 字段    | 类型    | 说明     | 示例 |
+| ------- | ------- | -------- | ---- |
 | data.ok | boolean | 是否成功 | true |
 
 ---
@@ -462,16 +462,16 @@
 
 **返回值（Success 200）**：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（ChangePasswordResult） | - |
+| 字段    | 类型   | 说明                         | 示例      |
+| ------- | ------ | ---------------------------- | --------- |
+| code    | string | 状态码                       | '0'       |
+| message | string | 状态描述                     | 'success' |
+| data    | object | 数据（ChangePasswordResult） | -         |
 
 `data` 字段结构（ChangePasswordResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
+| 字段    | 类型    | 说明     | 示例 |
+| ------- | ------- | -------- | ---- |
 | data.ok | boolean | 是否成功 | true |
 
 ---
@@ -497,31 +497,31 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（AvatarListResult） | - |
+| 字段    | 类型   | 说明                     | 示例      |
+| ------- | ------ | ------------------------ | --------- |
+| code    | string | 状态码                   | '0'       |
+| message | string | 状态描述                 | 'success' |
+| data    | object | 数据（AvatarListResult） | -         |
 
 `data` 字段结构（AvatarListResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list | array | 头像列表（Avatar[]） | - |
-| data.page | number | 当前页码 | 1 |
-| data.pageSize | number | 每页条数 | 10 |
-| data.total | number | 总条数 | 100 |
+| 字段          | 类型   | 说明                 | 示例 |
+| ------------- | ------ | -------------------- | ---- |
+| data.list     | array  | 头像列表（Avatar[]） | -    |
+| data.page     | number | 当前页码             | 1    |
+| data.pageSize | number | 每页条数             | 10   |
+| data.total    | number | 总条数               | 100  |
 
 `data.list` 字段结构（Avatar[]）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list[].avatarId | string | 头像业务 ID（格式：LD####AAAA） | LD0002EFGH |
-| data.list[].imageBase64 | string | base64 图片内容 | iVBORw0KGgoAAA... |
-| data.list[].description | string | 描述（最长 50） | 默认头像-1 |
-| data.list[].isEnabled | boolean | 是否启用 | true |
-| data.list[].createdAt | string | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00 |
-| data.list[].updatedAt | string | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00 |
+| 字段                    | 类型    | 说明                            | 示例                |
+| ----------------------- | ------- | ------------------------------- | ------------------- |
+| data.list[].avatarId    | string  | 头像业务 ID（格式：LD####AAAA） | LD0002EFGH          |
+| data.list[].imageBase64 | string  | base64 图片内容                 | iVBORw0KGgoAAA...   |
+| data.list[].description | string  | 描述（最长 50）                 | 默认头像-1          |
+| data.list[].isEnabled   | boolean | 是否启用                        | true                |
+| data.list[].createdAt   | string  | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00 |
+| data.list[].updatedAt   | string  | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00 |
 
 ---
 
@@ -545,22 +545,22 @@
 
 **返回值（Success 201）**：对象 `Avatar`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（Avatar） | - |
+| 字段    | 类型   | 说明           | 示例      |
+| ------- | ------ | -------------- | --------- |
+| code    | string | 状态码         | '0'       |
+| message | string | 状态描述       | 'success' |
+| data    | object | 数据（Avatar） | -         |
 
 `data` 字段结构（Avatar）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.avatarId | string | 头像业务 ID（格式：LD####AAAA） | LD0002EFGH |
-| data.imageBase64 | string | base64 图片内容 | iVBORw0KGgoAAA... |
-| data.description | string | 描述（最长 50） | 默认头像-1 |
-| data.isEnabled | boolean | 是否启用 | true |
-| data.createdAt | string | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00 |
-| data.updatedAt | string | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00 |
+| 字段             | 类型    | 说明                            | 示例                |
+| ---------------- | ------- | ------------------------------- | ------------------- |
+| data.avatarId    | string  | 头像业务 ID（格式：LD####AAAA） | LD0002EFGH          |
+| data.imageBase64 | string  | base64 图片内容                 | iVBORw0KGgoAAA...   |
+| data.description | string  | 描述（最长 50）                 | 默认头像-1          |
+| data.isEnabled   | boolean | 是否启用                        | true                |
+| data.createdAt   | string  | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00 |
+| data.updatedAt   | string  | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00 |
 
 ---
 
@@ -585,11 +585,11 @@
 
 **返回值（Success 200）**：对象 `Avatar`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（Avatar） | - |
+| 字段    | 类型   | 说明           | 示例      |
+| ------- | ------ | -------------- | --------- |
+| code    | string | 状态码         | '0'       |
+| message | string | 状态描述       | 'success' |
+| data    | object | 数据（Avatar） | -         |
 
 `data` 字段结构（Avatar）：同「9.3 新增头像」
 
@@ -613,16 +613,16 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（DeleteResult） | - |
+| 字段    | 类型   | 说明                 | 示例      |
+| ------- | ------ | -------------------- | --------- |
+| code    | string | 状态码               | '0'       |
+| message | string | 状态描述             | 'success' |
+| data    | object | 数据（DeleteResult） | -         |
 
 `data` 字段结构（DeleteResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
+| 字段    | 类型    | 说明     | 示例 |
+| ------- | ------- | -------- | ---- |
 | data.ok | boolean | 是否成功 | true |
 
 ---
@@ -647,28 +647,28 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（RoleListResult） | - |
+| 字段    | 类型   | 说明                   | 示例      |
+| ------- | ------ | ---------------------- | --------- |
+| code    | string | 状态码                 | '0'       |
+| message | string | 状态描述               | 'success' |
+| data    | object | 数据（RoleListResult） | -         |
 
 `data` 字段结构（RoleListResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list | array | 角色列表（Role[]） | - |
+| 字段      | 类型  | 说明               | 示例 |
+| --------- | ----- | ------------------ | ---- |
+| data.list | array | 角色列表（Role[]） | -    |
 
 `data.list` 字段结构（Role[]）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list[].id | string | 主键 ID（UUID） | 550e8400-e29b-41d4-a716-446655440000 |
-| data.list[].code | string | 角色 code（用于 users.role） | admin |
-| data.list[].name | string | 角色名称 | 管理员 |
-| data.list[].description | string | 角色描述 | 系统管理员角色 |
-| data.list[].isEnabled | boolean | 是否启用 | true |
-| data.list[].updatedAt | string | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-22 12:00:00 |
+| 字段                    | 类型    | 说明                            | 示例                                 |
+| ----------------------- | ------- | ------------------------------- | ------------------------------------ |
+| data.list[].id          | string  | 主键 ID（UUID）                 | 550e8400-e29b-41d4-a716-446655440000 |
+| data.list[].code        | string  | 角色 code（用于 users.role）    | admin                                |
+| data.list[].name        | string  | 角色名称                        | 管理员                               |
+| data.list[].description | string  | 角色描述                        | 系统管理员角色                       |
+| data.list[].isEnabled   | boolean | 是否启用                        | true                                 |
+| data.list[].updatedAt   | string  | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-22 12:00:00                  |
 
 ---
 
@@ -693,11 +693,11 @@
 
 **返回值（Success 201）**：对象 `Role`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（Role） | - |
+| 字段    | 类型   | 说明         | 示例      |
+| ------- | ------ | ------------ | --------- |
+| code    | string | 状态码       | '0'       |
+| message | string | 状态描述     | 'success' |
+| data    | object | 数据（Role） | -         |
 
 `data` 字段结构（Role）：同「9.6 获取角色列表」的 Role 字段。
 
@@ -724,11 +724,11 @@
 
 **返回值（Success 200）**：对象 `Role`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（Role） | - |
+| 字段    | 类型   | 说明         | 示例      |
+| ------- | ------ | ------------ | --------- |
+| code    | string | 状态码       | '0'       |
+| message | string | 状态描述     | 'success' |
+| data    | object | 数据（Role） | -         |
 
 `data` 字段结构（Role）：同「9.6 获取角色列表」的 Role 字段。
 
@@ -752,11 +752,11 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（DeleteResult） | - |
+| 字段    | 类型   | 说明                 | 示例      |
+| ------- | ------ | -------------------- | --------- |
+| code    | string | 状态码               | '0'       |
+| message | string | 状态描述             | 'success' |
+| data    | object | 数据（DeleteResult） | -         |
 
 `data` 字段结构（DeleteResult）：同「9.5 删除头像」。
 
@@ -784,35 +784,35 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（CarListResult） | - |
+| 字段    | 类型   | 说明                  | 示例      |
+| ------- | ------ | --------------------- | --------- |
+| code    | string | 状态码                | '0'       |
+| message | string | 状态描述              | 'success' |
+| data    | object | 数据（CarListResult） | -         |
 
 `data` 字段结构（CarListResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list | array | 车辆列表（Car[]） | - |
-| data.page | number | 当前页码 | 1 |
-| data.pageSize | number | 每页条数 | 10 |
-| data.total | number | 总条数 | 100 |
+| 字段          | 类型   | 说明              | 示例 |
+| ------------- | ------ | ----------------- | ---- |
+| data.list     | array  | 车辆列表（Car[]） | -    |
+| data.page     | number | 当前页码          | 1    |
+| data.pageSize | number | 每页条数          | 10   |
+| data.total    | number | 总条数            | 100  |
 
 `data.list` 字段结构（Car[]）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list[].carId | string | 车辆业务 ID（格式：LD####AAAA） | LD0002EFGH |
-| data.list[].userId | string | 归属用户业务 ID（格式：LD####AAAA） | LD0001ABCD |
-| data.list[].year | number | 年份 | 2022 |
-| data.list[].model | string | 型号 | A4L |
-| data.list[].version | string | 版本号 | 2.0T-2022 |
-| data.list[].status | string | 状态（on_sale/discontinued） | on_sale |
-| data.list[].isEnabled | boolean | 是否启用 | true |
-| data.list[].remark | string | 备注 | 试驾车 |
-| data.list[].createdAt | string | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00 |
-| data.list[].updatedAt | string | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00 |
+| 字段                  | 类型    | 说明                                | 示例                |
+| --------------------- | ------- | ----------------------------------- | ------------------- |
+| data.list[].carId     | string  | 车辆业务 ID（格式：LD####AAAA）     | LD0002EFGH          |
+| data.list[].userId    | string  | 归属用户业务 ID（格式：LD####AAAA） | LD0001ABCD          |
+| data.list[].year      | number  | 年份                                | 2022                |
+| data.list[].model     | string  | 型号                                | A4L                 |
+| data.list[].version   | string  | 版本号                              | 2.0T-2022           |
+| data.list[].status    | string  | 状态（on_sale/discontinued）        | on_sale             |
+| data.list[].isEnabled | boolean | 是否启用                            | true                |
+| data.list[].remark    | string  | 备注                                | 试驾车              |
+| data.list[].createdAt | string  | 创建时间（YYYY-MM-DD HH:mm:ss）     | 2026-01-10 00:00:00 |
+| data.list[].updatedAt | string  | 更新时间（YYYY-MM-DD HH:mm:ss）     | 2026-01-10 00:00:00 |
 
 ---
 
@@ -839,26 +839,26 @@
 
 **返回值（Success 201）**：对象 `Car`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（Car） | - |
+| 字段    | 类型   | 说明        | 示例      |
+| ------- | ------ | ----------- | --------- |
+| code    | string | 状态码      | '0'       |
+| message | string | 状态描述    | 'success' |
+| data    | object | 数据（Car） | -         |
 
 `data` 字段结构（Car）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.carId | string | 车辆业务 ID（格式：LD####AAAA） | LD0002EFGH |
-| data.userId | string | 归属用户业务 ID（格式：LD####AAAA） | LD0001ABCD |
-| data.year | number | 年份 | 2022 |
-| data.model | string | 型号 | A4L |
-| data.version | string | 版本号 | 2.0T-2022 |
-| data.status | string | 状态（on_sale/discontinued） | on_sale |
-| data.isEnabled | boolean | 是否启用 | true |
-| data.remark | string | 备注 | 试驾车 |
-| data.createdAt | string | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00 |
-| data.updatedAt | string | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00 |
+| 字段           | 类型    | 说明                                | 示例                |
+| -------------- | ------- | ----------------------------------- | ------------------- |
+| data.carId     | string  | 车辆业务 ID（格式：LD####AAAA）     | LD0002EFGH          |
+| data.userId    | string  | 归属用户业务 ID（格式：LD####AAAA） | LD0001ABCD          |
+| data.year      | number  | 年份                                | 2022                |
+| data.model     | string  | 型号                                | A4L                 |
+| data.version   | string  | 版本号                              | 2.0T-2022           |
+| data.status    | string  | 状态（on_sale/discontinued）        | on_sale             |
+| data.isEnabled | boolean | 是否启用                            | true                |
+| data.remark    | string  | 备注                                | 试驾车              |
+| data.createdAt | string  | 创建时间（YYYY-MM-DD HH:mm:ss）     | 2026-01-10 00:00:00 |
+| data.updatedAt | string  | 更新时间（YYYY-MM-DD HH:mm:ss）     | 2026-01-10 00:00:00 |
 
 ---
 
@@ -886,26 +886,26 @@
 
 **返回值（Success 200）**：对象 `Car`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（Car） | - |
+| 字段    | 类型   | 说明        | 示例      |
+| ------- | ------ | ----------- | --------- |
+| code    | string | 状态码      | '0'       |
+| message | string | 状态描述    | 'success' |
+| data    | object | 数据（Car） | -         |
 
 `data` 字段结构（Car）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.carId | string | 车辆业务 ID（格式：LD####AAAA） | LD0002EFGH |
-| data.userId | string | 归属用户业务 ID（格式：LD####AAAA） | LD0001ABCD |
-| data.year | number | 年份 | 2022 |
-| data.model | string | 型号 | A4L |
-| data.version | string | 版本号 | 2.0T-2022 |
-| data.status | string | 状态（on_sale/discontinued） | on_sale |
-| data.isEnabled | boolean | 是否启用 | true |
-| data.remark | string | 备注 | 试驾车 |
-| data.createdAt | string | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00 |
-| data.updatedAt | string | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00 |
+| 字段           | 类型    | 说明                                | 示例                |
+| -------------- | ------- | ----------------------------------- | ------------------- |
+| data.carId     | string  | 车辆业务 ID（格式：LD####AAAA）     | LD0002EFGH          |
+| data.userId    | string  | 归属用户业务 ID（格式：LD####AAAA） | LD0001ABCD          |
+| data.year      | number  | 年份                                | 2022                |
+| data.model     | string  | 型号                                | A4L                 |
+| data.version   | string  | 版本号                              | 2.0T-2022           |
+| data.status    | string  | 状态（on_sale/discontinued）        | on_sale             |
+| data.isEnabled | boolean | 是否启用                            | true                |
+| data.remark    | string  | 备注                                | 试驾车              |
+| data.createdAt | string  | 创建时间（YYYY-MM-DD HH:mm:ss）     | 2026-01-10 00:00:00 |
+| data.updatedAt | string  | 更新时间（YYYY-MM-DD HH:mm:ss）     | 2026-01-10 00:00:00 |
 
 ---
 
@@ -927,16 +927,16 @@
 
 **返回值（Success 200）**：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（DeleteResult） | - |
+| 字段    | 类型   | 说明                 | 示例      |
+| ------- | ------ | -------------------- | --------- |
+| code    | string | 状态码               | '0'       |
+| message | string | 状态描述             | 'success' |
+| data    | object | 数据（DeleteResult） | -         |
 
 `data` 字段结构（DeleteResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
+| 字段    | 类型    | 说明     | 示例 |
+| ------- | ------- | -------- | ---- |
 | data.ok | boolean | 是否成功 | true |
 
 ---
@@ -963,35 +963,35 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（CarFriendListResult） | - |
+| 字段    | 类型   | 说明                        | 示例      |
+| ------- | ------ | --------------------------- | --------- |
+| code    | string | 状态码                      | '0'       |
+| message | string | 状态描述                    | 'success' |
+| data    | object | 数据（CarFriendListResult） | -         |
 
 `data` 字段结构（CarFriendListResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list | array | 车友列表 | - |
-| data.total | number | 总条数 | 32 |
-| data.page | number | 当前页码 | 1 |
-| data.pageSize | number | 每页条数 | 10 |
+| 字段          | 类型   | 说明     | 示例 |
+| ------------- | ------ | -------- | ---- |
+| data.list     | array  | 车友列表 | -    |
+| data.total    | number | 总条数   | 32   |
+| data.page     | number | 当前页码 | 1    |
+| data.pageSize | number | 每页条数 | 10   |
 
 列表项 `CarFriend`：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list[].carFriendId | string | 车友记录业务 ID（格式：LD####AAAA） | LD0004MNOP |
-| data.list[].userId | string | 归属用户业务 ID（格式：LD####AAAA） | LD0001ABCD |
-| data.list[].username | string | 用户名 | 张三 |
-| data.list[].carId | string | 车辆业务 ID（格式：LD####AAAA） | LD0002EFGH |
-| data.list[].vin | string \ null | VIN 码（17 位） | LFV2A21J3G1234567 |
-| data.list[].carModel | string | 车辆型号 | A4L |
-| data.list[].carVersion | string | 车辆版本 | 2.0T-2022 |
-| data.list[].remark | string | 备注 | 车友群 1 |
-| data.list[].createdAt | string | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-16 12:00:00 |
-| data.list[].updatedAt | string | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-16 12:00:00 |
+| 字段                    | 类型          | 说明                                | 示例                |
+| ----------------------- | ------------- | ----------------------------------- | ------------------- |
+| data.list[].carFriendId | string        | 车友记录业务 ID（格式：LD####AAAA） | LD0004MNOP          |
+| data.list[].userId      | string        | 归属用户业务 ID（格式：LD####AAAA） | LD0001ABCD          |
+| data.list[].username    | string        | 用户名                              | 张三                |
+| data.list[].carId       | string        | 车辆业务 ID（格式：LD####AAAA）     | LD0002EFGH          |
+| data.list[].vin         | string \ null | VIN 码（17 位）                     | LFV2A21J3G1234567   |
+| data.list[].carModel    | string        | 车辆型号                            | A4L                 |
+| data.list[].carVersion  | string        | 车辆版本                            | 2.0T-2022           |
+| data.list[].remark      | string        | 备注                                | 车友群 1            |
+| data.list[].createdAt   | string        | 创建时间（YYYY-MM-DD HH:mm:ss）     | 2026-01-16 12:00:00 |
+| data.list[].updatedAt   | string        | 修改时间（YYYY-MM-DD HH:mm:ss）     | 2026-01-16 12:00:00 |
 
 ---
 
@@ -1018,26 +1018,26 @@
 
 **返回值（Success 201）**：对象 `CarFriend`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（CarFriend） | - |
+| 字段    | 类型   | 说明              | 示例      |
+| ------- | ------ | ----------------- | --------- |
+| code    | string | 状态码            | '0'       |
+| message | string | 状态描述          | 'success' |
+| data    | object | 数据（CarFriend） | -         |
 
 `data` 字段结构（CarFriend）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.carFriendId | string | 车友记录业务 ID（格式：LD####AAAA） | LD0004MNOP |
-| data.userId | string | 归属用户业务 ID（格式：LD####AAAA） | LD0001ABCD |
-| data.username | string | 用户名 | 张三 |
-| data.carId | string | 车辆业务 ID（格式：LD####AAAA） | LD0002EFGH |
-| data.vin | string \ null | VIN 码（17 位） | LFV2A21J3G1234567 |
-| data.carModel | string | 车辆型号 | A4L |
-| data.carVersion | string | 车辆版本 | 2.0T-2022 |
-| data.remark | string | 备注 | 车友群 1 |
-| data.createdAt | string | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-16 12:00:00 |
-| data.updatedAt | string | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-16 12:00:00 |
+| 字段             | 类型          | 说明                                | 示例                |
+| ---------------- | ------------- | ----------------------------------- | ------------------- |
+| data.carFriendId | string        | 车友记录业务 ID（格式：LD####AAAA） | LD0004MNOP          |
+| data.userId      | string        | 归属用户业务 ID（格式：LD####AAAA） | LD0001ABCD          |
+| data.username    | string        | 用户名                              | 张三                |
+| data.carId       | string        | 车辆业务 ID（格式：LD####AAAA）     | LD0002EFGH          |
+| data.vin         | string \ null | VIN 码（17 位）                     | LFV2A21J3G1234567   |
+| data.carModel    | string        | 车辆型号                            | A4L                 |
+| data.carVersion  | string        | 车辆版本                            | 2.0T-2022           |
+| data.remark      | string        | 备注                                | 车友群 1            |
+| data.createdAt   | string        | 创建时间（YYYY-MM-DD HH:mm:ss）     | 2026-01-16 12:00:00 |
+| data.updatedAt   | string        | 修改时间（YYYY-MM-DD HH:mm:ss）     | 2026-01-16 12:00:00 |
 
 ---
 
@@ -1065,26 +1065,26 @@
 
 **返回值（Success 200）**：对象 `CarFriend`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（CarFriend） | - |
+| 字段    | 类型   | 说明              | 示例      |
+| ------- | ------ | ----------------- | --------- |
+| code    | string | 状态码            | '0'       |
+| message | string | 状态描述          | 'success' |
+| data    | object | 数据（CarFriend） | -         |
 
 `data` 字段结构（CarFriend）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.carFriendId | string | 车友记录业务 ID（格式：LD####AAAA） | LD0004MNOP |
-| data.userId | string | 归属用户业务 ID（格式：LD####AAAA） | LD0001ABCD |
-| data.username | string | 用户名 | 张三 |
-| data.carId | string | 车辆业务 ID（格式：LD####AAAA） | LD0002EFGH |
-| data.vin | string \ null | VIN 码（17 位） | LFV2A21J3G1234567 |
-| data.carModel | string | 车辆型号 | A4L |
-| data.carVersion | string | 车辆版本 | 2.0T-2022 |
-| data.remark | string | 备注 | 车友群 1 |
-| data.createdAt | string | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-16 12:00:00 |
-| data.updatedAt | string | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-16 12:00:00 |
+| 字段             | 类型          | 说明                                | 示例                |
+| ---------------- | ------------- | ----------------------------------- | ------------------- |
+| data.carFriendId | string        | 车友记录业务 ID（格式：LD####AAAA） | LD0004MNOP          |
+| data.userId      | string        | 归属用户业务 ID（格式：LD####AAAA） | LD0001ABCD          |
+| data.username    | string        | 用户名                              | 张三                |
+| data.carId       | string        | 车辆业务 ID（格式：LD####AAAA）     | LD0002EFGH          |
+| data.vin         | string \ null | VIN 码（17 位）                     | LFV2A21J3G1234567   |
+| data.carModel    | string        | 车辆型号                            | A4L                 |
+| data.carVersion  | string        | 车辆版本                            | 2.0T-2022           |
+| data.remark      | string        | 备注                                | 车友群 1            |
+| data.createdAt   | string        | 创建时间（YYYY-MM-DD HH:mm:ss）     | 2026-01-16 12:00:00 |
+| data.updatedAt   | string        | 修改时间（YYYY-MM-DD HH:mm:ss）     | 2026-01-16 12:00:00 |
 
 ---
 
@@ -1106,16 +1106,16 @@
 
 **返回值（Success 200）**：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（DeleteResult） | - |
+| 字段    | 类型   | 说明                 | 示例      |
+| ------- | ------ | -------------------- | --------- |
+| code    | string | 状态码               | '0'       |
+| message | string | 状态描述             | 'success' |
+| data    | object | 数据（DeleteResult） | -         |
 
 `data` 字段结构（DeleteResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
+| 字段    | 类型    | 说明     | 示例 |
+| ------- | ------- | -------- | ---- |
 | data.ok | boolean | 是否成功 | true |
 
 ---
@@ -1142,34 +1142,33 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（PostListResult） | - |
+| 字段    | 类型   | 说明                   | 示例      |
+| ------- | ------ | ---------------------- | --------- |
+| code    | string | 状态码                 | '0'       |
+| message | string | 状态描述               | 'success' |
+| data    | object | 数据（PostListResult） | -         |
 
 `data` 字段结构（PostListResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list | array | 帖子列表（Post[]） | - |
-| data.page | number | 当前页码 | 1 |
-| data.pageSize | number | 每页条数 | 10 |
-| data.total | number | 总条数 | 100 |
+| 字段          | 类型   | 说明               | 示例 |
+| ------------- | ------ | ------------------ | ---- |
+| data.list     | array  | 帖子列表（Post[]） | -    |
+| data.page     | number | 当前页码           | 1    |
+| data.pageSize | number | 每页条数           | 10   |
+| data.total    | number | 总条数             | 100  |
 
 `data.list` 字段结构（Post[]）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list[].postId | string | 帖子业务 ID（格式：LD####AAAA） | LD0003IJKL |
-| data.list[].userId | string | 作者用户业务 ID（格式：LD####AAAA） | LD0001ABCD |
-| data.list[].carId | string \\ null | 关联车辆业务 ID（格式：LD####AAAA） | LD0002EFGH |
-| data.list[].title | string | 标题 | 我的第一台车 |
-| data.list[].content | string | 内容 | ... |
-| data.list[].status | string | 状态（draft/published/hidden） | published |
-| data.list[].createdAt | string | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00 |
-| data.list[].updatedAt | string | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-10 00:00:00 |
-
+| 字段                  | 类型           | 说明                                | 示例                |
+| --------------------- | -------------- | ----------------------------------- | ------------------- |
+| data.list[].postId    | string         | 帖子业务 ID（格式：LD####AAAA）     | LD0003IJKL          |
+| data.list[].userId    | string         | 作者用户业务 ID（格式：LD####AAAA） | LD0001ABCD          |
+| data.list[].carId     | string \\ null | 关联车辆业务 ID（格式：LD####AAAA） | LD0002EFGH          |
+| data.list[].title     | string         | 标题                                | 我的第一台车        |
+| data.list[].content   | string         | 内容                                | ...                 |
+| data.list[].status    | string         | 状态（draft/published/hidden）      | published           |
+| data.list[].createdAt | string         | 创建时间（YYYY-MM-DD HH:mm:ss）     | 2026-01-10 00:00:00 |
+| data.list[].updatedAt | string         | 更新时间（YYYY-MM-DD HH:mm:ss）     | 2026-01-10 00:00:00 |
 
 ## 12. 获取反馈列表（需登录）
 
@@ -1193,36 +1192,36 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（FeedbackListResult） | - |
+| 字段    | 类型   | 说明                       | 示例      |
+| ------- | ------ | -------------------------- | --------- |
+| code    | string | 状态码                     | '0'       |
+| message | string | 状态描述                   | 'success' |
+| data    | object | 数据（FeedbackListResult） | -         |
 
 `data` 字段结构（FeedbackListResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list | array | 反馈列表（Feedback[]） | - |
-| data.page | number | 当前页码 | 1 |
-| data.pageSize | number | 每页条数 | 10 |
-| data.total | number | 总条数 | 100 |
+| 字段          | 类型   | 说明                   | 示例 |
+| ------------- | ------ | ---------------------- | ---- |
+| data.list     | array  | 反馈列表（Feedback[]） | -    |
+| data.page     | number | 当前页码               | 1    |
+| data.pageSize | number | 每页条数               | 10   |
+| data.total    | number | 总条数                 | 100  |
 
 `data.list` 字段结构（Feedback[]）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list[].feedbackId | string | 反馈业务 ID（格式：LD####AAAA） | LD0006UVWX |
-| data.list[].cby | string | 用户名（创建人） | 张三 |
-| data.list[].type | string | 反馈问题类型 | bug |
-| data.list[].description | string | 反馈描述 | 页面无法加载 |
-| data.list[].contact | string \ null | 联系方式（可选） | 13800138000 |
-| data.list[].env | string | 环境信息（字符串） | Windows 11 / Chrome 120 |
-| data.list[].images | array | 图片数组 | - |
-| data.list[].images[].url | string | 图片 base64（或 dataURL） | data:image/png;base64,iVBORw0... |
-| data.list[].images[].uploadTime | string | 上传时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00 |
-| data.list[].createdAt | string | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00 |
-| data.list[].updatedAt | string | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00 |
+| 字段                            | 类型          | 说明                            | 示例                             |
+| ------------------------------- | ------------- | ------------------------------- | -------------------------------- |
+| data.list[].feedbackId          | string        | 反馈业务 ID（格式：LD####AAAA） | LD0006UVWX                       |
+| data.list[].cby                 | string        | 用户名（创建人）                | 张三                             |
+| data.list[].type                | string        | 反馈问题类型                    | bug                              |
+| data.list[].description         | string        | 反馈描述                        | 页面无法加载                     |
+| data.list[].contact             | string \ null | 联系方式（可选）                | 13800138000                      |
+| data.list[].env                 | string        | 环境信息（字符串）              | Windows 11 / Chrome 120          |
+| data.list[].images              | array         | 图片数组                        | -                                |
+| data.list[].images[].url        | string        | 图片 base64（或 dataURL）       | data:image/png;base64,iVBORw0... |
+| data.list[].images[].uploadTime | string        | 上传时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00              |
+| data.list[].createdAt           | string        | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00              |
+| data.list[].updatedAt           | string        | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00              |
 
 ---
 
@@ -1251,27 +1250,27 @@
 
 **返回值（Success 201）**：对象 `Feedback`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（Feedback） | - |
+| 字段    | 类型   | 说明             | 示例      |
+| ------- | ------ | ---------------- | --------- |
+| code    | string | 状态码           | '0'       |
+| message | string | 状态描述         | 'success' |
+| data    | object | 数据（Feedback） | -         |
 
 `data` 字段结构（Feedback）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.feedbackId | string | 反馈业务 ID（格式：LD####AAAA） | LD0006UVWX |
-| data.cby | string | 用户名（创建人） | 张三 |
-| data.type | string | 反馈问题类型 | bug |
-| data.description | string | 反馈描述 | 页面无法加载 |
-| data.contact | string \ null | 联系方式（可选） | 13800138000 |
-| data.env | string | 环境信息（字符串） | Windows 11 / Chrome 120 |
-| data.images | array | 图片数组（uploadTime 已格式化） | - |
-| data.images[].url | string | 图片 base64（或 dataURL） | data:image/png;base64,iVBORw0... |
-| data.images[].uploadTime | string | 上传时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00 |
-| data.createdAt | string | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00 |
-| data.updatedAt | string | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00 |
+| 字段                     | 类型          | 说明                            | 示例                             |
+| ------------------------ | ------------- | ------------------------------- | -------------------------------- |
+| data.feedbackId          | string        | 反馈业务 ID（格式：LD####AAAA） | LD0006UVWX                       |
+| data.cby                 | string        | 用户名（创建人）                | 张三                             |
+| data.type                | string        | 反馈问题类型                    | bug                              |
+| data.description         | string        | 反馈描述                        | 页面无法加载                     |
+| data.contact             | string \ null | 联系方式（可选）                | 13800138000                      |
+| data.env                 | string        | 环境信息（字符串）              | Windows 11 / Chrome 120          |
+| data.images              | array         | 图片数组（uploadTime 已格式化） | -                                |
+| data.images[].url        | string        | 图片 base64（或 dataURL）       | data:image/png;base64,iVBORw0... |
+| data.images[].uploadTime | string        | 上传时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00              |
+| data.createdAt           | string        | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00              |
+| data.updatedAt           | string        | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00              |
 
 ---
 
@@ -1298,27 +1297,27 @@
 
 **返回值（Success 200）**：对象 `Feedback`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（Feedback） | - |
+| 字段    | 类型   | 说明             | 示例      |
+| ------- | ------ | ---------------- | --------- |
+| code    | string | 状态码           | '0'       |
+| message | string | 状态描述         | 'success' |
+| data    | object | 数据（Feedback） | -         |
 
 `data` 字段结构（Feedback）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.feedbackId | string | 反馈业务 ID（格式：LD####AAAA） | LD0006UVWX |
-| data.cby | string | 用户名（创建人） | 张三 |
-| data.type | string | 反馈问题类型 | bug |
-| data.description | string | 反馈描述 | 页面无法加载 |
-| data.contact | string \ null | 联系方式（可选） | 13800138000 |
-| data.env | string | 环境信息（字符串） | Windows 11 / Chrome 120 |
-| data.images | array | 图片数组（uploadTime 已格式化） | - |
-| data.images[].url | string | 图片 base64（或 dataURL） | data:image/png;base64,iVBORw0... |
-| data.images[].uploadTime | string | 上传时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00 |
-| data.createdAt | string | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00 |
-| data.updatedAt | string | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00 |
+| 字段                     | 类型          | 说明                            | 示例                             |
+| ------------------------ | ------------- | ------------------------------- | -------------------------------- |
+| data.feedbackId          | string        | 反馈业务 ID（格式：LD####AAAA） | LD0006UVWX                       |
+| data.cby                 | string        | 用户名（创建人）                | 张三                             |
+| data.type                | string        | 反馈问题类型                    | bug                              |
+| data.description         | string        | 反馈描述                        | 页面无法加载                     |
+| data.contact             | string \ null | 联系方式（可选）                | 13800138000                      |
+| data.env                 | string        | 环境信息（字符串）              | Windows 11 / Chrome 120          |
+| data.images              | array         | 图片数组（uploadTime 已格式化） | -                                |
+| data.images[].url        | string        | 图片 base64（或 dataURL）       | data:image/png;base64,iVBORw0... |
+| data.images[].uploadTime | string        | 上传时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00              |
+| data.createdAt           | string        | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00              |
+| data.updatedAt           | string        | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00              |
 
 ---
 
@@ -1340,16 +1339,16 @@
 
 **返回值（Success 200）**：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（DeleteResult） | - |
+| 字段    | 类型   | 说明                 | 示例      |
+| ------- | ------ | -------------------- | --------- |
+| code    | string | 状态码               | '0'       |
+| message | string | 状态描述             | 'success' |
+| data    | object | 数据（DeleteResult） | -         |
 
 `data` 字段结构（DeleteResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
+| 字段    | 类型    | 说明     | 示例 |
+| ------- | ------- | -------- | ---- |
 | data.ok | boolean | 是否成功 | true |
 
 ---
@@ -1375,30 +1374,30 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（FeedbackTypeListResult） | - |
+| 字段    | 类型   | 说明                           | 示例      |
+| ------- | ------ | ------------------------------ | --------- |
+| code    | string | 状态码                         | '0'       |
+| message | string | 状态描述                       | 'success' |
+| data    | object | 数据（FeedbackTypeListResult） | -         |
 
 `data` 字段结构（FeedbackTypeListResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list | array | 类型列表（FeedbackType[]） | - |
-| data.page | number | 当前页码 | 1 |
-| data.pageSize | number | 每页条数 | 10 |
-| data.total | number | 总条数 | 100 |
+| 字段          | 类型   | 说明                       | 示例 |
+| ------------- | ------ | -------------------------- | ---- |
+| data.list     | array  | 类型列表（FeedbackType[]） | -    |
+| data.page     | number | 当前页码                   | 1    |
+| data.pageSize | number | 每页条数                   | 10   |
+| data.total    | number | 总条数                     | 100  |
 
 `data.list` 字段结构（FeedbackType[]）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list[].feedbackTypeId | string | 类型业务 ID（格式：LD####AAAA） | LD0007YZAB |
-| data.list[].name | string | 类型名 | BUG 反馈 |
-| data.list[].description | string | 类型描述 | 影响使用的错误与异常 |
-| data.list[].createdAt | string | 新增时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00 |
-| data.list[].updatedAt | string | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00 |
+| 字段                       | 类型   | 说明                            | 示例                 |
+| -------------------------- | ------ | ------------------------------- | -------------------- |
+| data.list[].feedbackTypeId | string | 类型业务 ID（格式：LD####AAAA） | LD0007YZAB           |
+| data.list[].name           | string | 类型名                          | BUG 反馈             |
+| data.list[].description    | string | 类型描述                        | 影响使用的错误与异常 |
+| data.list[].createdAt      | string | 新增时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00  |
+| data.list[].updatedAt      | string | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00  |
 
 ---
 
@@ -1421,21 +1420,21 @@
 
 **返回值（Success 201）**：对象 `FeedbackType`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（FeedbackType） | - |
+| 字段    | 类型   | 说明                 | 示例      |
+| ------- | ------ | -------------------- | --------- |
+| code    | string | 状态码               | '0'       |
+| message | string | 状态描述             | 'success' |
+| data    | object | 数据（FeedbackType） | -         |
 
 `data` 字段结构（FeedbackType）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.feedbackTypeId | string | 类型业务 ID（格式：LD####AAAA） | LD0007YZAB |
-| data.name | string | 类型名 | BUG 反馈 |
-| data.description | string | 类型描述 | 影响使用的错误与异常 |
-| data.createdAt | string | 新增时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00 |
-| data.updatedAt | string | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00 |
+| 字段                | 类型   | 说明                            | 示例                 |
+| ------------------- | ------ | ------------------------------- | -------------------- |
+| data.feedbackTypeId | string | 类型业务 ID（格式：LD####AAAA） | LD0007YZAB           |
+| data.name           | string | 类型名                          | BUG 反馈             |
+| data.description    | string | 类型描述                        | 影响使用的错误与异常 |
+| data.createdAt      | string | 新增时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00  |
+| data.updatedAt      | string | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00  |
 
 ---
 
@@ -1459,21 +1458,21 @@
 
 **返回值（Success 200）**：对象 `FeedbackType`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（FeedbackType） | - |
+| 字段    | 类型   | 说明                 | 示例      |
+| ------- | ------ | -------------------- | --------- |
+| code    | string | 状态码               | '0'       |
+| message | string | 状态描述             | 'success' |
+| data    | object | 数据（FeedbackType） | -         |
 
 `data` 字段结构（FeedbackType）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.feedbackTypeId | string | 类型业务 ID（格式：LD####AAAA） | LD0007YZAB |
-| data.name | string | 类型名 | BUG 反馈 |
-| data.description | string | 类型描述 | 影响使用的错误与异常 |
-| data.createdAt | string | 新增时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00 |
-| data.updatedAt | string | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00 |
+| 字段                | 类型   | 说明                            | 示例                 |
+| ------------------- | ------ | ------------------------------- | -------------------- |
+| data.feedbackTypeId | string | 类型业务 ID（格式：LD####AAAA） | LD0007YZAB           |
+| data.name           | string | 类型名                          | BUG 反馈             |
+| data.description    | string | 类型描述                        | 影响使用的错误与异常 |
+| data.createdAt      | string | 新增时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00  |
+| data.updatedAt      | string | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00  |
 
 ---
 
@@ -1495,16 +1494,16 @@
 
 **返回值（Success 200）**：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（DeleteResult） | - |
+| 字段    | 类型   | 说明                 | 示例      |
+| ------- | ------ | -------------------- | --------- |
+| code    | string | 状态码               | '0'       |
+| message | string | 状态描述             | 'success' |
+| data    | object | 数据（DeleteResult） | -         |
 
 `data` 字段结构（DeleteResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
+| 字段    | 类型    | 说明     | 示例 |
+| ------- | ------- | -------- | ---- |
 | data.ok | boolean | 是否成功 | true |
 
 ---
@@ -1529,28 +1528,28 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（MedalTypeListResult） | - |
+| 字段    | 类型   | 说明                        | 示例      |
+| ------- | ------ | --------------------------- | --------- |
+| code    | string | 状态码                      | '0'       |
+| message | string | 状态描述                    | 'success' |
+| data    | object | 数据（MedalTypeListResult） | -         |
 
 `data` 字段结构（MedalTypeListResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list | array | 列表（MedalType[]） | - |
+| 字段      | 类型  | 说明                | 示例 |
+| --------- | ----- | ------------------- | ---- |
+| data.list | array | 列表（MedalType[]） | -    |
 
 `data.list` 字段结构（MedalType[]）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list[].id | string | 主键 ID（UUID） | 550e8400-e29b-41d4-a716-446655440000 |
-| data.list[].medalTypeId | string | 业务 ID（格式：LD####AAAA） | LD0007YZAB |
-| data.list[].name | string | 勋章名字 | 新手勋章 |
-| data.list[].description | string | 勋章描述 | 完成注册获得 |
-| data.list[].isEnabled | boolean | 是否启用 | true |
-| data.list[].updatedAt | string | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00 |
+| 字段                    | 类型    | 说明                            | 示例                                 |
+| ----------------------- | ------- | ------------------------------- | ------------------------------------ |
+| data.list[].id          | string  | 主键 ID（UUID）                 | 550e8400-e29b-41d4-a716-446655440000 |
+| data.list[].medalTypeId | string  | 业务 ID（格式：LD####AAAA）     | LD0007YZAB                           |
+| data.list[].name        | string  | 勋章名字                        | 新手勋章                             |
+| data.list[].description | string  | 勋章描述                        | 完成注册获得                         |
+| data.list[].isEnabled   | boolean | 是否启用                        | true                                 |
+| data.list[].updatedAt   | string  | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00                  |
 
 ---
 
@@ -1574,22 +1573,22 @@
 
 **返回值（Success 201）**：对象 `MedalType`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（MedalType） | - |
+| 字段    | 类型   | 说明              | 示例      |
+| ------- | ------ | ----------------- | --------- |
+| code    | string | 状态码            | '0'       |
+| message | string | 状态描述          | 'success' |
+| data    | object | 数据（MedalType） | -         |
 
 `data` 字段结构（MedalType）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.id | string | 主键 ID（UUID） | 550e8400-e29b-41d4-a716-446655440000 |
-| data.medalTypeId | string | 业务 ID（格式：LD####AAAA） | LD0007YZAB |
-| data.name | string | 勋章名字 | 新手勋章 |
-| data.description | string | 勋章描述 | 完成注册获得 |
-| data.isEnabled | boolean | 是否启用 | true |
-| data.updatedAt | string | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00 |
+| 字段             | 类型    | 说明                            | 示例                                 |
+| ---------------- | ------- | ------------------------------- | ------------------------------------ |
+| data.id          | string  | 主键 ID（UUID）                 | 550e8400-e29b-41d4-a716-446655440000 |
+| data.medalTypeId | string  | 业务 ID（格式：LD####AAAA）     | LD0007YZAB                           |
+| data.name        | string  | 勋章名字                        | 新手勋章                             |
+| data.description | string  | 勋章描述                        | 完成注册获得                         |
+| data.isEnabled   | boolean | 是否启用                        | true                                 |
+| data.updatedAt   | string  | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00                  |
 
 ---
 
@@ -1614,22 +1613,22 @@
 
 **返回值（Success 200）**：对象 `MedalType`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（MedalType） | - |
+| 字段    | 类型   | 说明              | 示例      |
+| ------- | ------ | ----------------- | --------- |
+| code    | string | 状态码            | '0'       |
+| message | string | 状态描述          | 'success' |
+| data    | object | 数据（MedalType） | -         |
 
 `data` 字段结构（MedalType）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.id | string | 主键 ID（UUID） | 550e8400-e29b-41d4-a716-446655440000 |
-| data.medalTypeId | string | 业务 ID（格式：LD####AAAA） | LD0007YZAB |
-| data.name | string | 勋章名字 | 新手勋章 |
-| data.description | string | 勋章描述 | 完成注册获得 |
-| data.isEnabled | boolean | 是否启用 | true |
-| data.updatedAt | string | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00 |
+| 字段             | 类型    | 说明                            | 示例                                 |
+| ---------------- | ------- | ------------------------------- | ------------------------------------ |
+| data.id          | string  | 主键 ID（UUID）                 | 550e8400-e29b-41d4-a716-446655440000 |
+| data.medalTypeId | string  | 业务 ID（格式：LD####AAAA）     | LD0007YZAB                           |
+| data.name        | string  | 勋章名字                        | 新手勋章                             |
+| data.description | string  | 勋章描述                        | 完成注册获得                         |
+| data.isEnabled   | boolean | 是否启用                        | true                                 |
+| data.updatedAt   | string  | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00                  |
 
 ---
 
@@ -1651,16 +1650,16 @@
 
 **返回值（Success 200）**：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（DeleteResult） | - |
+| 字段    | 类型   | 说明                 | 示例      |
+| ------- | ------ | -------------------- | --------- |
+| code    | string | 状态码               | '0'       |
+| message | string | 状态描述             | 'success' |
+| data    | object | 数据（DeleteResult） | -         |
 
 `data` 字段结构（DeleteResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
+| 字段    | 类型    | 说明     | 示例 |
+| ------- | ------- | -------- | ---- |
 | data.ok | boolean | 是否成功 | true |
 
 ---
@@ -1687,33 +1686,33 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（MedalListResult） | - |
+| 字段    | 类型   | 说明                    | 示例      |
+| ------- | ------ | ----------------------- | --------- |
+| code    | string | 状态码                  | '0'       |
+| message | string | 状态描述                | 'success' |
+| data    | object | 数据（MedalListResult） | -         |
 
 `data` 字段结构（MedalListResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list | array | 列表（Medal[]） | - |
-| data.page | number | 当前页码 | 1 |
-| data.pageSize | number | 每页条数 | 10 |
-| data.total | number | 总条数 | 100 |
+| 字段          | 类型   | 说明            | 示例 |
+| ------------- | ------ | --------------- | ---- |
+| data.list     | array  | 列表（Medal[]） | -    |
+| data.page     | number | 当前页码        | 1    |
+| data.pageSize | number | 每页条数        | 10   |
+| data.total    | number | 总条数          | 100  |
 
 `data.list` 字段结构（Medal[]）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list[].id | string | 主键 ID（UUID） | 550e8400-e29b-41d4-a716-446655440000 |
-| data.list[].medalId | string | 勋章业务 ID（格式：LD####AAAA） | LD0007YZAB |
-| data.list[].medalTypeId | string | 勋章类型业务 ID（格式：LD####AAAA） | LD0001ABCD |
-| data.list[].name | string | 勋章名字 | 新手勋章 |
-| data.list[].description | string | 勋章描述 | 完成注册获得 |
-| data.list[].iconBase64 | string | 勋章图标 base64 | data:image/png;base64,iVBORw0... |
-| data.list[].isEnabled | boolean | 是否启用 | true |
-| data.list[].updatedAt | string | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00 |
+| 字段                    | 类型    | 说明                                | 示例                                 |
+| ----------------------- | ------- | ----------------------------------- | ------------------------------------ |
+| data.list[].id          | string  | 主键 ID（UUID）                     | 550e8400-e29b-41d4-a716-446655440000 |
+| data.list[].medalId     | string  | 勋章业务 ID（格式：LD####AAAA）     | LD0007YZAB                           |
+| data.list[].medalTypeId | string  | 勋章类型业务 ID（格式：LD####AAAA） | LD0001ABCD                           |
+| data.list[].name        | string  | 勋章名字                            | 新手勋章                             |
+| data.list[].description | string  | 勋章描述                            | 完成注册获得                         |
+| data.list[].iconBase64  | string  | 勋章图标 base64                     | data:image/png;base64,iVBORw0...     |
+| data.list[].isEnabled   | boolean | 是否启用                            | true                                 |
+| data.list[].updatedAt   | string  | 修改时间（YYYY-MM-DD HH:mm:ss）     | 2026-01-14 12:00:00                  |
 
 ---
 
@@ -1739,11 +1738,11 @@
 
 **返回值（Success 201）**：对象 `Medal`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（Medal） | - |
+| 字段    | 类型   | 说明          | 示例      |
+| ------- | ------ | ------------- | --------- |
+| code    | string | 状态码        | '0'       |
+| message | string | 状态描述      | 'success' |
+| data    | object | 数据（Medal） | -         |
 
 `data` 字段结构（Medal）：同上 `Medal[]` 单项字段。
 
@@ -1772,11 +1771,11 @@
 
 **返回值（Success 200）**：对象 `Medal`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（Medal） | - |
+| 字段    | 类型   | 说明          | 示例      |
+| ------- | ------ | ------------- | --------- |
+| code    | string | 状态码        | '0'       |
+| message | string | 状态描述      | 'success' |
+| data    | object | 数据（Medal） | -         |
 
 ---
 
@@ -1798,16 +1797,16 @@
 
 **返回值（Success 200）**：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（DeleteResult） | - |
+| 字段    | 类型   | 说明                 | 示例      |
+| ------- | ------ | -------------------- | --------- |
+| code    | string | 状态码               | '0'       |
+| message | string | 状态描述             | 'success' |
+| data    | object | 数据（DeleteResult） | -         |
 
 `data` 字段结构（DeleteResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
+| 字段    | 类型    | 说明     | 示例 |
+| ------- | ------- | -------- | ---- |
 | data.ok | boolean | 是否成功 | true |
 
 ---
@@ -1833,35 +1832,35 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（MedalAllResult） | - |
+| 字段    | 类型   | 说明                   | 示例      |
+| ------- | ------ | ---------------------- | --------- |
+| code    | string | 状态码                 | '0'       |
+| message | string | 状态描述               | 'success' |
+| data    | object | 数据（MedalAllResult） | -         |
 
 `data` 字段结构（MedalAllResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list | array | 列表（MedalAllItem[]） | - |
-| data.page | number | 当前页码 | 1 |
-| data.pageSize | number | 每页条数 | 10 |
-| data.total | number | 总条数 | 100 |
+| 字段          | 类型   | 说明                   | 示例 |
+| ------------- | ------ | ---------------------- | ---- |
+| data.list     | array  | 列表（MedalAllItem[]） | -    |
+| data.page     | number | 当前页码               | 1    |
+| data.pageSize | number | 每页条数               | 10   |
+| data.total    | number | 总条数                 | 100  |
 
 `data.list` 字段结构（MedalAllItem[]）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list[].medalId | string | 勋章业务 ID（格式：LD####AAAA） | LD0007YZAB |
-| data.list[].medalTypeId | string | 勋章类型业务 ID（格式：LD####AAAA） | LD0001ABCD |
-| data.list[].name | string | 勋章名字 | 新手勋章 |
-| data.list[].description | string | 勋章描述 | 完成注册获得 |
-| data.list[].iconBase64 | string | 勋章图标 base64 | data:image/png;base64,iVBORw0... |
-| data.list[].isEnabled | boolean | 是否启用 | true |
-| data.list[].updatedAt | string | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00 |
-| data.list[].isOwned | boolean | 是否已获得 | false |
-| data.list[].obtainedAt | string \ null | 获得时间（已获得才有） | 2026-01-14 12:00:00 |
-| data.list[].isWorn | boolean | 是否佩戴中 | false |
+| 字段                    | 类型          | 说明                                | 示例                             |
+| ----------------------- | ------------- | ----------------------------------- | -------------------------------- |
+| data.list[].medalId     | string        | 勋章业务 ID（格式：LD####AAAA）     | LD0007YZAB                       |
+| data.list[].medalTypeId | string        | 勋章类型业务 ID（格式：LD####AAAA） | LD0001ABCD                       |
+| data.list[].name        | string        | 勋章名字                            | 新手勋章                         |
+| data.list[].description | string        | 勋章描述                            | 完成注册获得                     |
+| data.list[].iconBase64  | string        | 勋章图标 base64                     | data:image/png;base64,iVBORw0... |
+| data.list[].isEnabled   | boolean       | 是否启用                            | true                             |
+| data.list[].updatedAt   | string        | 修改时间（YYYY-MM-DD HH:mm:ss）     | 2026-01-14 12:00:00              |
+| data.list[].isOwned     | boolean       | 是否已获得                          | false                            |
+| data.list[].obtainedAt  | string \ null | 获得时间（已获得才有）              | 2026-01-14 12:00:00              |
+| data.list[].isWorn      | boolean       | 是否佩戴中                          | false                            |
 
 ---
 
@@ -1886,33 +1885,33 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（MyMedalListResult） | - |
+| 字段    | 类型   | 说明                      | 示例      |
+| ------- | ------ | ------------------------- | --------- |
+| code    | string | 状态码                    | '0'       |
+| message | string | 状态描述                  | 'success' |
+| data    | object | 数据（MyMedalListResult） | -         |
 
 `data` 字段结构（MyMedalListResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list | array | 列表（MyMedal[]） | - |
-| data.page | number | 当前页码 | 1 |
-| data.pageSize | number | 每页条数 | 10 |
-| data.total | number | 总条数 | 100 |
+| 字段          | 类型   | 说明              | 示例 |
+| ------------- | ------ | ----------------- | ---- |
+| data.list     | array  | 列表（MyMedal[]） | -    |
+| data.page     | number | 当前页码          | 1    |
+| data.pageSize | number | 每页条数          | 10   |
+| data.total    | number | 总条数            | 100  |
 
 `data.list` 字段结构（MyMedal[]）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list[].medalId | string | 勋章业务 ID（格式：LD####AAAA） | LD0007YZAB |
-| data.list[].medalTypeId | string | 勋章类型业务 ID（格式：LD####AAAA） | LD0001ABCD |
-| data.list[].name | string | 勋章名字 | 新手勋章 |
-| data.list[].description | string | 勋章描述 | 完成注册获得 |
-| data.list[].iconBase64 | string | 勋章图标 base64 | data:image/png;base64,iVBORw0... |
-| data.list[].updatedAt | string | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00 |
-| data.list[].obtainedAt | string | 获得时间 | 2026-01-14 12:00:00 |
-| data.list[].isWorn | boolean | 是否佩戴中 | false |
+| 字段                    | 类型    | 说明                                | 示例                             |
+| ----------------------- | ------- | ----------------------------------- | -------------------------------- |
+| data.list[].medalId     | string  | 勋章业务 ID（格式：LD####AAAA）     | LD0007YZAB                       |
+| data.list[].medalTypeId | string  | 勋章类型业务 ID（格式：LD####AAAA） | LD0001ABCD                       |
+| data.list[].name        | string  | 勋章名字                            | 新手勋章                         |
+| data.list[].description | string  | 勋章描述                            | 完成注册获得                     |
+| data.list[].iconBase64  | string  | 勋章图标 base64                     | data:image/png;base64,iVBORw0... |
+| data.list[].updatedAt   | string  | 修改时间（YYYY-MM-DD HH:mm:ss）     | 2026-01-14 12:00:00              |
+| data.list[].obtainedAt  | string  | 获得时间                            | 2026-01-14 12:00:00              |
+| data.list[].isWorn      | boolean | 是否佩戴中                          | false                            |
 
 ---
 
@@ -1934,17 +1933,17 @@
 
 **返回值（Success 200）**：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（WearResult） | - |
+| 字段    | 类型   | 说明               | 示例      |
+| ------- | ------ | ------------------ | --------- |
+| code    | string | 状态码             | '0'       |
+| message | string | 状态描述           | 'success' |
+| data    | object | 数据（WearResult） | -         |
 
 `data` 字段结构（WearResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.ok | boolean | 是否成功 | true |
+| 字段             | 类型          | 说明               | 示例       |
+| ---------------- | ------------- | ------------------ | ---------- |
+| data.ok          | boolean       | 是否成功           | true       |
 | data.wornMedalId | string \ null | 当前佩戴的 medalId | LD0007YZAB |
 
 ---
@@ -1969,19 +1968,19 @@
 
 **返回值（Success 200）**：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（GrantResult） | - |
+| 字段    | 类型   | 说明                | 示例      |
+| ------- | ------ | ------------------- | --------- |
+| code    | string | 状态码              | '0'       |
+| message | string | 状态描述            | 'success' |
+| data    | object | 数据（GrantResult） | -         |
 
 `data` 字段结构（GrantResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.ok | boolean | 是否成功 | true |
-| data.granted | boolean | 是否本次新增获得 | true |
-| data.alreadyOwned | boolean | 是否之前已拥有 | false |
+| 字段              | 类型    | 说明             | 示例  |
+| ----------------- | ------- | ---------------- | ----- |
+| data.ok           | boolean | 是否成功         | true  |
+| data.granted      | boolean | 是否本次新增获得 | true  |
+| data.alreadyOwned | boolean | 是否之前已拥有   | false |
 
 ---
 
@@ -2007,32 +2006,32 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（MedalGrantLogListResult） | - |
+| 字段    | 类型   | 说明                            | 示例      |
+| ------- | ------ | ------------------------------- | --------- |
+| code    | string | 状态码                          | '0'       |
+| message | string | 状态描述                        | 'success' |
+| data    | object | 数据（MedalGrantLogListResult） | -         |
 
 `data` 字段结构（MedalGrantLogListResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list | array | 列表（MedalGrantLog[]） | - |
-| data.page | number | 当前页码 | 1 |
-| data.pageSize | number | 每页条数 | 10 |
-| data.total | number | 总条数 | 100 |
+| 字段          | 类型   | 说明                    | 示例 |
+| ------------- | ------ | ----------------------- | ---- |
+| data.list     | array  | 列表（MedalGrantLog[]） | -    |
+| data.page     | number | 当前页码                | 1    |
+| data.pageSize | number | 每页条数                | 10   |
+| data.total    | number | 总条数                  | 100  |
 
 `data.list` 字段结构（MedalGrantLog[]）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list[].id | string | 主键 ID（UUID） | 550e8400-e29b-41d4-a716-446655440000 |
-| data.list[].userId | string | 用户业务 ID（格式：LD####AAAA） | LD0001ABCD |
-| data.list[].medalId | string | 勋章业务 ID（格式：LD####AAAA） | LD0007YZAB |
-| data.list[].operatorUserId | string \ null | 操作人用户业务 ID | LD0002EFGH |
-| data.list[].sourceType | string | 来源类型 | admin_manual |
-| data.list[].reason | string | 发放原因 | 活动奖励 |
-| data.list[].createdAt | string | 发放时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00 |
+| 字段                       | 类型          | 说明                            | 示例                                 |
+| -------------------------- | ------------- | ------------------------------- | ------------------------------------ |
+| data.list[].id             | string        | 主键 ID（UUID）                 | 550e8400-e29b-41d4-a716-446655440000 |
+| data.list[].userId         | string        | 用户业务 ID（格式：LD####AAAA） | LD0001ABCD                           |
+| data.list[].medalId        | string        | 勋章业务 ID（格式：LD####AAAA） | LD0007YZAB                           |
+| data.list[].operatorUserId | string \ null | 操作人用户业务 ID               | LD0002EFGH                           |
+| data.list[].sourceType     | string        | 来源类型                        | admin_manual                         |
+| data.list[].reason         | string        | 发放原因                        | 活动奖励                             |
+| data.list[].createdAt      | string        | 发放时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00                  |
 
 ---
 
@@ -2058,32 +2057,32 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（QaTagListResult） | - |
+| 字段    | 类型   | 说明                    | 示例      |
+| ------- | ------ | ----------------------- | --------- |
+| code    | string | 状态码                  | '0'       |
+| message | string | 状态描述                | 'success' |
+| data    | object | 数据（QaTagListResult） | -         |
 
 `data` 字段结构（QaTagListResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list | array | 列表（QaTag[]） | - |
-| data.page | number | 当前页码 | 1 |
-| data.pageSize | number | 每页条数 | 10 |
-| data.total | number | 总条数 | 100 |
+| 字段          | 类型   | 说明            | 示例 |
+| ------------- | ------ | --------------- | ---- |
+| data.list     | array  | 列表（QaTag[]） | -    |
+| data.page     | number | 当前页码        | 1    |
+| data.pageSize | number | 每页条数        | 10   |
+| data.total    | number | 总条数          | 100  |
 
 `data.list` 字段结构（QaTag[]）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list[].id | string | 主键 ID（UUID） | 550e8400-e29b-41d4-a716-446655440000 |
-| data.list[].qaTagId | string | 标签业务 ID（格式：LD####AAAA） | LD0007YZAB |
-| data.list[].name | string | 标签名 | 续航 |
-| data.list[].description | string | 标签描述 | 续航相关问题 |
-| data.list[].seq | number | 排序号 | 1 |
-| data.list[].isEnabled | boolean | 是否启用 | true |
-| data.list[].updatedAt | string | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00 |
+| 字段                    | 类型    | 说明                            | 示例                                 |
+| ----------------------- | ------- | ------------------------------- | ------------------------------------ |
+| data.list[].id          | string  | 主键 ID（UUID）                 | 550e8400-e29b-41d4-a716-446655440000 |
+| data.list[].qaTagId     | string  | 标签业务 ID（格式：LD####AAAA） | LD0007YZAB                           |
+| data.list[].name        | string  | 标签名                          | 续航                                 |
+| data.list[].description | string  | 标签描述                        | 续航相关问题                         |
+| data.list[].seq         | number  | 排序号                          | 1                                    |
+| data.list[].isEnabled   | boolean | 是否启用                        | true                                 |
+| data.list[].updatedAt   | string  | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00                  |
 
 ---
 
@@ -2108,23 +2107,23 @@
 
 **返回值（Success 201）**：对象 `QaTag`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（QaTag） | - |
+| 字段    | 类型   | 说明          | 示例      |
+| ------- | ------ | ------------- | --------- |
+| code    | string | 状态码        | '0'       |
+| message | string | 状态描述      | 'success' |
+| data    | object | 数据（QaTag） | -         |
 
 `data` 字段结构（QaTag）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.id | string | 主键 ID（UUID） | 550e8400-e29b-41d4-a716-446655440000 |
-| data.qaTagId | string | 标签业务 ID（格式：LD####AAAA） | LD0007YZAB |
-| data.name | string | 标签名 | 续航 |
-| data.description | string | 标签描述 | 续航相关问题 |
-| data.seq | number | 排序号 | 1 |
-| data.isEnabled | boolean | 是否启用 | true |
-| data.updatedAt | string | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00 |
+| 字段             | 类型    | 说明                            | 示例                                 |
+| ---------------- | ------- | ------------------------------- | ------------------------------------ |
+| data.id          | string  | 主键 ID（UUID）                 | 550e8400-e29b-41d4-a716-446655440000 |
+| data.qaTagId     | string  | 标签业务 ID（格式：LD####AAAA） | LD0007YZAB                           |
+| data.name        | string  | 标签名                          | 续航                                 |
+| data.description | string  | 标签描述                        | 续航相关问题                         |
+| data.seq         | number  | 排序号                          | 1                                    |
+| data.isEnabled   | boolean | 是否启用                        | true                                 |
+| data.updatedAt   | string  | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00                  |
 
 ---
 
@@ -2150,11 +2149,11 @@
 
 **返回值（Success 200）**：对象 `QaTag`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（QaTag） | - |
+| 字段    | 类型   | 说明          | 示例      |
+| ------- | ------ | ------------- | --------- |
+| code    | string | 状态码        | '0'       |
+| message | string | 状态描述      | 'success' |
+| data    | object | 数据（QaTag） | -         |
 
 `data` 字段结构（QaTag）：同上 `QaTag` 字段。
 
@@ -2178,16 +2177,16 @@
 
 **返回值（Success 200）**：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（DeleteResult） | - |
+| 字段    | 类型   | 说明                 | 示例      |
+| ------- | ------ | -------------------- | --------- |
+| code    | string | 状态码               | '0'       |
+| message | string | 状态描述             | 'success' |
+| data    | object | 数据（DeleteResult） | -         |
 
 `data` 字段结构（DeleteResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
+| 字段    | 类型    | 说明     | 示例 |
+| ------- | ------- | -------- | ---- |
 | data.ok | boolean | 是否成功 | true |
 
 ---
@@ -2219,48 +2218,48 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（QaQuestionListResult） | - |
+| 字段    | 类型   | 说明                         | 示例      |
+| ------- | ------ | ---------------------------- | --------- |
+| code    | string | 状态码                       | '0'       |
+| message | string | 状态描述                     | 'success' |
+| data    | object | 数据（QaQuestionListResult） | -         |
 
 `data` 字段结构（QaQuestionListResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list | array | 列表（QaQuestion[]） | - |
-| data.page | number | 当前页码 | 1 |
-| data.pageSize | number | 每页条数 | 10 |
-| data.total | number | 总条数 | 100 |
+| 字段          | 类型   | 说明                 | 示例 |
+| ------------- | ------ | -------------------- | ---- |
+| data.list     | array  | 列表（QaQuestion[]） | -    |
+| data.page     | number | 当前页码             | 1    |
+| data.pageSize | number | 每页条数             | 10   |
+| data.total    | number | 总条数               | 100  |
 
 `data.list` 字段结构（QaQuestion[]）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list[].id | string | 主键 ID（UUID） | 550e8400-e29b-41d4-a716-446655440000 |
-| data.list[].qaQuestionId | string | 问答问题业务 ID（格式：LD####AAAA） | LD0007YZAB |
-| data.list[].authorUserId | string | 作者用户业务 ID | LD0001ABCD |
-| data.list[].title | string | 标题 | 充电口盖怎么打开？ |
-| data.list[].description | string | 描述 | 车型 XX，找不到开关 |
-| data.list[].images | array | 图片 base64 列表（string[]，最多 9 张） | - |
-| data.list[].tagIds | array | 标签业务 ID 列表 | ["LD0001ABCD"] |
-| data.list[].likeCount | number | 点赞数 | 12 |
-| data.list[].answerCount | number | 回答数 | 3 |
-| data.list[].viewCount | number | 浏览量 | 256 |
-| data.list[].acceptedAnswerId | string \ null | 已采纳回答业务 ID | LD0009WXYZ |
-| data.list[].isSolved | boolean | 是否已解决 | true |
-| data.list[].isEnabled | boolean | 是否启用 | true |
-| data.list[].isFeatured | boolean | 是否精选 | false |
-| data.list[].featuredAt | string \ null | 精选设置时间（YYYY-MM-DD HH:mm:ss） | 2026-01-22 12:00:00 |
-| data.list[].publishedAt | string | 发布时间（YYYY-MM-DD HH:mm:ss） | 2026-01-20 12:00:00 |
-| data.list[].createdAt | string | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-20 12:00:00 |
-| data.list[].updatedAt | string | 最后互动时间（评论/采纳变更时更新，YYYY-MM-DD HH:mm:ss） | 2026-01-20 12:00:00 |
+| 字段                         | 类型          | 说明                                                     | 示例                                 |
+| ---------------------------- | ------------- | -------------------------------------------------------- | ------------------------------------ |
+| data.list[].id               | string        | 主键 ID（UUID）                                          | 550e8400-e29b-41d4-a716-446655440000 |
+| data.list[].qaQuestionId     | string        | 问答问题业务 ID（格式：LD####AAAA）                      | LD0007YZAB                           |
+| data.list[].authorUserId     | string        | 作者用户业务 ID                                          | LD0001ABCD                           |
+| data.list[].title            | string        | 标题                                                     | 充电口盖怎么打开？                   |
+| data.list[].description      | string        | 描述                                                     | 车型 XX，找不到开关                  |
+| data.list[].images           | array         | 图片 base64 列表（string[]，最多 9 张）                  | -                                    |
+| data.list[].tagIds           | array         | 标签业务 ID 列表                                         | ["LD0001ABCD"]                       |
+| data.list[].likeCount        | number        | 点赞数                                                   | 12                                   |
+| data.list[].answerCount      | number        | 回答数                                                   | 3                                    |
+| data.list[].viewCount        | number        | 浏览量                                                   | 256                                  |
+| data.list[].acceptedAnswerId | string \ null | 已采纳回答业务 ID                                        | LD0009WXYZ                           |
+| data.list[].isSolved         | boolean       | 是否已解决                                               | true                                 |
+| data.list[].isEnabled        | boolean       | 是否启用                                                 | true                                 |
+| data.list[].isFeatured       | boolean       | 是否精选                                                 | false                                |
+| data.list[].featuredAt       | string \ null | 精选设置时间（YYYY-MM-DD HH:mm:ss）                      | 2026-01-22 12:00:00                  |
+| data.list[].publishedAt      | string        | 发布时间（YYYY-MM-DD HH:mm:ss）                          | 2026-01-20 12:00:00                  |
+| data.list[].createdAt        | string        | 创建时间（YYYY-MM-DD HH:mm:ss）                          | 2026-01-20 12:00:00                  |
+| data.list[].updatedAt        | string        | 最后互动时间（评论/采纳变更时更新，YYYY-MM-DD HH:mm:ss） | 2026-01-20 12:00:00                  |
 
 `data.list[].images` 字段结构（string[]）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
+| 字段                 | 类型   | 说明                                     | 示例                                 |
+| -------------------- | ------ | ---------------------------------------- | ------------------------------------ |
 | data.list[].images[] | string | 图片 base64（可为 data URL 或纯 base64） | data:image/png;base64,iVBORw0KGgo... |
 
 ---
@@ -2283,44 +2282,44 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（QaQuestionDetailResult） | - |
+| 字段    | 类型   | 说明                           | 示例      |
+| ------- | ------ | ------------------------------ | --------- |
+| code    | string | 状态码                         | '0'       |
+| message | string | 状态描述                       | 'success' |
+| data    | object | 数据（QaQuestionDetailResult） | -         |
 
 `data` 字段结构（QaQuestionDetailResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.question | object | 问题（QaQuestion） | - |
-| data.acceptedAnswer | object \ null | 已采纳回答（QaAnswer） | - |
+| 字段                | 类型          | 说明                   | 示例 |
+| ------------------- | ------------- | ---------------------- | ---- |
+| data.question       | object        | 问题（QaQuestion）     | -    |
+| data.acceptedAnswer | object \ null | 已采纳回答（QaAnswer） | -    |
 
 `data.question` 字段结构：包含上文 `QaQuestion` 字段（其中 updatedAt 为最后互动时间：评论/采纳变更时更新），并额外返回：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.question.nickname | string | 作者昵称（未设置时为空字符串） | 张三 |
-| data.question.isLiked | boolean | 当前登录用户是否已点赞该问题 | true |
+| 字段                      | 类型    | 说明                                                                          | 示例  |
+| ------------------------- | ------- | ----------------------------------------------------------------------------- | ----- |
+| data.question.nickname    | string  | 作者昵称（未设置时为空字符串）                                                | 张三  |
+| data.question.isLiked     | boolean | 当前登录用户是否已点赞该问题                                                  | true  |
 | data.question.isCollected | boolean | 当前登录用户是否已收藏已采纳回答（仅在存在采纳回答且该回答已被收藏时为 true） | false |
 
 `data.acceptedAnswer` 字段结构（QaAnswer）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.acceptedAnswer.id | string | 主键 ID（UUID） | 550e8400-e29b-41d4-a716-446655440000 |
-| data.acceptedAnswer.qaAnswerId | string | 回答业务 ID（格式：LD####AAAA） | LD0009WXYZ |
-| data.acceptedAnswer.qaQuestionId | string | 问题业务 ID | LD0007YZAB |
-| data.acceptedAnswer.authorUserId | string | 作者用户业务 ID | LD0002EFGH |
-| data.acceptedAnswer.content | string | 回答内容 | 按住左侧按钮 3 秒 |
-| data.acceptedAnswer.likeCount | number | 点赞数 | 5 |
-| data.acceptedAnswer.isLiked | boolean | 当前登录用户是否已点赞该回答 | false |
-| data.acceptedAnswer.isCollected | boolean | 当前登录用户是否已收藏该回答 | false |
-| data.acceptedAnswer.isAccepted | boolean | 是否已采纳 | true |
-| data.acceptedAnswer.acceptedAt | string \ null | 采纳时间（YYYY-MM-DD HH:mm:ss） | 2026-01-20 12:00:00 |
-| data.acceptedAnswer.createdAt | string | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-20 12:00:00 |
-| data.acceptedAnswer.updatedAt | string | 记录更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-20 12:00:00 |
-| data.acceptedAnswer.modifiedAt | string \ null | 内容修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-20 12:00:00 |
+| 字段                             | 类型          | 说明                                | 示例                                 |
+| -------------------------------- | ------------- | ----------------------------------- | ------------------------------------ |
+| data.acceptedAnswer.id           | string        | 主键 ID（UUID）                     | 550e8400-e29b-41d4-a716-446655440000 |
+| data.acceptedAnswer.qaAnswerId   | string        | 回答业务 ID（格式：LD####AAAA）     | LD0009WXYZ                           |
+| data.acceptedAnswer.qaQuestionId | string        | 问题业务 ID                         | LD0007YZAB                           |
+| data.acceptedAnswer.authorUserId | string        | 作者用户业务 ID                     | LD0002EFGH                           |
+| data.acceptedAnswer.content      | string        | 回答内容                            | 按住左侧按钮 3 秒                    |
+| data.acceptedAnswer.likeCount    | number        | 点赞数                              | 5                                    |
+| data.acceptedAnswer.isLiked      | boolean       | 当前登录用户是否已点赞该回答        | false                                |
+| data.acceptedAnswer.isCollected  | boolean       | 当前登录用户是否已收藏该回答        | false                                |
+| data.acceptedAnswer.isAccepted   | boolean       | 是否已采纳                          | true                                 |
+| data.acceptedAnswer.acceptedAt   | string \ null | 采纳时间（YYYY-MM-DD HH:mm:ss）     | 2026-01-20 12:00:00                  |
+| data.acceptedAnswer.createdAt    | string        | 创建时间（YYYY-MM-DD HH:mm:ss）     | 2026-01-20 12:00:00                  |
+| data.acceptedAnswer.updatedAt    | string        | 记录更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-20 12:00:00                  |
+| data.acceptedAnswer.modifiedAt   | string \ null | 内容修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-20 12:00:00                  |
 
 ---
 
@@ -2346,17 +2345,17 @@
 
 `images` 字段结构（string[]）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
+| 字段     | 类型   | 说明                                     | 示例                                 |
+| -------- | ------ | ---------------------------------------- | ------------------------------------ |
 | images[] | string | 图片 base64（可为 data URL 或纯 base64） | data:image/png;base64,iVBORw0KGgo... |
 
 **返回值（Success 201）**：对象 `QaQuestion`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（QaQuestion） | - |
+| 字段    | 类型   | 说明               | 示例      |
+| ------- | ------ | ------------------ | --------- |
+| code    | string | 状态码             | '0'       |
+| message | string | 状态描述           | 'success' |
+| data    | object | 数据（QaQuestion） | -         |
 
 `data` 字段结构（QaQuestion）：同上 `QaQuestion` 字段。
 
@@ -2385,11 +2384,11 @@
 
 **返回值（Success 200）**：对象 `QaQuestion`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（QaQuestion） | - |
+| 字段    | 类型   | 说明               | 示例      |
+| ------- | ------ | ------------------ | --------- |
+| code    | string | 状态码             | '0'       |
+| message | string | 状态描述           | 'success' |
+| data    | object | 数据（QaQuestion） | -         |
 
 `data` 字段结构（QaQuestion）：同上 `QaQuestion` 字段。
 
@@ -2413,16 +2412,16 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（DeleteResult） | - |
+| 字段    | 类型   | 说明                 | 示例      |
+| ------- | ------ | -------------------- | --------- |
+| code    | string | 状态码               | '0'       |
+| message | string | 状态描述             | 'success' |
+| data    | object | 数据（DeleteResult） | -         |
 
 `data` 字段结构（DeleteResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
+| 字段    | 类型    | 说明     | 示例 |
+| ------- | ------- | -------- | ---- |
 | data.ok | boolean | 是否成功 | true |
 
 ---
@@ -2446,16 +2445,16 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（AdoptResult） | - |
+| 字段    | 类型   | 说明                | 示例      |
+| ------- | ------ | ------------------- | --------- |
+| code    | string | 状态码              | '0'       |
+| message | string | 状态描述            | 'success' |
+| data    | object | 数据（AdoptResult） | -         |
 
 `data` 字段结构（AdoptResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
+| 字段    | 类型    | 说明     | 示例 |
+| ------- | ------- | -------- | ---- |
 | data.ok | boolean | 是否成功 | true |
 
 **错误说明**：
@@ -2482,11 +2481,11 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（AdoptResult） | - |
+| 字段    | 类型   | 说明                | 示例      |
+| ------- | ------ | ------------------- | --------- |
+| code    | string | 状态码              | '0'       |
+| message | string | 状态描述            | 'success' |
+| data    | object | 数据（AdoptResult） | -         |
 
 `data` 字段结构（AdoptResult）：同上 `AdoptResult` 字段。
 
@@ -2510,17 +2509,17 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（LikeResult） | - |
+| 字段    | 类型   | 说明               | 示例      |
+| ------- | ------ | ------------------ | --------- |
+| code    | string | 状态码             | '0'       |
+| message | string | 状态描述           | 'success' |
+| data    | object | 数据（LikeResult） | -         |
 
 `data` 字段结构（LikeResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.likeCount | number | 最新点赞数 | 12 |
+| 字段           | 类型   | 说明       | 示例 |
+| -------------- | ------ | ---------- | ---- |
+| data.likeCount | number | 最新点赞数 | 12   |
 
 ---
 
@@ -2542,11 +2541,11 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（LikeResult） | - |
+| 字段    | 类型   | 说明               | 示例      |
+| ------- | ------ | ------------------ | --------- |
+| code    | string | 状态码             | '0'       |
+| message | string | 状态描述           | 'success' |
+| data    | object | 数据（LikeResult） | -         |
 
 `data` 字段结构（LikeResult）：同上 `LikeResult` 字段。
 
@@ -2576,42 +2575,42 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（QaAnswerListResult） | - |
+| 字段    | 类型   | 说明                       | 示例      |
+| ------- | ------ | -------------------------- | --------- |
+| code    | string | 状态码                     | '0'       |
+| message | string | 状态描述                   | 'success' |
+| data    | object | 数据（QaAnswerListResult） | -         |
 
 `data` 字段结构（QaAnswerListResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list | array | 列表（QaAnswer[]） | - |
-| data.page | number | 当前页码 | 1 |
-| data.pageSize | number | 每页条数 | 10 |
-| data.total | number | 总条数 | 100 |
+| 字段          | 类型   | 说明               | 示例 |
+| ------------- | ------ | ------------------ | ---- |
+| data.list     | array  | 列表（QaAnswer[]） | -    |
+| data.page     | number | 当前页码           | 1    |
+| data.pageSize | number | 每页条数           | 10   |
+| data.total    | number | 总条数             | 100  |
 
 `data.list` 字段结构（QaAnswer[]）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list[].id | string | 主键 ID（UUID） | 550e8400-e29b-41d4-a716-446655440000 |
-| data.list[].qaAnswerId | string | 回答业务 ID（格式：LD####AAAA） | LD0009WXYZ |
-| data.list[].qaQuestionId | string | 问题业务 ID | LD0007YZAB |
-| data.list[].authorUserId | string | 作者用户业务 ID | LD0002EFGH |
-| data.list[].nickname | string | 作者昵称（未设置时为空字符串） | 张三 |
-| data.list[].content | string | 回答内容 | 按住左侧按钮 3 秒 |
-| data.list[].likeCount | number | 点赞数 | 5 |
-| data.list[].isLiked | boolean | 当前登录用户是否已点赞该回答 | true |
-| data.list[].isCollected | boolean | 当前登录用户是否已收藏该回答 | false |
-| data.list[].isAccepted | boolean | 是否已采纳 | false |
-| data.list[].acceptedAt | string \ null | 采纳时间（YYYY-MM-DD HH:mm:ss） | 2026-01-20 12:00:00 |
-| data.list[].createdAt | string | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-20 12:00:00 |
-| data.list[].updatedAt | string | 记录更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-20 12:00:00 |
-| data.list[].modifiedAt | string \ null | 内容修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-20 12:00:00 |
-| data.list[].parentQaAnswerId | string \ null | 父回答业务 ID（根回答固定为 null） | null |
-| data.list[].rootQaAnswerId | string \ null | 根回答业务 ID（根回答固定为 null） | null |
-| data.list[].replyCount | number | 该根回答引发的回复数（仅根回答列表场景有意义） | 3 |
+| 字段                         | 类型          | 说明                                           | 示例                                 |
+| ---------------------------- | ------------- | ---------------------------------------------- | ------------------------------------ |
+| data.list[].id               | string        | 主键 ID（UUID）                                | 550e8400-e29b-41d4-a716-446655440000 |
+| data.list[].qaAnswerId       | string        | 回答业务 ID（格式：LD####AAAA）                | LD0009WXYZ                           |
+| data.list[].qaQuestionId     | string        | 问题业务 ID                                    | LD0007YZAB                           |
+| data.list[].authorUserId     | string        | 作者用户业务 ID                                | LD0002EFGH                           |
+| data.list[].nickname         | string        | 作者昵称（未设置时为空字符串）                 | 张三                                 |
+| data.list[].content          | string        | 回答内容                                       | 按住左侧按钮 3 秒                    |
+| data.list[].likeCount        | number        | 点赞数                                         | 5                                    |
+| data.list[].isLiked          | boolean       | 当前登录用户是否已点赞该回答                   | true                                 |
+| data.list[].isCollected      | boolean       | 当前登录用户是否已收藏该回答                   | false                                |
+| data.list[].isAccepted       | boolean       | 是否已采纳                                     | false                                |
+| data.list[].acceptedAt       | string \ null | 采纳时间（YYYY-MM-DD HH:mm:ss）                | 2026-01-20 12:00:00                  |
+| data.list[].createdAt        | string        | 创建时间（YYYY-MM-DD HH:mm:ss）                | 2026-01-20 12:00:00                  |
+| data.list[].updatedAt        | string        | 记录更新时间（YYYY-MM-DD HH:mm:ss）            | 2026-01-20 12:00:00                  |
+| data.list[].modifiedAt       | string \ null | 内容修改时间（YYYY-MM-DD HH:mm:ss）            | 2026-01-20 12:00:00                  |
+| data.list[].parentQaAnswerId | string \ null | 父回答业务 ID（根回答固定为 null）             | null                                 |
+| data.list[].rootQaAnswerId   | string \ null | 根回答业务 ID（根回答固定为 null）             | null                                 |
+| data.list[].replyCount       | number        | 该根回答引发的回复数（仅根回答列表场景有意义） | 3                                    |
 
 ---
 
@@ -2635,11 +2634,11 @@
 
 **返回值（Success 201）**：对象 `QaAnswer`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（QaAnswer） | - |
+| 字段    | 类型   | 说明             | 示例      |
+| ------- | ------ | ---------------- | --------- |
+| code    | string | 状态码           | '0'       |
+| message | string | 状态描述         | 'success' |
+| data    | object | 数据（QaAnswer） | -         |
 
 `data` 字段结构（QaAnswer）：同上 `QaAnswer` 字段。
 
@@ -2664,11 +2663,11 @@
 
 **返回值（Success 200）**：对象 `QaAnswer`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（QaAnswer） | - |
+| 字段    | 类型   | 说明             | 示例      |
+| ------- | ------ | ---------------- | --------- |
+| code    | string | 状态码           | '0'       |
+| message | string | 状态描述         | 'success' |
+| data    | object | 数据（QaAnswer） | -         |
 
 `data` 字段结构（QaAnswer）：同上 `QaAnswer` 字段。
 
@@ -2692,11 +2691,11 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（DeleteResult） | - |
+| 字段    | 类型   | 说明                 | 示例      |
+| ------- | ------ | -------------------- | --------- |
+| code    | string | 状态码               | '0'       |
+| message | string | 状态描述             | 'success' |
+| data    | object | 数据（DeleteResult） | -         |
 
 `data` 字段结构（DeleteResult）：同上 `DeleteResult` 字段。
 
@@ -2720,17 +2719,17 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（LikeResult） | - |
+| 字段    | 类型   | 说明               | 示例      |
+| ------- | ------ | ------------------ | --------- |
+| code    | string | 状态码             | '0'       |
+| message | string | 状态描述           | 'success' |
+| data    | object | 数据（LikeResult） | -         |
 
 `data` 字段结构（LikeResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.likeCount | number | 最新点赞数 | 5 |
+| 字段           | 类型   | 说明       | 示例 |
+| -------------- | ------ | ---------- | ---- |
+| data.likeCount | number | 最新点赞数 | 5    |
 
 ---
 
@@ -2752,11 +2751,11 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（LikeResult） | - |
+| 字段    | 类型   | 说明               | 示例      |
+| ------- | ------ | ------------------ | --------- |
+| code    | string | 状态码             | '0'       |
+| message | string | 状态描述           | 'success' |
+| data    | object | 数据（LikeResult） | -         |
 
 `data` 字段结构（LikeResult）：同上 `LikeResult` 字段。
 
@@ -2780,16 +2779,16 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（FeatureResult） | - |
+| 字段    | 类型   | 说明                  | 示例      |
+| ------- | ------ | --------------------- | --------- |
+| code    | string | 状态码                | '0'       |
+| message | string | 状态描述              | 'success' |
+| data    | object | 数据（FeatureResult） | -         |
 
 `data` 字段结构（FeatureResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
+| 字段    | 类型    | 说明     | 示例 |
+| ------- | ------- | -------- | ---- |
 | data.ok | boolean | 是否成功 | true |
 
 ---
@@ -2812,16 +2811,16 @@
 
 **返回值（Success 200）：**对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（CollectResult） | - |
+| 字段    | 类型   | 说明                  | 示例      |
+| ------- | ------ | --------------------- | --------- |
+| code    | string | 状态码                | '0'       |
+| message | string | 状态描述              | 'success' |
+| data    | object | 数据（CollectResult） | -         |
 
 `data` 字段结构（CollectResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
+| 字段             | 类型    | 说明                                 | 示例 |
+| ---------------- | ------- | ------------------------------------ | ---- |
 | data.isCollected | boolean | 是否已收藏（成功收藏或已在收藏夹中） | true |
 
 ---
@@ -2844,11 +2843,11 @@
 
 **返回值（Success 200）：**对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（CollectResult） | - |
+| 字段    | 类型   | 说明                  | 示例      |
+| ------- | ------ | --------------------- | --------- |
+| code    | string | 状态码                | '0'       |
+| message | string | 状态描述              | 'success' |
+| data    | object | 数据（CollectResult） | -         |
 
 `data` 字段结构（CollectResult）：同上 `CollectResult` 字段。
 
@@ -2872,11 +2871,11 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（FeatureResult） | - |
+| 字段    | 类型   | 说明                  | 示例      |
+| ------- | ------ | --------------------- | --------- |
+| code    | string | 状态码                | '0'       |
+| message | string | 状态描述              | 'success' |
+| data    | object | 数据（FeatureResult） | -         |
 
 `data` 字段结构（FeatureResult）：同上 `FeatureResult` 字段。
 
@@ -2903,32 +2902,32 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（ArticleCategoryListResult） | - |
+| 字段    | 类型   | 说明                              | 示例      |
+| ------- | ------ | --------------------------------- | --------- |
+| code    | string | 状态码                            | '0'       |
+| message | string | 状态描述                          | 'success' |
+| data    | object | 数据（ArticleCategoryListResult） | -         |
 
 `data` 字段结构（ArticleCategoryListResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list | array | 列表（ArticleCategory[]） | - |
-| data.page | number | 当前页码 | 1 |
-| data.pageSize | number | 每页条数 | 1000 |
-| data.total | number | 总条数 | 20 |
+| 字段          | 类型   | 说明                      | 示例 |
+| ------------- | ------ | ------------------------- | ---- |
+| data.list     | array  | 列表（ArticleCategory[]） | -    |
+| data.page     | number | 当前页码                  | 1    |
+| data.pageSize | number | 每页条数                  | 1000 |
+| data.total    | number | 总条数                    | 20   |
 
 `data.list` 字段结构（ArticleCategory[]）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list[].id | string | 主键 ID（UUID） | 550e8400-e29b-41d4-a716-446655440000 |
-| data.list[].articleCategoryId | string | 分类业务 ID（格式：LD####AAAA） | LD0001ABCD |
-| data.list[].name | string | 分类名字 | 新闻 |
-| data.list[].description | string | 分类描述 | 新闻类文章分类 |
-| data.list[].seq | number | 排序 seq | 0 |
-| data.list[].isEnabled | boolean | 是否启用 | true |
-| data.list[].updatedAt | string | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-24 12:00:00 |
+| 字段                          | 类型    | 说明                            | 示例                                 |
+| ----------------------------- | ------- | ------------------------------- | ------------------------------------ |
+| data.list[].id                | string  | 主键 ID（UUID）                 | 550e8400-e29b-41d4-a716-446655440000 |
+| data.list[].articleCategoryId | string  | 分类业务 ID（格式：LD####AAAA） | LD0001ABCD                           |
+| data.list[].name              | string  | 分类名字                        | 新闻                                 |
+| data.list[].description       | string  | 分类描述                        | 新闻类文章分类                       |
+| data.list[].seq               | number  | 排序 seq                        | 0                                    |
+| data.list[].isEnabled         | boolean | 是否启用                        | true                                 |
+| data.list[].updatedAt         | string  | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-24 12:00:00                  |
 
 ---
 
@@ -2953,11 +2952,11 @@
 
 **返回值（Success 201）**：对象 `ArticleCategory`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（ArticleCategory） | - |
+| 字段    | 类型   | 说明                    | 示例      |
+| ------- | ------ | ----------------------- | --------- |
+| code    | string | 状态码                  | '0'       |
+| message | string | 状态描述                | 'success' |
+| data    | object | 数据（ArticleCategory） | -         |
 
 `data` 字段结构（ArticleCategory）：同上 `ArticleCategory` 字段。
 
@@ -2985,11 +2984,11 @@
 
 **返回值（Success 200）**：对象 `ArticleCategory`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（ArticleCategory） | - |
+| 字段    | 类型   | 说明                    | 示例      |
+| ------- | ------ | ----------------------- | --------- |
+| code    | string | 状态码                  | '0'       |
+| message | string | 状态描述                | 'success' |
+| data    | object | 数据（ArticleCategory） | -         |
 
 `data` 字段结构（ArticleCategory）：同上 `ArticleCategory` 字段。
 
@@ -3013,16 +3012,16 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（DeleteResult） | - |
+| 字段    | 类型   | 说明                 | 示例      |
+| ------- | ------ | -------------------- | --------- |
+| code    | string | 状态码               | '0'       |
+| message | string | 状态描述             | 'success' |
+| data    | object | 数据（DeleteResult） | -         |
 
 `data` 字段结构（DeleteResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
+| 字段    | 类型    | 说明     | 示例 |
+| ------- | ------- | -------- | ---- |
 | data.ok | boolean | 是否成功 | true |
 
 ---
@@ -3050,42 +3049,42 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（ArticleListResult） | - |
+| 字段    | 类型   | 说明                      | 示例      |
+| ------- | ------ | ------------------------- | --------- |
+| code    | string | 状态码                    | '0'       |
+| message | string | 状态描述                  | 'success' |
+| data    | object | 数据（ArticleListResult） | -         |
 
 `data` 字段结构（ArticleListResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list | array | 列表（Article[]） | - |
-| data.page | number | 当前页码 | 1 |
-| data.pageSize | number | 每页条数 | 10 |
-| data.total | number | 总条数 | 100 |
+| 字段          | 类型   | 说明              | 示例 |
+| ------------- | ------ | ----------------- | ---- |
+| data.list     | array  | 列表（Article[]） | -    |
+| data.page     | number | 当前页码          | 1    |
+| data.pageSize | number | 每页条数          | 10   |
+| data.total    | number | 总条数            | 100  |
 
 `data.list` 字段结构（Article[]）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list[].id | string | 主键 ID（UUID） | 550e8400-e29b-41d4-a716-446655440000 |
-| data.list[].articleId | string | 文章业务 ID（格式：LD####AAAA） | LD0001ABCD |
-| data.list[].authorUserId | string | 作者用户业务 ID | LD0002EFGH |
-| data.list[].articleCategoryId | string | 分类业务 ID | LD0003IJKL |
-| data.list[].title | string | 标题 | 标题示例 |
-| data.list[].content | string | 正文（textarea 纯文本） | ... |
-| data.list[].coverScreenshotBase64 | string | 封面截图（base64/dataURL） | data:image/png;base64,... |
-| data.list[].coverPhotoBase64 | string | 封面图（base64/dataURL） | data:image/jpeg;base64,... |
-| data.list[].contentImages | array | 正文图片 base64/dataURL 数组 | [] |
-| data.list[].isEnabled | boolean | 是否启用 | true |
-| data.list[].viewCount | number | 浏览量 | 0 |
-| data.list[].likeCount | number | 点赞数 | 0 |
-| data.list[].commentCount | number | 评论数（含楼中楼回复，口径同问答 answerCount） | 0 |
-| data.list[].publishedAt | string | 发布时间（YYYY-MM-DD HH:mm:ss） | 2026-01-25 12:00:00 |
-| data.list[].modifiedAt | string | 最近评论更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-25 12:00:00 |
-| data.list[].createdAt | string | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-25 12:00:00 |
-| data.list[].updatedAt | string | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-25 12:00:00 |
+| 字段                              | 类型    | 说明                                           | 示例                                 |
+| --------------------------------- | ------- | ---------------------------------------------- | ------------------------------------ |
+| data.list[].id                    | string  | 主键 ID（UUID）                                | 550e8400-e29b-41d4-a716-446655440000 |
+| data.list[].articleId             | string  | 文章业务 ID（格式：LD####AAAA）                | LD0001ABCD                           |
+| data.list[].authorUserId          | string  | 作者用户业务 ID                                | LD0002EFGH                           |
+| data.list[].articleCategoryId     | string  | 分类业务 ID                                    | LD0003IJKL                           |
+| data.list[].title                 | string  | 标题                                           | 标题示例                             |
+| data.list[].content               | string  | 正文（textarea 纯文本）                        | ...                                  |
+| data.list[].coverScreenshotBase64 | string  | 封面截图（base64/dataURL）                     | data:image/png;base64,...            |
+| data.list[].coverPhotoBase64      | string  | 封面图（base64/dataURL）                       | data:image/jpeg;base64,...           |
+| data.list[].contentImages         | array   | 正文图片 base64/dataURL 数组                   | []                                   |
+| data.list[].isEnabled             | boolean | 是否启用                                       | true                                 |
+| data.list[].viewCount             | number  | 浏览量                                         | 0                                    |
+| data.list[].likeCount             | number  | 点赞数                                         | 0                                    |
+| data.list[].commentCount          | number  | 评论数（含楼中楼回复，口径同问答 answerCount） | 0                                    |
+| data.list[].publishedAt           | string  | 发布时间（YYYY-MM-DD HH:mm:ss）                | 2026-01-25 12:00:00                  |
+| data.list[].modifiedAt            | string  | 最近评论更新时间（YYYY-MM-DD HH:mm:ss）        | 2026-01-25 12:00:00                  |
+| data.list[].createdAt             | string  | 创建时间（YYYY-MM-DD HH:mm:ss）                | 2026-01-25 12:00:00                  |
+| data.list[].updatedAt             | string  | 更新时间（YYYY-MM-DD HH:mm:ss）                | 2026-01-25 12:00:00                  |
 
 ---
 
@@ -3107,19 +3106,19 @@
 
 **返回值（Success 200）**：对象 `Article`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（Article） | - |
+| 字段    | 类型   | 说明            | 示例      |
+| ------- | ------ | --------------- | --------- |
+| code    | string | 状态码          | '0'       |
+| message | string | 状态描述        | 'success' |
+| data    | object | 数据（Article） | -         |
 
 `data` 字段结构（Article）：同上 `Article[]` 的字段结构。
 
 并额外返回：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.isLiked | boolean | 当前登录用户是否已点赞该文章 | true |
+| 字段             | 类型    | 说明                         | 示例  |
+| ---------------- | ------- | ---------------------------- | ----- |
+| data.isLiked     | boolean | 当前登录用户是否已点赞该文章 | true  |
 | data.isCollected | boolean | 当前登录用户是否已收藏该文章 | false |
 
 ---
@@ -3148,11 +3147,11 @@
 
 **返回值（Success 201）**：对象 `Article`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（Article） | - |
+| 字段    | 类型   | 说明            | 示例      |
+| ------- | ------ | --------------- | --------- |
+| code    | string | 状态码          | '0'       |
+| message | string | 状态描述        | 'success' |
+| data    | object | 数据（Article） | -         |
 
 ---
 
@@ -3181,11 +3180,11 @@
 
 **返回值（Success 200）**：对象 `Article`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（Article） | - |
+| 字段    | 类型   | 说明            | 示例      |
+| ------- | ------ | --------------- | --------- |
+| code    | string | 状态码          | '0'       |
+| message | string | 状态描述        | 'success' |
+| data    | object | 数据（Article） | -         |
 
 ---
 
@@ -3207,16 +3206,16 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（DeleteResult） | - |
+| 字段    | 类型   | 说明                 | 示例      |
+| ------- | ------ | -------------------- | --------- |
+| code    | string | 状态码               | '0'       |
+| message | string | 状态描述             | 'success' |
+| data    | object | 数据（DeleteResult） | -         |
 
 `data` 字段结构（DeleteResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
+| 字段    | 类型    | 说明     | 示例 |
+| ------- | ------- | -------- | ---- |
 | data.ok | boolean | 是否成功 | true |
 
 ---
@@ -3242,39 +3241,39 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（ArticleCommentListResult） | - |
+| 字段    | 类型   | 说明                             | 示例      |
+| ------- | ------ | -------------------------------- | --------- |
+| code    | string | 状态码                           | '0'       |
+| message | string | 状态描述                         | 'success' |
+| data    | object | 数据（ArticleCommentListResult） | -         |
 
 `data` 字段结构（ArticleCommentListResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list | array | 列表（ArticleComment[]） | - |
-| data.page | number | 当前页码 | 1 |
-| data.pageSize | number | 每页条数 | 10 |
-| data.total | number | 总条数 | 100 |
+| 字段          | 类型   | 说明                     | 示例 |
+| ------------- | ------ | ------------------------ | ---- |
+| data.list     | array  | 列表（ArticleComment[]） | -    |
+| data.page     | number | 当前页码                 | 1    |
+| data.pageSize | number | 每页条数                 | 10   |
+| data.total    | number | 总条数                   | 100  |
 
 `data.list` 字段结构（ArticleComment[]）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list[].id | string | 主键 ID（UUID） | 550e8400-e29b-41d4-a716-446655440000 |
-| data.list[].articleCommentId | string | 评论业务 ID（格式：LD####AAAA） | LD0001ABCD |
-| data.list[].articleId | string | 文章业务 ID | LD0002EFGH |
-| data.list[].authorUserId | string | 作者用户业务 ID | LD0003IJKL |
-| data.list[].nickname | string | 作者昵称 | 张三 |
-| data.list[].content | string | 评论内容 | ... |
-| data.list[].likeCount | number | 点赞数 | 0 |
-| data.list[].isLiked | boolean | 当前用户是否已点赞 | false |
-| data.list[].replyCount | number | 回复数（仅根评论列表返回有效） | 0 |
-| data.list[].parentArticleCommentId | string \ null | 父评论业务 ID | null |
-| data.list[].rootArticleCommentId | string \ null | 根评论业务 ID | null |
-| data.list[].createdAt | string | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-25 12:00:00 |
-| data.list[].updatedAt | string | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-25 12:00:00 |
-| data.list[].modifiedAt | string \ null | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-25 12:00:00 |
+| 字段                               | 类型          | 说明                            | 示例                                 |
+| ---------------------------------- | ------------- | ------------------------------- | ------------------------------------ |
+| data.list[].id                     | string        | 主键 ID（UUID）                 | 550e8400-e29b-41d4-a716-446655440000 |
+| data.list[].articleCommentId       | string        | 评论业务 ID（格式：LD####AAAA） | LD0001ABCD                           |
+| data.list[].articleId              | string        | 文章业务 ID                     | LD0002EFGH                           |
+| data.list[].authorUserId           | string        | 作者用户业务 ID                 | LD0003IJKL                           |
+| data.list[].nickname               | string        | 作者昵称                        | 张三                                 |
+| data.list[].content                | string        | 评论内容                        | ...                                  |
+| data.list[].likeCount              | number        | 点赞数                          | 0                                    |
+| data.list[].isLiked                | boolean       | 当前用户是否已点赞              | false                                |
+| data.list[].replyCount             | number        | 回复数（仅根评论列表返回有效）  | 0                                    |
+| data.list[].parentArticleCommentId | string \ null | 父评论业务 ID                   | null                                 |
+| data.list[].rootArticleCommentId   | string \ null | 根评论业务 ID                   | null                                 |
+| data.list[].createdAt              | string        | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-25 12:00:00                  |
+| data.list[].updatedAt              | string        | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-25 12:00:00                  |
+| data.list[].modifiedAt             | string \ null | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-25 12:00:00                  |
 
 ---
 
@@ -3298,11 +3297,11 @@
 
 **返回值（Success 201）**：对象 `ArticleComment`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（ArticleComment） | - |
+| 字段    | 类型   | 说明                   | 示例      |
+| ------- | ------ | ---------------------- | --------- |
+| code    | string | 状态码                 | '0'       |
+| message | string | 状态描述               | 'success' |
+| data    | object | 数据（ArticleComment） | -         |
 
 ---
 
@@ -3325,11 +3324,11 @@
 
 **返回值（Success 200）**：对象 `ArticleComment`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（ArticleComment） | - |
+| 字段    | 类型   | 说明                   | 示例      |
+| ------- | ------ | ---------------------- | --------- |
+| code    | string | 状态码                 | '0'       |
+| message | string | 状态描述               | 'success' |
+| data    | object | 数据（ArticleComment） | -         |
 
 ---
 
@@ -3351,11 +3350,11 @@
 
 **返回值（Success 200）**：对象 `DeleteResult`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（DeleteResult） | - |
+| 字段    | 类型   | 说明                 | 示例      |
+| ------- | ------ | -------------------- | --------- |
+| code    | string | 状态码               | '0'       |
+| message | string | 状态描述             | 'success' |
+| data    | object | 数据（DeleteResult） | -         |
 
 ---
 
@@ -3377,17 +3376,17 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（LikeResult） | - |
+| 字段    | 类型   | 说明               | 示例      |
+| ------- | ------ | ------------------ | --------- |
+| code    | string | 状态码             | '0'       |
+| message | string | 状态描述           | 'success' |
+| data    | object | 数据（LikeResult） | -         |
 
 `data` 字段结构（LikeResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.likeCount | number | 最新点赞数 | 10 |
+| 字段           | 类型   | 说明       | 示例 |
+| -------------- | ------ | ---------- | ---- |
+| data.likeCount | number | 最新点赞数 | 10   |
 
 ---
 
@@ -3409,11 +3408,11 @@
 
 **返回值（Success 200）**：对象 `LikeResult`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（LikeResult） | - |
+| 字段    | 类型   | 说明               | 示例      |
+| ------- | ------ | ------------------ | --------- |
+| code    | string | 状态码             | '0'       |
+| message | string | 状态描述           | 'success' |
+| data    | object | 数据（LikeResult） | -         |
 
 ---
 
@@ -3435,17 +3434,17 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（LikeResult） | - |
+| 字段    | 类型   | 说明               | 示例      |
+| ------- | ------ | ------------------ | --------- |
+| code    | string | 状态码             | '0'       |
+| message | string | 状态描述           | 'success' |
+| data    | object | 数据（LikeResult） | -         |
 
 `data` 字段结构（LikeResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.likeCount | number | 最新点赞数 | 12 |
+| 字段           | 类型   | 说明       | 示例 |
+| -------------- | ------ | ---------- | ---- |
+| data.likeCount | number | 最新点赞数 | 12   |
 
 ---
 
@@ -3467,11 +3466,11 @@
 
 **返回值（Success 200）**：对象 `LikeResult`
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（LikeResult） | - |
+| 字段    | 类型   | 说明               | 示例      |
+| ------- | ------ | ------------------ | --------- |
+| code    | string | 状态码             | '0'       |
+| message | string | 状态描述           | 'success' |
+| data    | object | 数据（LikeResult） | -         |
 
 `data` 字段结构（LikeResult）：同上 `LikeResult` 字段。
 
@@ -3495,16 +3494,16 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（CollectResult） | - |
+| 字段    | 类型   | 说明                  | 示例      |
+| ------- | ------ | --------------------- | --------- |
+| code    | string | 状态码                | '0'       |
+| message | string | 状态描述              | 'success' |
+| data    | object | 数据（CollectResult） | -         |
 
 `data` 字段结构（CollectResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
+| 字段             | 类型    | 说明                                 | 示例 |
+| ---------------- | ------- | ------------------------------------ | ---- |
 | data.isCollected | boolean | 是否已收藏（成功收藏或已在收藏夹中） | true |
 
 ---
@@ -3538,49 +3537,49 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（FavoriteListResult） | - |
+| 字段    | 类型   | 说明                       | 示例      |
+| ------- | ------ | -------------------------- | --------- |
+| code    | string | 状态码                     | '0'       |
+| message | string | 状态描述                   | 'success' |
+| data    | object | 数据（FavoriteListResult） | -         |
 
 `data` 字段结构（FavoriteListResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list | array | 列表 | - |
-| data.page | number | 当前页码 | 1 |
-| data.pageSize | number | 每页条数 | 10 |
-| data.total | number | 总条数 | 20 |
+| 字段          | 类型   | 说明     | 示例 |
+| ------------- | ------ | -------- | ---- |
+| data.list     | array  | 列表     | -    |
+| data.page     | number | 当前页码 | 1    |
+| data.pageSize | number | 每页条数 | 10   |
+| data.total    | number | 总条数   | 20   |
 
 当 `type = 'article'` 时，`data.list` 结构同上 `Article[]` 字段结构，并额外包含：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list[].isLiked | boolean | 当前登录用户是否已点赞该文章 | true |
+| 字段                    | 类型    | 说明                                      | 示例 |
+| ----------------------- | ------- | ----------------------------------------- | ---- |
+| data.list[].isLiked     | boolean | 当前登录用户是否已点赞该文章              | true |
 | data.list[].isCollected | boolean | 当前登录用户是否已收藏该文章（恒为 true） | true |
 
 当 `type = 'qa_answer'` 时，`data.list` 中每一项为一个回答对象（QaAnswer），字段包含：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list[].id | string | 主键 ID（UUID） | 550e8400-e29b-41d4-a716-446655440000 |
-| data.list[].qaAnswerId | string | 回答业务 ID（格式：LD####AAAA） | LD0009WXYZ |
-| data.list[].qaQuestionId | string | 问题业务 ID | LD0007YZAB |
-| data.list[].authorUserId | string | 作者用户业务 ID | LD0002EFGH |
-| data.list[].nickname | string | 作者昵称 | 张三 |
-| data.list[].questionTitle | string | 所属问题标题 | 我的车钥匙没电怎么办？ |
-| data.list[].content | string | 回答内容 | 按住左侧按钮 3 秒 |
-| data.list[].likeCount | number | 点赞数 | 5 |
-| data.list[].isLiked | boolean | 当前登录用户是否已点赞该回答 | true |
-| data.list[].isAccepted | boolean | 是否已采纳 | false |
-| data.list[].acceptedAt | string \ null | 采纳时间（YYYY-MM-DD HH:mm:ss） | 2026-01-20 12:00:00 |
-| data.list[].createdAt | string | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-20 12:00:00 |
-| data.list[].updatedAt | string | 记录更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-20 12:00:00 |
-| data.list[].modifiedAt | string \ null | 内容修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-20 12:00:00 |
-| data.list[].parentQaAnswerId | string \ null | 父回答业务 ID | null |
-| data.list[].rootQaAnswerId | string \ null | 根回答业务 ID | null |
-| data.list[].isCollected | boolean | 当前登录用户是否已收藏该回答（恒为 true） | true |
+| 字段                         | 类型          | 说明                                      | 示例                                 |
+| ---------------------------- | ------------- | ----------------------------------------- | ------------------------------------ |
+| data.list[].id               | string        | 主键 ID（UUID）                           | 550e8400-e29b-41d4-a716-446655440000 |
+| data.list[].qaAnswerId       | string        | 回答业务 ID（格式：LD####AAAA）           | LD0009WXYZ                           |
+| data.list[].qaQuestionId     | string        | 问题业务 ID                               | LD0007YZAB                           |
+| data.list[].authorUserId     | string        | 作者用户业务 ID                           | LD0002EFGH                           |
+| data.list[].nickname         | string        | 作者昵称                                  | 张三                                 |
+| data.list[].questionTitle    | string        | 所属问题标题                              | 我的车钥匙没电怎么办？               |
+| data.list[].content          | string        | 回答内容                                  | 按住左侧按钮 3 秒                    |
+| data.list[].likeCount        | number        | 点赞数                                    | 5                                    |
+| data.list[].isLiked          | boolean       | 当前登录用户是否已点赞该回答              | true                                 |
+| data.list[].isAccepted       | boolean       | 是否已采纳                                | false                                |
+| data.list[].acceptedAt       | string \ null | 采纳时间（YYYY-MM-DD HH:mm:ss）           | 2026-01-20 12:00:00                  |
+| data.list[].createdAt        | string        | 创建时间（YYYY-MM-DD HH:mm:ss）           | 2026-01-20 12:00:00                  |
+| data.list[].updatedAt        | string        | 记录更新时间（YYYY-MM-DD HH:mm:ss）       | 2026-01-20 12:00:00                  |
+| data.list[].modifiedAt       | string \ null | 内容修改时间（YYYY-MM-DD HH:mm:ss）       | 2026-01-20 12:00:00                  |
+| data.list[].parentQaAnswerId | string \ null | 父回答业务 ID                             | null                                 |
+| data.list[].rootQaAnswerId   | string \ null | 根回答业务 ID                             | null                                 |
+| data.list[].isCollected      | boolean       | 当前登录用户是否已收藏该回答（恒为 true） | true                                 |
 
 **接口标题**：文章取消收藏
 
@@ -3598,11 +3597,11 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（CollectResult） | - |
+| 字段    | 类型   | 说明                  | 示例      |
+| ------- | ------ | --------------------- | --------- |
+| code    | string | 状态码                | '0'       |
+| message | string | 状态描述              | 'success' |
+| data    | object | 数据（CollectResult） | -         |
 
 `data` 字段结构（CollectResult）：同上 `CollectResult` 字段。
 
@@ -3629,24 +3628,147 @@
 
 **返回值（Success 200）**：对象
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '0' |
-| message | string | 状态描述 | 'success' |
-| data | object | 数据（MyPostListResult） | - |
+| 字段    | 类型   | 说明                     | 示例      |
+| ------- | ------ | ------------------------ | --------- |
+| code    | string | 状态码                   | '0'       |
+| message | string | 状态描述                 | 'success' |
+| data    | object | 数据（MyPostListResult） | -         |
 
 `data` 字段结构（MyPostListResult）：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| data.list | array | 列表 | - |
-| data.page | number | 当前页码 | 1 |
-| data.pageSize | number | 每页条数 | 10 |
-| data.total | number | 总条数 | 20 |
+| 字段          | 类型   | 说明     | 示例 |
+| ------------- | ------ | -------- | ---- |
+| data.list     | array  | 列表     | -    |
+| data.page     | number | 当前页码 | 1    |
+| data.pageSize | number | 每页条数 | 10   |
+| data.total    | number | 总条数   | 20   |
 
 当 `type = 'article'` 时，`data.list` 结构同上 `Article[]` 字段结构。
 
 当 `type = 'qa_question'` 时，`data.list` 结构同上 `QaQuestion[]` 字段结构。
+
+## 75. 获取社区系统指南（需登录）
+
+**接口标题**：社区系统指南
+
+**功能描述**：获取社区系统指南（系统唯一一份指南），不需要任何参数。
+
+**接口路由**：`POST /community-guides`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：无（可传空对象 `{}`）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                   | 示例      |
+| ------- | ------ | ---------------------- | --------- |
+| code    | string | 状态码                 | '0'       |
+| message | string | 状态描述               | 'success' |
+| data    | object | 数据（CommunityGuide） | -         |
+
+`data` 字段结构（CommunityGuide）：
+
+| 字段                         | 类型    | 说明                            | 示例                                       |
+| ---------------------------- | ------- | ------------------------------- | ------------------------------------------ |
+| data.communityGuideId        | string  | 指南业务 ID（格式：LD####AAAA） | LD0009WXYZ                                 |
+| data.title                   | string  | 标题                            | 社区指南：如何使用蓝电信息系统             |
+| data.summary                 | string  | 简介                            | 第一次使用本系统？这篇指南将带你快速上手。 |
+| data.tags                    | array   | 标签数组                        | ['通知', '新手必读']                       |
+| data.contentBlocks           | array   | 正文块数组                      | -                                          |
+| data.contentBlocks[].title   | string  | 小标题                          | 首页模块说明                               |
+| data.contentBlocks[].content | string  | 小正文                          | 当前页面，帮助你理解系统结构与入口。       |
+| data.isEnabled               | boolean | 是否启用                        | true                                       |
+| data.createdAt               | string  | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-31 12:00:00                        |
+| data.updatedAt               | string  | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-31 12:00:00                        |
+
+## 76. 创建社区系统指南（需登录）
+
+**接口标题**：创建社区系统指南
+
+**功能描述**：创建系统唯一一份社区指南（若已存在则报错）。
+
+**接口路由**：`POST /community-guides/create`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `title`（string，必填）：标题（1~100）
+- `summary`（string，可选）：简介（0~5000，默认空字符串）
+- `tags`（string[]，可选）：标签数组（最多 50 个）
+- `contentBlocks`（array，可选）：正文块数组（最多 200 条）
+  - `contentBlocks[].title`（string，必填）：小标题（1~100）
+  - `contentBlocks[].content`（string，必填）：小正文（1~20000）
+- `isEnabled`（boolean，可选）：是否启用（默认 true）
+
+**返回值（Success 201）**：对象
+
+| 字段    | 类型   | 说明                   | 示例      |
+| ------- | ------ | ---------------------- | --------- |
+| code    | string | 状态码                 | '0'       |
+| message | string | 状态描述               | 'success' |
+| data    | object | 数据（CommunityGuide） | -         |
+
+`data` 字段结构（CommunityGuide）：同上。
+
+## 77. 更新社区系统指南（需登录）
+
+**接口标题**：更新社区系统指南
+
+**功能描述**：更新系统唯一一份社区指南。
+
+**接口路由**：`POST /community-guides/update`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：至少传一个字段
+
+- `title`（string，可选）：标题（1~100）
+- `summary`（string，可选）：简介（0~5000）
+- `tags`（string[]，可选）：标签数组（最多 50 个）
+- `contentBlocks`（array，可选）：正文块数组（最多 200 条）
+  - `contentBlocks[].title`（string，必填）：小标题（1~100）
+  - `contentBlocks[].content`（string，必填）：小正文（1~20000）
+- `isEnabled`（boolean，可选）：是否启用
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                   | 示例      |
+| ------- | ------ | ---------------------- | --------- |
+| code    | string | 状态码                 | '0'       |
+| message | string | 状态描述               | 'success' |
+| data    | object | 数据（CommunityGuide） | -         |
+
+`data` 字段结构（CommunityGuide）：同上。
+
+## 78. 删除社区系统指南（需登录）
+
+**接口标题**：删除社区系统指南
+
+**功能描述**：删除系统唯一一份社区指南（软删除）。
+
+**接口路由**：`POST /community-guides/delete`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：无（可传空对象 `{}`）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明     | 示例         |
+| ------- | ------ | -------- | ------------ |
+| code    | string | 状态码   | '0'          |
+| message | string | 状态描述 | 'success'    |
+| data    | object | 数据     | { ok: true } |
 
 ## 通用错误响应
 
@@ -3654,11 +3776,11 @@
 
 错误时 HTTP 状态码为 `err.status` 或 `err.statusCode`，返回：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码（HTTP 状态码字符串） | '401' |
+| 字段    | 类型   | 说明                               | 示例                 |
+| ------- | ------ | ---------------------------------- | -------------------- |
+| code    | string | 状态码（HTTP 状态码字符串）        | '401'                |
 | message | string | 错误描述（仅 expose 的错误会透出） | Authentication Error |
-| data | array | 数据（失败固定空数组） | [] |
+| data    | array  | 数据（失败固定空数组）             | []                   |
 
 示例：
 
@@ -3672,11 +3794,11 @@
 
 当路由使用了 Joi 校验中间件，校验失败时 HTTP 400，返回：
 
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| code | string | 状态码 | '400' |
+| 字段    | 类型   | 说明                                     | 示例                                          |
+| ------- | ------ | ---------------------------------------- | --------------------------------------------- |
+| code    | string | 状态码                                   | '400'                                         |
 | message | string | 明确的参数错误描述（包含字段路径与原因） | 参数校验失败：password "password" is required |
-| data | array | 数据（失败固定空数组） | [] |
+| data    | array  | 数据（失败固定空数组）                   | []                                            |
 
 示例：
 
