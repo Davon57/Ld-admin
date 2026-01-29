@@ -53,6 +53,8 @@ const spacing = {
   16: "64px"
 } as const;
 
+const OFFICIAL_QA_RE = /官方\s*QA/g;
+
 type GuideFormModel = {
   title: string;
   summary: string;
@@ -119,6 +121,10 @@ function normalizeBlocks(
     if (out.length >= 200) break;
   }
   return out;
+}
+
+function replaceOfficialQa(input: string): string {
+  return input.replace(OFFICIAL_QA_RE, "社区QA");
 }
 
 function resetToEmpty(): void {
@@ -257,10 +263,13 @@ async function onInitGuide(): Promise<void> {
   try {
     await formRef.value?.validate();
 
-    const title = model.title.trim();
-    const summary = model.summary.trim();
-    const tags = normalizeTags(model.tags);
-    const contentBlocks = normalizeBlocks(model.contentBlocks);
+    const title = replaceOfficialQa(model.title.trim());
+    const summary = replaceOfficialQa(model.summary.trim());
+    const tags = normalizeTags(model.tags).map(replaceOfficialQa);
+    const contentBlocks = normalizeBlocks(model.contentBlocks).map(b => ({
+      title: replaceOfficialQa(b.title),
+      content: replaceOfficialQa(b.content)
+    }));
 
     for (const [i, b] of contentBlocks.entries()) {
       if (!b.title) {
