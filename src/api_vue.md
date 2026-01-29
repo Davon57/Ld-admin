@@ -3770,6 +3770,195 @@
 | message | string | 状态描述 | 'success'    |
 | data    | object | 数据     | { ok: true } |
 
+## 79. 获取 OTA 更新日志列表（需登录）
+
+**接口标题**：OTA 更新日志列表
+
+**功能描述**：获取 OTA 更新日志列表，支持分页与筛选。
+
+**接口路由**：`POST /ota-logs`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `page`（number，可选）：页码（从 1 开始，默认 1）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 1000）
+- `channel`（string，可选）：渠道（stable/beta）
+- `pushStatus`（string，可选）：推送状态（scheduled/pushing/paused/completed）
+- `isEnabled`（boolean，可选）：是否启用
+- `versionKeyword`（string，可选）：版本关键词（对 versionName 做模糊匹配）
+- `otaLogId`（string，可选）：OTA 日志业务 ID（格式：LD####AAAA；传入则按单条精确查询）
+- `includeDetail`（boolean，可选）：是否包含详情字段 sections/cautions/faqs（默认 false）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                     | 示例      |
+| ------- | ------ | ------------------------ | --------- |
+| code    | string | 状态码                   | '0'       |
+| message | string | 状态描述                 | 'success' |
+| data    | object | 数据（OtaLogListResult） | -         |
+
+`data` 字段结构（OtaLogListResult）：
+
+| 字段          | 类型   | 说明             | 示例 |
+| ------------- | ------ | ---------------- | ---- |
+| data.list     | array  | 列表（OtaLog[]） | -    |
+| data.page     | number | 当前页码         | 1    |
+| data.pageSize | number | 每页条数         | 10   |
+| data.total    | number | 总条数           | 100  |
+
+`data.list` 字段结构（OtaLog[]）：
+
+| 字段                             | 类型          | 说明                                           | 示例                             |
+| -------------------------------- | ------------- | ---------------------------------------------- | -------------------------------- |
+| data.list[].otaLogId             | string        | OTA 日志业务 ID（格式：LD####AAAA）            | LD0007YZAB                       |
+| data.list[].channel              | string        | 渠道（stable/beta）                            | stable                           |
+| data.list[].versionName          | string        | 版本号展示                                     | V1.3.0                           |
+| data.list[].versionCode          | number \ null | 版本数值（可选）                               | 10300                            |
+| data.list[].pushStatus           | string        | 推送状态（scheduled/pushing/paused/completed） | pushing                          |
+| data.list[].publishedAt          | string        | 发布日期（YYYY-MM-DD）                         | 2026-01-03                       |
+| data.list[].packageSizeBytes     | number \ null | 包大小（字节，可选）                           | 1288490188                       |
+| data.list[].packageSizeText      | string        | 包大小展示（可选）                             | 1.2 GB                           |
+| data.list[].applicableModelsText | string        | 适用车型文案                                   | 蓝电 SUV 全系、蓝电 轿车 2024 款 |
+| data.list[].summary              | string        | 列表简述                                       | 本次优化续航与稳定性             |
+| data.list[].seq                  | number        | 排序号                                         | 0                                |
+| data.list[].isEnabled            | boolean       | 是否启用                                       | true                             |
+| data.list[].createdAt            | string        | 创建时间（YYYY-MM-DD HH:mm:ss）                | 2026-01-28 12:00:00              |
+| data.list[].updatedAt            | string        | 更新时间（YYYY-MM-DD HH:mm:ss）                | 2026-01-28 12:00:00              |
+| data.list[].sections             | array         | 更新内容分组（includeDetail=true 时返回）      | -                                |
+| data.list[].cautions             | array         | 注意事项（includeDetail=true 时返回）          | -                                |
+| data.list[].faqs                 | array         | 常见问题（includeDetail=true 时返回）          | -                                |
+
+`data.list[].sections` 字段结构：
+
+| 字段                         | 类型     | 说明     | 示例           |
+| ---------------------------- | -------- | -------- | -------------- |
+| data.list[].sections[].title | string   | 分组标题 | 续航与能耗优化 |
+| data.list[].sections[].items | string[] | 要点列表 | -              |
+
+`data.list[].faqs` 字段结构：
+
+| 字段                        | 类型     | 说明     | 示例                                          |
+| --------------------------- | -------- | -------- | --------------------------------------------- |
+| data.list[].faqs[].question | string   | 问题     | 升级过程一直停在“正在校验/安装”，需要等多久？ |
+| data.list[].faqs[].answers  | string[] | 解决要点 | -                                             |
+
+## 80. 新增 OTA 更新日志（需登录）
+
+**接口标题**：新增 OTA 更新日志
+
+**功能描述**：新增一条 OTA 更新日志。
+
+**接口路由**：`POST /ota-logs/create`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `channel`（string，必填）：渠道（stable/beta）
+- `versionName`（string，必填）：版本号展示（1~50）
+- `versionCode`（number \ null，可选）：版本数值（0~2000000000）
+- `pushStatus`（string，必填）：推送状态（scheduled/pushing/paused/completed）
+- `publishedAt`（string，必填）：发布日期（ISO 字符串）
+- `packageSizeBytes`（number \ null，可选）：包大小（字节）
+- `packageSizeText`（string，可选）：包大小展示（0~50，默认空字符串）
+- `applicableModelsText`（string，必填）：适用车型文案（1~5000）
+- `summary`（string，可选）：列表简述（0~5000，默认空字符串）
+- `sections`（array，可选）：更新内容分组（最多 50 组，默认 []）
+  - `sections[].title`（string，必填）：分组标题（1~100）
+  - `sections[].items`（string[]，必填）：要点列表（最多 50 条）
+- `cautions`（string[]，可选）：注意事项（最多 200 条，默认 []）
+- `faqs`（array，可选）：常见问题（最多 50 题，默认 []）
+  - `faqs[].question`（string，必填）：问题（1~2000）
+  - `faqs[].answers`（string[]，必填）：解决要点（最多 50 条）
+- `seq`（number，可选）：排序号（默认 0）
+- `isEnabled`（boolean，可选）：是否启用（默认 true）
+
+**返回值（Success 201）**：对象
+
+| 字段    | 类型   | 说明           | 示例      |
+| ------- | ------ | -------------- | --------- |
+| code    | string | 状态码         | '0'       |
+| message | string | 状态描述       | 'success' |
+| data    | object | 数据（OtaLog） | -         |
+
+`data` 字段结构（OtaLog）：同上 `OtaLog[]` 单项字段。
+
+## 81. 更新 OTA 更新日志（需登录）
+
+**接口标题**：更新 OTA 更新日志
+
+**功能描述**：更新一条 OTA 更新日志（按 otaLogId 定位，支持部分字段更新）。
+
+**接口路由**：`POST /ota-logs/update`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：至少传一个字段
+
+- `otaLogId`（string，必填）：OTA 日志业务 ID（格式：LD####AAAA）
+- `channel`（string，可选）：渠道（stable/beta）
+- `versionName`（string，可选）：版本号展示（1~50）
+- `versionCode`（number \ null，可选）：版本数值
+- `pushStatus`（string，可选）：推送状态（scheduled/pushing/paused/completed）
+- `publishedAt`（string，可选）：发布日期（ISO 字符串）
+- `packageSizeBytes`（number \ null，可选）：包大小（字节）
+- `packageSizeText`（string，可选）：包大小展示（0~50）
+- `applicableModelsText`（string，可选）：适用车型文案（1~5000）
+- `summary`（string，可选）：列表简述（0~5000）
+- `sections`（array，可选）：更新内容分组（最多 50 组）
+- `cautions`（string[]，可选）：注意事项（最多 200 条）
+- `faqs`（array，可选）：常见问题（最多 50 题）
+- `seq`（number，可选）：排序号
+- `isEnabled`（boolean，可选）：是否启用
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明           | 示例      |
+| ------- | ------ | -------------- | --------- |
+| code    | string | 状态码         | '0'       |
+| message | string | 状态描述       | 'success' |
+| data    | object | 数据（OtaLog） | -         |
+
+`data` 字段结构（OtaLog）：同上 `OtaLog[]` 单项字段。
+
+## 82. 删除 OTA 更新日志（需登录）
+
+**接口标题**：删除 OTA 更新日志
+
+**功能描述**：删除一条 OTA 更新日志（软删除）。
+
+**接口路由**：`POST /ota-logs/delete`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `otaLogId`（string，必填）：OTA 日志业务 ID（格式：LD####AAAA）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                 | 示例      |
+| ------- | ------ | -------------------- | --------- |
+| code    | string | 状态码               | '0'       |
+| message | string | 状态描述             | 'success' |
+| data    | object | 数据（DeleteResult） | -         |
+
+`data` 字段结构（DeleteResult）：
+
+| 字段    | 类型    | 说明     | 示例 |
+| ------- | ------- | -------- | ---- |
+| data.ok | boolean | 是否成功 | true |
+
 ## 通用错误响应
 
 ### 1) 业务/鉴权等错误（errorHandler 兜底）

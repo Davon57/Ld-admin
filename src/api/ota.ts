@@ -1,142 +1,115 @@
 import { http } from "@/utils/http";
 
-export type Status = 0 | 1;
+export type OtaChannel = "stable" | "beta";
 
-export type EmptyData = Record<string, never>;
+export type OtaPushStatus = "scheduled" | "pushing" | "paused" | "completed";
 
-export type PageResult<T> = {
-  list: T[];
+export type OtaLogSection = {
+  title: string;
+  items: string[];
+};
+
+export type OtaLogFaq = {
+  question: string;
+  answers: string[];
+};
+
+export type OtaLog = {
+  otaLogId: string;
+  channel: OtaChannel;
+  versionName: string;
+  versionCode: number | null;
+  pushStatus: OtaPushStatus;
+  publishedAt: string;
+  packageSizeBytes: number | null;
+  packageSizeText: string;
+  applicableModelsText: string;
+  summary: string;
+  seq: number;
+  isEnabled: boolean;
+  createdAt: string;
+  updatedAt: string;
+  sections?: OtaLogSection[];
+  cautions?: string[];
+  faqs?: OtaLogFaq[];
+};
+
+export type OtaLogListParams = {
+  page?: number;
+  pageSize?: number;
+  channel?: OtaChannel;
+  pushStatus?: OtaPushStatus;
+  isEnabled?: boolean;
+  versionKeyword?: string;
+  otaLogId?: string;
+  includeDetail?: boolean;
+};
+
+export type OtaLogListResult = {
+  list: OtaLog[];
+  page: number;
+  pageSize: number;
   total: number;
 };
 
-export type OtaTypeItem = {
-  id: number;
-  name: string;
-  code: string;
-  status: Status;
-  createdAt: string;
+export type CreateOtaLogPayload = {
+  channel: OtaChannel;
+  versionName: string;
+  versionCode?: number | null;
+  pushStatus: OtaPushStatus;
+  publishedAt: string;
+  packageSizeBytes?: number | null;
+  packageSizeText?: string;
+  applicableModelsText: string;
+  summary?: string;
+  sections?: OtaLogSection[];
+  cautions?: string[];
+  faqs?: OtaLogFaq[];
+  seq?: number;
+  isEnabled?: boolean;
 };
 
-export type OtaContentItem = {
-  id: number;
-  typeId: number;
-  version: string;
-  title: string;
-  vehicleModelVersion: string;
-  packageSize: string;
-  releaseAt: string;
-  status: Status;
-  content: string;
-  createdAt: string;
+export type UpdateOtaLogPayload = {
+  otaLogId: string;
+} & Partial<
+  Omit<CreateOtaLogPayload, "channel" | "pushStatus" | "publishedAt">
+> & {
+    channel?: OtaChannel;
+    pushStatus?: OtaPushStatus;
+    publishedAt?: string;
+  };
+
+export type DeleteResult = {
+  ok: boolean;
 };
 
-export type OtaTypeListParams = {
-  page: number;
-  pageSize: number;
-  keyword?: string;
-  status?: Status;
+export const getOtaLogList = (data: OtaLogListParams = {}) => {
+  return http.request<OtaLogListResult>("post", "/ota-logs", { data });
 };
 
-export type OtaContentListParams = {
-  page: number;
-  pageSize: number;
-  keyword?: string;
-  status?: Status;
-  typeId?: number;
-};
-
-export type CreateOtaTypePayload = Omit<OtaTypeItem, "id" | "createdAt">;
-
-export type UpdateOtaTypePayload = Pick<OtaTypeItem, "id"> &
-  Partial<Omit<OtaTypeItem, "id" | "createdAt">>;
-
-export const getOtaTypeList = (data: OtaTypeListParams) => {
-  return http.request<PageResult<OtaTypeItem>>("post", "/ota/type/list", {
-    data
-  });
-};
-
-export const createOtaType = (data: CreateOtaTypePayload) => {
-  return http.request<OtaTypeItem | EmptyData>(
+export const createOtaLog = (data: CreateOtaLogPayload) => {
+  return http.request<OtaLog>(
     "post",
-    "/ota/type/create",
+    "/ota-logs/create",
     { data },
     { showSuccessMessage: true }
   );
 };
 
-export const updateOtaType = (data: UpdateOtaTypePayload) => {
-  return http.request<OtaTypeItem | EmptyData>(
+export const updateOtaLog = (data: UpdateOtaLogPayload) => {
+  return http.request<OtaLog>(
     "post",
-    "/ota/type/update",
+    "/ota-logs/update",
     { data },
     { showSuccessMessage: true }
   );
 };
 
-export const deleteOtaType = (data: { id: number }) => {
-  return http.request<EmptyData>(
+export const deleteOtaLog = (data: { otaLogId: string }) => {
+  return http.request<DeleteResult>(
     "post",
-    "/ota/type/delete",
+    "/ota-logs/delete",
     { data },
-    { showSuccessMessage: true }
-  );
-};
-
-export const batchDeleteOtaTypes = (data: { ids: number[] }) => {
-  return http.request<EmptyData>(
-    "post",
-    "/ota/type/batchDelete",
-    { data },
-    { showSuccessMessage: true }
-  );
-};
-
-export type CreateOtaContentPayload = Omit<OtaContentItem, "id" | "createdAt">;
-
-export type UpdateOtaContentPayload = Pick<OtaContentItem, "id"> &
-  Partial<Omit<OtaContentItem, "id" | "createdAt">>;
-
-export const getOtaContentList = (data: OtaContentListParams) => {
-  return http.request<PageResult<OtaContentItem>>("post", "/ota/content/list", {
-    data
-  });
-};
-
-export const createOtaContent = (data: CreateOtaContentPayload) => {
-  return http.request<OtaContentItem | EmptyData>(
-    "post",
-    "/ota/content/create",
-    { data },
-    { showSuccessMessage: true }
-  );
-};
-
-export const updateOtaContent = (data: UpdateOtaContentPayload) => {
-  return http.request<OtaContentItem | EmptyData>(
-    "post",
-    "/ota/content/update",
-    { data },
-    { showSuccessMessage: true }
-  );
-};
-
-export const deleteOtaContent = (data: { id: number }) => {
-  return http.request<EmptyData>(
-    "post",
-    "/ota/content/delete",
-    { data },
-    { showSuccessMessage: true }
-  );
-};
-
-export const batchDeleteOtaContents = (data: { ids: number[] }) => {
-  return http.request<EmptyData>(
-    "post",
-    "/ota/content/batchDelete",
-    {
-      data
-    },
     { showSuccessMessage: true }
   );
 };

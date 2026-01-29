@@ -11,6 +11,7 @@ export interface DataInfo<T> {
   refreshToken?: string;
   /** 头像 */
   avatar?: string;
+  avatarSrc?: string;
   /** 用户名 */
   username?: string;
   /** 昵称 */

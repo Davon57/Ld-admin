@@ -1,6 +1,6 @@
 export default {
   path: "/ota",
-  redirect: "/ota/content",
+  redirect: "/ota/logs",
   meta: {
     icon: "ri/rocket-2-line",
     title: "OTA 管理",
@@ -8,19 +8,29 @@ export default {
   },
   children: [
     {
-      path: "/ota/content",
-      name: "OtaContent",
-      component: () => import("@/views/ota/content/index.vue"),
+      path: "/ota/logs",
+      name: "OtaLogs",
+      component: () => import("@/views/ota/logs/index.vue"),
       meta: {
-        title: "升级内容"
+        title: "OTA 列表"
       }
     },
     {
-      path: "/ota/type",
-      name: "OtaType",
-      component: () => import("@/views/ota/type/index.vue"),
+      path: "/ota/logs/create",
+      name: "OtaLogCreate",
+      component: () => import("@/views/ota/logs/form.vue"),
       meta: {
-        title: "升级类型"
+        title: "新增 OTA",
+        showLink: false
+      }
+    },
+    {
+      path: "/ota/logs/edit/:otaLogId",
+      name: "OtaLogEdit",
+      component: () => import("@/views/ota/logs/form.vue"),
+      meta: {
+        title: "编辑 OTA",
+        showLink: false
       }
     }
   ]

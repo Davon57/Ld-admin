@@ -21,6 +21,7 @@ const errorInfo =
 export function useNav() {
   const route = useRoute();
   const pureApp = useAppStoreHook();
+  const userStore = useUserStoreHook();
   const routers = useRouter().options.routes;
   const { isFullscreen, toggle } = useFullscreen();
   const { wholeMenus } = storeToRefs(usePermissionStoreHook());
@@ -39,16 +40,17 @@ export function useNav() {
 
   /** 头像（如果头像为空则使用 src/assets/user.jpg ） */
   const userAvatar = computed(() => {
-    return isAllEmpty(useUserStoreHook()?.avatar)
-      ? Avatar
-      : useUserStoreHook()?.avatar;
+    if (!isAllEmpty(userStore?.avatarSrc)) return userStore.avatarSrc;
+    const raw = String(userStore?.avatar ?? "").trim();
+    if (raw.startsWith("data:") || /^https?:\/\//i.test(raw)) return raw;
+    return Avatar;
   });
 
   /** 昵称（如果昵称为空则显示用户名） */
   const username = computed(() => {
-    return isAllEmpty(useUserStoreHook()?.nickname)
-      ? useUserStoreHook()?.username
-      : useUserStoreHook()?.nickname;
+    return isAllEmpty(userStore?.nickname)
+      ? userStore?.username
+      : userStore?.nickname;
   });
 
   const avatarsStyle = computed(() => {
@@ -81,7 +83,11 @@ export function useNav() {
 
   /** 退出登录 */
   function logout() {
-    useUserStoreHook().logOut();
+    userStore.logOut();
+  }
+
+  if (!isAllEmpty(userStore?.avatar) && isAllEmpty(userStore?.avatarSrc)) {
+    void userStore.ensureAvatarSrc();
   }
 
   function backTopMenu() {
