@@ -3959,6 +3959,375 @@
 | ------- | ------- | -------- | ---- |
 | data.ok | boolean | 是否成功 | true |
 
+## 83. 获取社区 QA 列表（需登录）
+
+**接口标题**：社区 QA 列表
+
+**功能描述**：获取社区 QA 列表，支持分页与筛选。普通用户仅返回启用数据；管理员/版主可按 isEnabled 筛选。
+
+**接口路由**：`POST /community-qas`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `page`（number，可选）：页码（从 1 开始，默认 1）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 1000）
+- `keyword`（string，可选）：标题关键词（对 title 做模糊匹配）
+- `categoryId`（string，可选）：分类 ID（格式：LD####AAAA）
+- `isEnabled`（boolean，可选）：是否启用（仅 admin/moderator 生效）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                          | 示例      |
+| ------- | ------ | ----------------------------- | --------- |
+| code    | string | 状态码                        | '0'       |
+| message | string | 状态描述                      | 'success' |
+| data    | object | 数据（CommunityQaListResult） | -         |
+
+`data` 字段结构（CommunityQaListResult）：
+
+| 字段          | 类型   | 说明                  | 示例 |
+| ------------- | ------ | --------------------- | ---- |
+| data.list     | array  | 列表（CommunityQa[]） | -    |
+| data.page     | number | 当前页码              | 1    |
+| data.pageSize | number | 每页条数              | 10   |
+| data.total    | number | 总条数                | 100  |
+
+`data.list` 字段结构（CommunityQa[]）：
+
+| 字段                                       | 类型          | 说明                                | 示例                |
+| ------------------------------------------ | ------------- | ----------------------------------- | ------------------- |
+| data.list[].communityQaId                  | string        | 社区 QA 业务 ID（格式：LD####AAAA） | LD0007YZAB          |
+| data.list[].title                          | string        | 标题                                | 如何绑定车辆？      |
+| data.list[].categoryId                     | string        | 分类 ID（格式：LD####AAAA）         | LD0000ABCD          |
+| data.list[].categoryName                   | string        | 分类名称                            | 续航与能耗          |
+| data.list[].categoryColor                  | string        | 分类代表颜色（HEX）                 | #00B894             |
+| data.list[].category                       | object \ null | 分类信息                            | -                   |
+| data.list[].category.communityQaCategoryId | string        | 分类业务 ID（格式：LD####AAAA）     | LD0000ABCD          |
+| data.list[].category.name                  | string        | 分类名称                            | 续航与能耗          |
+| data.list[].category.description           | string        | 分类描述                            | -                   |
+| data.list[].category.color                 | string        | 分类代表颜色（HEX）                 | #00B894             |
+| data.list[].category.isEnabled             | boolean       | 分类是否启用                        | true                |
+| data.list[].category.createdAt             | string        | 分类创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-29 12:00:00 |
+| data.list[].category.updatedAt             | string        | 分类更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-29 12:00:00 |
+| data.list[].contentBlocks                  | array         | 正文块数组                          | -                   |
+| data.list[].contentBlocks[].title          | string        | 小标题                              | 操作步骤            |
+| data.list[].contentBlocks[].content        | string        | 小正文                              | 打开 App -> ...     |
+| data.list[].contentBlocks[].seq            | number        | 排序号                              | 0                   |
+| data.list[].viewCount                      | number        | 浏览数                              | 12                  |
+| data.list[].usefulCount                    | number        | 有用数                              | 3                   |
+| data.list[].uselessCount                   | number        | 没用数                              | 0                   |
+| data.list[].watchCount                     | number        | 关注数                              | 1                   |
+| data.list[].isEnabled                      | boolean       | 是否启用                            | true                |
+| data.list[].publishedAt                    | string        | 发布时间（YYYY-MM-DD HH:mm:ss）     | 2026-01-29 12:00:00 |
+| data.list[].createdAt                      | string        | 创建时间（YYYY-MM-DD HH:mm:ss）     | 2026-01-29 12:00:00 |
+| data.list[].updatedAt                      | string        | 更新时间（YYYY-MM-DD HH:mm:ss）     | 2026-01-29 12:00:00 |
+
+## 84. 获取社区 QA 详情（需登录）
+
+**接口标题**：社区 QA 详情
+
+**功能描述**：获取单条社区 QA 详情，并将 viewCount +1；返回当前用户态度 myAttitude。
+
+**接口路由**：`POST /community-qas/detail`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `communityQaId`（string，必填）：社区 QA 业务 ID（格式：LD####AAAA）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                      | 示例      |
+| ------- | ------ | ------------------------- | --------- |
+| code    | string | 状态码                    | '0'       |
+| message | string | 状态描述                  | 'success' |
+| data    | object | 数据（CommunityQaDetail） | -         |
+
+`data` 字段结构（CommunityQaDetail）：
+
+| 字段                                | 类型          | 说明                                 | 示例                |
+| ----------------------------------- | ------------- | ------------------------------------ | ------------------- |
+| data.communityQaId                  | string        | 社区 QA 业务 ID（格式：LD####AAAA）  | LD0007YZAB          |
+| data.title                          | string        | 标题                                 | 如何绑定车辆？      |
+| data.categoryId                     | string        | 分类 ID（格式：LD####AAAA）          | LD0000ABCD          |
+| data.categoryName                   | string        | 分类名称                             | 续航与能耗          |
+| data.categoryColor                  | string        | 分类代表颜色（HEX）                  | #00B894             |
+| data.category                       | object \ null | 分类信息                             | -                   |
+| data.category.communityQaCategoryId | string        | 分类业务 ID（格式：LD####AAAA）      | LD0000ABCD          |
+| data.category.name                  | string        | 分类名称                             | 续航与能耗          |
+| data.category.description           | string        | 分类描述                             | -                   |
+| data.category.color                 | string        | 分类代表颜色（HEX）                  | #00B894             |
+| data.category.isEnabled             | boolean       | 分类是否启用                         | true                |
+| data.category.createdAt             | string        | 分类创建时间（YYYY-MM-DD HH:mm:ss）  | 2026-01-29 12:00:00 |
+| data.category.updatedAt             | string        | 分类更新时间（YYYY-MM-DD HH:mm:ss）  | 2026-01-29 12:00:00 |
+| data.contentBlocks                  | array         | 正文块数组                           | -                   |
+| data.viewCount                      | number        | 浏览数                               | 13                  |
+| data.usefulCount                    | number        | 有用数                               | 3                   |
+| data.uselessCount                   | number        | 没用数                               | 0                   |
+| data.watchCount                     | number        | 关注数                               | 1                   |
+| data.isEnabled                      | boolean       | 是否启用                             | true                |
+| data.publishedAt                    | string        | 发布时间（YYYY-MM-DD HH:mm:ss）      | 2026-01-29 12:00:00 |
+| data.createdAt                      | string        | 创建时间（YYYY-MM-DD HH:mm:ss）      | 2026-01-29 12:00:00 |
+| data.updatedAt                      | string        | 更新时间（YYYY-MM-DD HH:mm:ss）      | 2026-01-29 12:00:00 |
+| data.myAttitude                     | string \ null | 当前用户态度（useful/useless/watch） | useful              |
+
+## 85. 创建社区 QA（需登录）
+
+**接口标题**：创建社区 QA
+
+**功能描述**：创建一条社区 QA（仅 admin/moderator 可用）。
+
+**接口路由**：`POST /community-qas/create`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `title`（string，必填）：标题（1~100）
+- `categoryId`（string，必填）：分类 ID（格式：LD####AAAA）
+- `contentBlocks`（array，可选）：正文块数组（最多 200 条，默认 []）
+  - `contentBlocks[].title`（string，必填）：小标题（1~100）
+  - `contentBlocks[].content`（string，必填）：小正文（1~20000）
+  - `contentBlocks[].seq`（number，可选）：排序号（默认 0）
+- `isEnabled`（boolean，可选）：是否启用（默认 true）
+
+**返回值（Success 201）**：对象
+
+| 字段    | 类型   | 说明                | 示例      |
+| ------- | ------ | ------------------- | --------- |
+| code    | string | 状态码              | '0'       |
+| message | string | 状态描述            | 'success' |
+| data    | object | 数据（CommunityQa） | -         |
+
+`data` 字段结构（CommunityQa）：同上 CommunityQaDetail 去掉 myAttitude。
+
+## 86. 更新社区 QA（需登录）
+
+**接口标题**：更新社区 QA
+
+**功能描述**：更新一条社区 QA（仅 admin/moderator 可用；按 communityQaId 定位，支持部分字段更新）。
+
+**接口路由**：`POST /community-qas/update`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：至少传一个字段
+
+- `communityQaId`（string，必填）：社区 QA 业务 ID（格式：LD####AAAA）
+- `title`（string，可选）：标题（1~100）
+- `categoryId`（string，可选）：分类 ID（格式：LD####AAAA）
+- `contentBlocks`（array，可选）：正文块数组（最多 200 条）
+- `isEnabled`（boolean，可选）：是否启用
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                | 示例      |
+| ------- | ------ | ------------------- | --------- |
+| code    | string | 状态码              | '0'       |
+| message | string | 状态描述            | 'success' |
+| data    | object | 数据（CommunityQa） | -         |
+
+`data` 字段结构（CommunityQa）：同上。
+
+## 87. 删除社区 QA（需登录）
+
+**接口标题**：删除社区 QA
+
+**功能描述**：删除一条社区 QA（仅 admin/moderator 可用；软删除）。
+
+**接口路由**：`POST /community-qas/delete`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `communityQaId`（string，必填）：社区 QA 业务 ID（格式：LD####AAAA）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明     | 示例         |
+| ------- | ------ | -------- | ------------ |
+| code    | string | 状态码   | '0'          |
+| message | string | 状态描述 | 'success'    |
+| data    | object | 数据     | { ok: true } |
+
+## 88. 设置/取消社区 QA 态度（需登录）
+
+**接口标题**：社区 QA 态度
+
+**功能描述**：设置当前用户对 QA 的态度（useful/useless/watch），三态互斥；传 null 表示取消态度并回滚计数。
+
+**接口路由**：`POST /community-qas/attitude`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `communityQaId`（string，必填）：社区 QA 业务 ID（格式：LD####AAAA）
+- `attitude`（string \ null，可选）：态度（useful/useless/watch；传 null 表示取消）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                              | 示例      |
+| ------- | ------ | --------------------------------- | --------- |
+| code    | string | 状态码                            | '0'       |
+| message | string | 状态描述                          | 'success' |
+| data    | object | 数据（CommunityQaAttitudeResult） | -         |
+
+`data` 字段结构（CommunityQaAttitudeResult）：
+
+| 字段              | 类型          | 说明                                 | 示例  |
+| ----------------- | ------------- | ------------------------------------ | ----- |
+| data.myAttitude   | string \ null | 当前用户态度（useful/useless/watch） | watch |
+| data.usefulCount  | number        | 有用数                               | 3     |
+| data.uselessCount | number        | 没用数                               | 0     |
+| data.watchCount   | number        | 关注数                               | 2     |
+
+## 89. 获取社区 QA 分类列表（需登录）
+
+**接口标题**：社区 QA 分类列表
+
+**功能描述**：获取社区 QA 分类列表，支持分页与筛选。普通用户仅返回启用分类；管理员/版主可按 isEnabled 筛选。
+
+**接口路由**：`POST /community-qa-categories`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `page`（number，可选）：页码（从 1 开始，默认 1）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 1000）
+- `communityQaCategoryId`（string，可选）：分类业务 ID（格式：LD####AAAA）
+- `nameKeyword`（string，可选）：名称关键词（对 name 做模糊匹配）
+- `isEnabled`（boolean，可选）：是否启用（仅 admin/moderator 生效）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                                  | 示例      |
+| ------- | ------ | ------------------------------------- | --------- |
+| code    | string | 状态码                                | '0'       |
+| message | string | 状态描述                              | 'success' |
+| data    | object | 数据（CommunityQaCategoryListResult） | -         |
+
+`data` 字段结构（CommunityQaCategoryListResult）：
+
+| 字段          | 类型   | 说明                          | 示例 |
+| ------------- | ------ | ----------------------------- | ---- |
+| data.list     | array  | 列表（CommunityQaCategory[]） | -    |
+| data.page     | number | 当前页码                      | 1    |
+| data.pageSize | number | 每页条数                      | 10   |
+| data.total    | number | 总条数                        | 100  |
+
+`data.list` 字段结构（CommunityQaCategory[]）：
+
+| 字段                              | 类型    | 说明                            | 示例                |
+| --------------------------------- | ------- | ------------------------------- | ------------------- |
+| data.list[].communityQaCategoryId | string  | 分类业务 ID（格式：LD####AAAA） | LD0000ABCD          |
+| data.list[].name                  | string  | 名称                            | 续航与能耗          |
+| data.list[].description           | string  | 描述                            | -                   |
+| data.list[].color                 | string  | 代表颜色（HEX）                 | #00B894             |
+| data.list[].isEnabled             | boolean | 是否启用                        | true                |
+| data.list[].createdAt             | string  | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-29 12:00:00 |
+| data.list[].updatedAt             | string  | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-01-29 12:00:00 |
+
+## 90. 创建社区 QA 分类（需登录）
+
+**接口标题**：创建社区 QA 分类
+
+**功能描述**：创建一条社区 QA 分类（仅 admin/moderator 可用）。
+
+**接口路由**：`POST /community-qa-categories/create`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `name`（string，必填）：名称（1~50）
+- `description`（string，可选）：描述（0~5000，默认 ''）
+- `color`（string，必填）：代表颜色（HEX，支持 6/8 位，例如 #00B894 或 #00B894FF）
+- `isEnabled`（boolean，可选）：是否启用（默认 true）
+
+**返回值（Success 201）**：对象
+
+| 字段    | 类型   | 说明                        | 示例      |
+| ------- | ------ | --------------------------- | --------- |
+| code    | string | 状态码                      | '0'       |
+| message | string | 状态描述                    | 'success' |
+| data    | object | 数据（CommunityQaCategory） | -         |
+
+`data` 字段结构（CommunityQaCategory）：同上 `CommunityQaCategory[]` 单项字段。
+
+## 91. 更新社区 QA 分类（需登录）
+
+**接口标题**：更新社区 QA 分类
+
+**功能描述**：更新一条社区 QA 分类（仅 admin/moderator 可用；按 communityQaCategoryId 定位，支持部分字段更新）。
+
+**接口路由**：`POST /community-qa-categories/update`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：至少传一个字段
+
+- `communityQaCategoryId`（string，必填）：分类业务 ID（格式：LD####AAAA）
+- `name`（string，可选）：名称（1~50）
+- `description`（string，可选）：描述（0~5000）
+- `color`（string，可选）：代表颜色（HEX）
+- `isEnabled`（boolean，可选）：是否启用
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                        | 示例      |
+| ------- | ------ | --------------------------- | --------- |
+| code    | string | 状态码                      | '0'       |
+| message | string | 状态描述                    | 'success' |
+| data    | object | 数据（CommunityQaCategory） | -         |
+
+## 92. 删除社区 QA 分类（需登录）
+
+**接口标题**：删除社区 QA 分类
+
+**功能描述**：删除一条社区 QA 分类（仅 admin/moderator 可用；软删除）。
+
+**接口路由**：`POST /community-qa-categories/delete`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `communityQaCategoryId`（string，必填）：分类业务 ID（格式：LD####AAAA）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明     | 示例         |
+| ------- | ------ | -------- | ------------ |
+| code    | string | 状态码   | '0'          |
+| message | string | 状态描述 | 'success'    |
+| data    | object | 数据     | { ok: true } |
+
 ## 通用错误响应
 
 ### 1) 业务/鉴权等错误（errorHandler 兜底）
