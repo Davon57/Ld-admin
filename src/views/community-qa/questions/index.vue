@@ -91,6 +91,7 @@ const exportColumns: CsvColumn<QaQuestionItem>[] = [
   { label: "回答数", key: "answerCount" },
   { label: "浏览量", key: "viewCount" },
   { label: "点赞数", key: "likeCount" },
+  { label: "收藏数", key: "collectCount" },
   {
     label: "已解决",
     key: "isSolved",
@@ -1174,6 +1175,11 @@ async function onUnlikeAnswer(row: QaAnswerItem): Promise<void> {
         <el-table-column prop="answerCount" label="回答" width="90" />
         <el-table-column prop="viewCount" label="浏览" width="90" />
         <el-table-column prop="likeCount" label="点赞" width="90" />
+        <el-table-column prop="collectCount" label="收藏" width="90">
+          <template #default="{ row }">
+            {{ row.collectCount ?? 0 }}
+          </template>
+        </el-table-column>
         <el-table-column prop="isSolved" label="已解决" width="100">
           <template #default="{ row }">
             <el-tag v-if="row.isSolved" type="success">是</el-tag>

@@ -121,6 +121,7 @@ const exportColumns: CsvColumn<ArticleItem>[] = [
   { label: "标题", key: "title" },
   { label: "浏览量", key: "viewCount" },
   { label: "点赞数", key: "likeCount" },
+  { label: "收藏数", key: "collectCount" },
   { label: "评论数", key: "commentCount" },
   {
     label: "分类",
@@ -932,6 +933,9 @@ function openDetailDialog(row: ArticleItem): void {
               <el-descriptions-item label="点赞数">
                 {activeArticle.value?.likeCount ?? row.likeCount ?? 0}
               </el-descriptions-item>
+              <el-descriptions-item label="收藏数">
+                {activeArticle.value?.collectCount ?? row.collectCount ?? 0}
+              </el-descriptions-item>
               <el-descriptions-item label="评论数">
                 {activeArticle.value?.commentCount ?? row.commentCount ?? 0}
               </el-descriptions-item>
@@ -1162,6 +1166,16 @@ fetchArticles();
         >
           <template #default="{ row }">
             {{ row.likeCount ?? 0 }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="collectCount"
+          label="收藏"
+          width="110"
+          align="right"
+        >
+          <template #default="{ row }">
+            {{ row.collectCount ?? 0 }}
           </template>
         </el-table-column>
         <el-table-column

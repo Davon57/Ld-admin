@@ -90,6 +90,7 @@ export type QaQuestionItem = {
   tagIds: string[];
   likeCount: number;
   isLiked?: boolean;
+  collectCount?: number;
   answerCount: number;
   viewCount: number;
   acceptedAnswerId: string | null;

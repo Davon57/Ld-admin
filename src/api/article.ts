@@ -220,6 +220,9 @@ export type ArticleItem = {
   isEnabled: boolean;
   viewCount: number;
   likeCount: number;
+  collectCount?: number;
+  isLiked?: boolean;
+  isCollected?: boolean;
   commentCount: number;
   publishedAt: string;
   modifiedAt: string;

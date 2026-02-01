@@ -105,7 +105,7 @@ type CategoryFormModel = {
 const categoryFormRules: FormRules<CategoryFormModel> = {
   name: [{ required: true, message: "请输入分类名称", trigger: "blur" }],
   color: [
-    { required: true, message: "请输入代表颜色", trigger: "blur" },
+    { required: true, message: "请输入代表颜色", trigger: ["blur", "change"] },
     {
       validator: (_rule, value: unknown, cb) => {
         const v = typeof value === "string" ? value.trim() : "";
@@ -119,7 +119,7 @@ const categoryFormRules: FormRules<CategoryFormModel> = {
         }
         cb();
       },
-      trigger: "blur"
+      trigger: ["blur", "change"]
     }
   ]
 };
@@ -141,6 +141,26 @@ function openCategoryDialog(
     setup() {
       nextTick(() => {
         formRef.value?.clearValidate();
+      });
+
+      const predefineColors = [
+        "#00B894",
+        "#00CEC9",
+        "#0984E3",
+        "#74B9FF",
+        "#6C5CE7",
+        "#A29BFE",
+        "#E84393",
+        "#FD79A8",
+        "#D63031",
+        "#E17055",
+        "#FDCB6E",
+        "#2D3436"
+      ];
+
+      const previewColor = computed(() => {
+        const c = normalizeColor(model.color).trim();
+        return COLOR_RE.test(c) ? c : "transparent";
       });
 
       return () => (
@@ -169,11 +189,24 @@ function openCategoryDialog(
           </el-form-item>
           <el-form-item label="代表颜色" prop="color">
             <div class="flex items-center gap-3 w-full">
-              <el-input v-model={model.color} clearable placeholder="#00B894" />
+              <el-input
+                v-model={model.color}
+                clearable
+                placeholder="#00B894"
+                onBlur={() => {
+                  model.color = normalizeColor(model.color);
+                }}
+              />
+              <el-color-picker
+                v-model={model.color}
+                showAlpha
+                colorFormat="hex"
+                predefine={predefineColors}
+              />
               <div
                 class="h-8 w-8 rounded border"
                 style={{
-                  backgroundColor: model.color.trim() || "transparent",
+                  backgroundColor: previewColor.value,
                   borderColor: "var(--el-border-color)"
                 }}
               />
@@ -201,7 +234,7 @@ function openCategoryDialog(
         const payload = {
           name: model.name.trim(),
           description: model.description.trim(),
-          color: model.color.trim(),
+          color: normalizeColor(model.color).trim(),
           isEnabled: model.isEnabled
         };
 
