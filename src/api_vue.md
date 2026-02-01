@@ -2250,6 +2250,7 @@
 | data.list[].viewCount | number | 浏览量 | 256 |
 | data.list[].acceptedAnswerId | string \ null | 已采纳回答业务 ID | LD0009WXYZ |
 | data.list[].isSolved | boolean | 是否已解决 | true |
+| data.list[].collectCount | number | 收藏数量（已采纳回答的收藏数量；未采纳时为 0） | 12 |
 | data.list[].isEnabled | boolean | 是否启用 | true |
 | data.list[].isFeatured | boolean | 是否精选 | false |
 | data.list[].featuredAt | string \ null | 精选设置时间（YYYY-MM-DD HH:mm:ss） | 2026-01-22 12:00:00 |
@@ -3082,6 +3083,7 @@
 | data.list[].viewCount | number | 浏览量 | 0 |
 | data.list[].likeCount | number | 点赞数 | 0 |
 | data.list[].commentCount | number | 评论数（含楼中楼回复，口径同问答 answerCount） | 0 |
+| data.list[].collectCount | number | 收藏数量 | 12 |
 | data.list[].publishedAt | string | 发布时间（YYYY-MM-DD HH:mm:ss） | 2026-01-25 12:00:00 |
 | data.list[].modifiedAt | string | 最近评论更新时间（YYYY-MM-DD HH:mm:ss） | 2026-01-25 12:00:00 |
 | data.list[].createdAt | string | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-01-25 12:00:00 |
