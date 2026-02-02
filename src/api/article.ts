@@ -305,6 +305,43 @@ export const deleteArticle = (data: { articleId: string }) => {
   );
 };
 
+export type HotResult = {
+  ok: boolean;
+};
+
+export type HotArticleListParams = {
+  page: number;
+  pageSize: number;
+  keyword?: string;
+  articleCategoryId?: string;
+  isEnabled?: boolean;
+};
+
+export type HotArticleListResult = {
+  list: ArticleItem[];
+  page: number;
+  pageSize: number;
+  total: number;
+};
+
+export const setArticleHot = (data: { articleId: string }) => {
+  return http.request<HotResult>("post", "/articles/hot", {
+    data
+  });
+};
+
+export const unsetArticleHot = (data: { articleId: string }) => {
+  return http.request<HotResult>("post", "/articles/unhot", {
+    data
+  });
+};
+
+export const getHotArticleList = (data: HotArticleListParams) => {
+  return http.request<HotArticleListResult>("post", "/articles/hot-list", {
+    data
+  });
+};
+
 export type ArticleCommentItem = {
   id: string;
   articleCommentId: string;

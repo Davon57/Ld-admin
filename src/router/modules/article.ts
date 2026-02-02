@@ -16,6 +16,14 @@ export default {
       }
     },
     {
+      path: "/article/hot",
+      name: "ArticleHot",
+      component: () => import("@/views/article/hot/index.vue"),
+      meta: {
+        title: "热门列表"
+      }
+    },
+    {
       path: "/article/category",
       name: "ArticleCategory",
       component: () => import("@/views/article/category/index.vue"),

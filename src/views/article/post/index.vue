@@ -61,7 +61,6 @@ const queryState = reactive<
   Required<Pick<ArticleListParams, "page" | "pageSize">> & {
     keyword: string;
     articleCategoryId: "" | string;
-    authorUserId: string;
     isEnabled: "" | boolean;
   }
 >({
@@ -69,7 +68,6 @@ const queryState = reactive<
   pageSize: 10,
   keyword: "",
   articleCategoryId: "",
-  authorUserId: "",
   isEnabled: ""
 });
 
@@ -128,7 +126,6 @@ const exportColumns: CsvColumn<ArticleItem>[] = [
     key: "articleCategoryId",
     format: (_value, row) => resolveCategoryName(row.articleCategoryId)
   },
-  { label: "作者ID", key: "authorUserId" },
   {
     label: "作者昵称",
     key: "authorUserId",
@@ -154,8 +151,6 @@ const listParams = computed((): ArticleListParams => {
   if (queryState.articleCategoryId !== "") {
     params.articleCategoryId = queryState.articleCategoryId;
   }
-  const authorUserId = queryState.authorUserId.trim();
-  if (authorUserId) params.authorUserId = authorUserId;
   if (queryState.isEnabled !== "") params.isEnabled = queryState.isEnabled;
   return params;
 });
@@ -202,7 +197,6 @@ function onReset(): void {
   queryState.pageSize = 10;
   queryState.keyword = "";
   queryState.articleCategoryId = "";
-  queryState.authorUserId = "";
   queryState.isEnabled = "";
   fetchArticles();
 }
@@ -913,9 +907,6 @@ function openDetailDialog(row: ArticleItem): void {
               <el-descriptions-item label="文章ID">
                 <el-tag effect="plain">{articleId}</el-tag>
               </el-descriptions-item>
-              <el-descriptions-item label="作者ID">
-                {activeArticle.value?.authorUserId || row.authorUserId}
-              </el-descriptions-item>
               <el-descriptions-item label="作者昵称">
                 {resolveAuthorNickname(
                   activeArticle.value?.authorUserId || row.authorUserId
@@ -1096,15 +1087,6 @@ fetchArticles();
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="作者ID">
-          <el-input
-            v-model="queryState.authorUserId"
-            placeholder="LD0001ABCD"
-            clearable
-            class="w-[180px]!"
-            @keyup.enter="onSearch"
-          />
-        </el-form-item>
         <el-form-item label="启用">
           <el-select
             v-model="queryState.isEnabled"
@@ -1193,7 +1175,6 @@ fetchArticles();
             {{ resolveCategoryName(row.articleCategoryId) }}
           </template>
         </el-table-column>
-        <el-table-column prop="authorUserId" label="作者ID" min-width="150" />
         <el-table-column label="作者昵称" min-width="140">
           <template #default="{ row }">
             {{ resolveAuthorNickname(row.authorUserId) }}
