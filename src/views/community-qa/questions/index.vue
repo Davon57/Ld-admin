@@ -1,5 +1,14 @@
 <script setup lang="tsx">
-import { h, reactive, ref, computed, nextTick, defineComponent } from "vue";
+import {
+  h,
+  reactive,
+  ref,
+  computed,
+  watch,
+  nextTick,
+  defineComponent
+} from "vue";
+import { useRoute } from "vue-router";
 import type {
   FormInstance,
   FormRules,
@@ -31,6 +40,8 @@ import {
   createQaQuestion,
   updateQaQuestion,
   deleteQaQuestion,
+  featureQaQuestion,
+  unfeatureQaQuestion,
   getQaAnswerList,
   createQaAnswer,
   updateQaAnswer,
@@ -43,6 +54,22 @@ import {
 
 defineOptions({
   name: "CommunityQaQuestions"
+});
+
+const route = useRoute();
+
+const isFeaturedList = computed((): boolean => {
+  return route.name === "CommunityQaFeaturedQuestions";
+});
+
+const isHotList = computed((): boolean => {
+  return route.name === "CommunityQaHotQuestions";
+});
+
+const tableTitle = computed((): string => {
+  if (isFeaturedList.value) return "精选列表";
+  if (isHotList.value) return "热门列表";
+  return "问答列表";
 });
 
 const queryState = reactive<
@@ -102,14 +129,79 @@ const exportColumns: CsvColumn<QaQuestionItem>[] = [
     key: "isEnabled",
     format: (_value, row) => (row.isEnabled ? "启用" : "禁用")
   },
+  {
+    label: "精选",
+    key: "isFeatured",
+    format: (_value, row) => (row.isFeatured ? "是" : "否")
+  },
+  { label: "精选时间", key: "featuredAt" },
   { label: "更新时间", key: "updatedAt" }
 ];
+
+const featuringMap = reactive<Record<string, boolean>>({});
+
+function setFeaturing(qaQuestionId: string, value: boolean): void {
+  if (!qaQuestionId) return;
+  if (value) {
+    featuringMap[qaQuestionId] = true;
+  } else {
+    delete featuringMap[qaQuestionId];
+  }
+}
+
+function isFeaturing(row: QaQuestionItem): boolean {
+  return Boolean(featuringMap[row.qaQuestionId]);
+}
+
+async function onFeatureRow(row: QaQuestionItem): Promise<void> {
+  const qaQuestionId = row.qaQuestionId;
+  if (!qaQuestionId) return;
+
+  setFeaturing(qaQuestionId, true);
+  const prev = Boolean(row.isFeatured);
+  try {
+    const idx = tableData.value.findIndex(q => q.qaQuestionId === qaQuestionId);
+    if (idx >= 0)
+      tableData.value[idx] = { ...tableData.value[idx], isFeatured: true };
+    await featureQaQuestion({ qaQuestionId });
+    fetchQuestions();
+  } catch {
+    const idx = tableData.value.findIndex(q => q.qaQuestionId === qaQuestionId);
+    if (idx >= 0)
+      tableData.value[idx] = { ...tableData.value[idx], isFeatured: prev };
+  } finally {
+    setFeaturing(qaQuestionId, false);
+  }
+}
+
+async function onUnfeatureRow(row: QaQuestionItem): Promise<void> {
+  const qaQuestionId = row.qaQuestionId;
+  if (!qaQuestionId) return;
+
+  setFeaturing(qaQuestionId, true);
+  const prev = Boolean(row.isFeatured);
+  try {
+    const idx = tableData.value.findIndex(q => q.qaQuestionId === qaQuestionId);
+    if (idx >= 0)
+      tableData.value[idx] = { ...tableData.value[idx], isFeatured: false };
+    await unfeatureQaQuestion({ qaQuestionId });
+    fetchQuestions();
+  } catch {
+    const idx = tableData.value.findIndex(q => q.qaQuestionId === qaQuestionId);
+    if (idx >= 0)
+      tableData.value[idx] = { ...tableData.value[idx], isFeatured: prev };
+  } finally {
+    setFeaturing(qaQuestionId, false);
+  }
+}
 
 const listParams = computed((): QaQuestionListParams => {
   const params: QaQuestionListParams = {
     page: queryState.page,
     pageSize: queryState.pageSize
   };
+  if (isFeaturedList.value) params.type = "featured";
+  else if (isHotList.value) params.type = "hot";
   const keyword = queryState.keyword.trim();
   if (keyword) params.keyword = keyword;
   if (queryState.isSolved !== "") params.isSolved = queryState.isSolved;
@@ -253,12 +345,45 @@ async function onExportList(): Promise<void> {
   }
   exporting.value = true;
   try {
-    await exportToXlsx(tableData.value, exportColumns, "问答列表");
+    await exportToXlsx(tableData.value, exportColumns, tableTitle.value);
   } catch {
     message("导出失败", { type: "error" });
   } finally {
     exporting.value = false;
   }
+}
+
+function openHotExplainDialog(): void {
+  const HotExplainDialog = defineComponent({
+    name: "CommunityQaHotExplainDialog",
+    setup() {
+      return () => (
+        <div class="p-4">
+          <el-alert
+            title="满足以下条件的问答问题才会进入热门列表"
+            type="info"
+            show-icon
+            closable={false}
+          />
+          <div class="mt-3 space-y-2 text-[14px] leading-6">
+            <div>已采纳：acceptedAnswerId != null</div>
+            <div>回答数阈值：answerCount &gt;= 5</div>
+            <div>点赞数阈值：likeCount &gt;= 10</div>
+            <div>排序规则：按 viewCount（浏览量）倒序</div>
+          </div>
+        </div>
+      );
+    }
+  });
+
+  addDialog({
+    title: "热门问答说明",
+    width: "520px",
+    alignCenter: true,
+    destroyOnClose: true,
+    hideFooter: true,
+    contentRenderer: () => h(HotExplainDialog)
+  });
 }
 
 type QuestionFormMode = "create" | "edit";
@@ -854,6 +979,14 @@ function openDetailDialog(row: QaQuestionItem): void {
   });
 }
 
+watch(
+  () => route.name,
+  () => {
+    queryState.page = 1;
+    fetchQuestions();
+  }
+);
+
 fetchTagOptions();
 fetchQuestions();
 
@@ -1123,11 +1256,23 @@ async function onUnlikeAnswer(row: QaAnswerItem): Promise<void> {
       </el-form>
     </el-card>
 
-    <PureTableBar class="mt-2" title="问答列表" @refresh="fetchQuestions">
+    <PureTableBar class="mt-2" :title="tableTitle" @refresh="fetchQuestions">
       <template #buttons>
         <el-space wrap>
-          <el-button type="primary" @click="openQuestionDialog('create')">
+          <el-button
+            v-if="!isHotList"
+            type="primary"
+            @click="openQuestionDialog('create')"
+          >
             新增问题
+          </el-button>
+          <el-button
+            v-if="isHotList"
+            type="info"
+            plain
+            @click="openHotExplainDialog"
+          >
+            说明
           </el-button>
           <el-button
             type="success"
@@ -1146,13 +1291,7 @@ async function onUnlikeAnswer(row: QaAnswerItem): Promise<void> {
         row-key="qaQuestionId"
         class="w-full"
       >
-        <el-table-column prop="qaQuestionId" label="问题ID" min-width="140" />
         <el-table-column prop="title" label="标题" min-width="240" />
-        <el-table-column
-          prop="authorUserId"
-          label="作者用户ID"
-          min-width="140"
-        />
         <el-table-column label="作者昵称" min-width="200">
           <template #default="{ row }">
             {{ getQuestionNickname(row) }}
@@ -1192,8 +1331,14 @@ async function onUnlikeAnswer(row: QaAnswerItem): Promise<void> {
             <el-tag v-else type="info">禁用</el-tag>
           </template>
         </el-table-column>
+        <el-table-column prop="isFeatured" label="精选" width="90">
+          <template #default="{ row }">
+            <el-tag v-if="row.isFeatured" type="warning">精选</el-tag>
+            <el-tag v-else type="info">否</el-tag>
+          </template>
+        </el-table-column>
         <el-table-column prop="updatedAt" label="更新时间" min-width="170" />
-        <el-table-column label="操作" fixed="right" width="280">
+        <el-table-column label="操作" fixed="right" width="360">
           <template #default="{ row }">
             <el-space>
               <el-button link type="primary" @click="openAnswersDialog(row)">
@@ -1202,6 +1347,35 @@ async function onUnlikeAnswer(row: QaAnswerItem): Promise<void> {
               <el-button link type="primary" @click="openDetailDialog(row)">
                 详情
               </el-button>
+              <el-button
+                v-if="isFeaturedList"
+                link
+                type="warning"
+                :loading="isFeaturing(row)"
+                @click="onUnfeatureRow(row)"
+              >
+                取消精选
+              </el-button>
+              <template v-else>
+                <el-button
+                  v-if="row.isFeatured"
+                  link
+                  type="warning"
+                  :loading="isFeaturing(row)"
+                  @click="onUnfeatureRow(row)"
+                >
+                  取消精选
+                </el-button>
+                <el-button
+                  v-else
+                  link
+                  type="success"
+                  :loading="isFeaturing(row)"
+                  @click="onFeatureRow(row)"
+                >
+                  设为精选
+                </el-button>
+              </template>
               <el-button
                 link
                 type="primary"

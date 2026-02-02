@@ -24,6 +24,22 @@ export default {
       }
     },
     {
+      path: "/community-qa/hot-questions",
+      name: "CommunityQaHotQuestions",
+      component: () => import("@/views/community-qa/questions/index.vue"),
+      meta: {
+        title: "热门列表"
+      }
+    },
+    {
+      path: "/community-qa/featured-questions",
+      name: "CommunityQaFeaturedQuestions",
+      component: () => import("@/views/community-qa/questions/index.vue"),
+      meta: {
+        title: "精选列表"
+      }
+    },
+    {
       path: "/community-qa/comments",
       name: "CommunityQaComments",
       component: () => import("@/views/community-qa/comments/index.vue"),

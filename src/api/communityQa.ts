@@ -13,6 +13,10 @@ export type AdoptResult = {
   ok: boolean;
 };
 
+export type FeatureResult = {
+  ok: boolean;
+};
+
 export type QaTagItem = {
   id: string;
   qaTagId: string;
@@ -96,11 +100,16 @@ export type QaQuestionItem = {
   acceptedAnswerId: string | null;
   isSolved: boolean;
   isEnabled: boolean;
+  isFeatured?: boolean;
+  featuredAt?: string | null;
   createdAt: string;
   updatedAt: string;
 };
 
+export type QaQuestionListType = "latest" | "unanswered" | "hot" | "featured";
+
 export type QaQuestionListParams = {
+  type?: QaQuestionListType;
   page?: number;
   pageSize?: number;
   keyword?: string;
@@ -196,6 +205,24 @@ export const likeQaQuestion = (data: { qaQuestionId: string }) => {
 
 export const unlikeQaQuestion = (data: { qaQuestionId: string }) => {
   return http.request<LikeResult>("post", "/qa-questions/unlike", { data });
+};
+
+export const featureQaQuestion = (data: { qaQuestionId: string }) => {
+  return http.request<FeatureResult>(
+    "post",
+    "/qa-questions/feature",
+    { data },
+    { showSuccessMessage: true }
+  );
+};
+
+export const unfeatureQaQuestion = (data: { qaQuestionId: string }) => {
+  return http.request<FeatureResult>(
+    "post",
+    "/qa-questions/unfeature",
+    { data },
+    { showSuccessMessage: true }
+  );
 };
 
 export type QaAnswerItem = {
