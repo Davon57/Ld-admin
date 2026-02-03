@@ -31,10 +31,51 @@ const {
 
 const subMenuData = ref([]);
 
+function getDisplayTitle(menu): string {
+  const child = menu?.children?.length === 1 ? menu.children[0] : null;
+  if (child && child?.meta?.showParent !== true) {
+    return child?.meta?.title ?? menu?.meta?.title ?? "";
+  }
+  return menu?.meta?.title ?? "";
+}
+
+function sortSidebarMenus(menus) {
+  const pinned = ["系统管理", "公告管理", "社区QA", "文章管理", "社区问答"];
+  return (Array.isArray(menus) ? menus : [])
+    .slice()
+    .map((menu, index) => {
+      const title = getDisplayTitle(menu);
+      const pinnedIndex = pinned.indexOf(title);
+      const group =
+        title === "首页" || menu?.name === "Home" || menu?.path === "/"
+          ? -1
+          : pinnedIndex >= 0
+            ? 0
+            : title === "活动管理" || title === "勋章管理"
+              ? 2
+              : 1;
+      const order =
+        group === 0
+          ? pinnedIndex
+          : title === "活动管理"
+            ? 0
+            : title === "勋章管理"
+              ? 1
+              : 0;
+      return { menu, index, group, order };
+    })
+    .sort((a, b) => {
+      if (a.group !== b.group) return a.group - b.group;
+      if (a.order !== b.order) return a.order - b.order;
+      return a.index - b.index;
+    })
+    .map(v => v.menu);
+}
+
 const menuData = computed(() => {
   return pureApp.layout === "mix" && device.value !== "mobile"
     ? subMenuData.value
-    : usePermissionStoreHook().wholeMenus;
+    : sortSidebarMenus(usePermissionStoreHook().wholeMenus);
 });
 
 const loading = computed(() =>
