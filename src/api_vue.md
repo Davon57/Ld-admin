@@ -4444,6 +4444,367 @@
 | message | string | 状态描述 | 'success'    |
 | data    | object | 数据     | { ok: true } |
 
+## 93. 获取公告标签列表（管理端）（需登录）
+
+**接口标题**：公告标签列表
+
+**功能描述**：获取公告标签列表，支持分页与筛选。
+
+**接口路由**：`POST /community-announcement-tags`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `page`（number，可选）：页码（从 1 开始，默认 1）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 1000）
+- `communityAnnouncementTagId`（string，可选）：标签业务 ID（格式：LD####AAAA）
+- `nameKeyword`（string，可选）：标签名关键词（对 name 做模糊匹配）
+- `isEnabled`（boolean，可选）：是否启用（仅 admin/moderator 生效）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                                       | 示例      |
+| ------- | ------ | ------------------------------------------ | --------- |
+| code    | string | 状态码                                     | '0'       |
+| message | string | 状态描述                                   | 'success' |
+| data    | object | 数据（CommunityAnnouncementTagListResult） | -         |
+
+`data` 字段结构（CommunityAnnouncementTagListResult）：
+
+| 字段          | 类型   | 说明                               | 示例 |
+| ------------- | ------ | ---------------------------------- | ---- |
+| data.list     | array  | 列表（CommunityAnnouncementTag[]） | -    |
+| data.page     | number | 当前页码                           | 1    |
+| data.pageSize | number | 每页条数                           | 10   |
+| data.total    | number | 总条数                             | 100  |
+
+`data.list` 字段结构（CommunityAnnouncementTag[]）：
+
+| 字段                                   | 类型    | 说明                            | 示例                |
+| -------------------------------------- | ------- | ------------------------------- | ------------------- |
+| data.list[].communityAnnouncementTagId | string  | 标签业务 ID（格式：LD####AAAA） | LD0000ABCD          |
+| data.list[].name                       | string  | 标签名                          | 通知                |
+| data.list[].description                | string  | 描述                            | -                   |
+| data.list[].seq                        | number  | 排序号                          | 0                   |
+| data.list[].isEnabled                  | boolean | 是否启用                        | true                |
+| data.list[].createdAt                  | string  | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-02-03 12:00:00 |
+| data.list[].updatedAt                  | string  | 修改时间（YYYY-MM-DD HH:mm:ss） | 2026-02-03 12:00:00 |
+
+## 94. 创建公告标签（管理端）（需登录）
+
+**接口标题**：创建公告标签
+
+**功能描述**：创建一条公告标签（仅 admin/moderator 可用）。
+
+**接口路由**：`POST /community-announcement-tags/create`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `name`（string，必填）：标签名（1~50）
+- `description`（string，可选）：描述（0~5000，默认 ''）
+- `seq`（number，可选）：排序号（默认 0）
+- `isEnabled`（boolean，可选）：是否启用（默认 true）
+
+**返回值（Success 201）**：对象
+
+| 字段    | 类型   | 说明                             | 示例      |
+| ------- | ------ | -------------------------------- | --------- |
+| code    | string | 状态码                           | '0'       |
+| message | string | 状态描述                         | 'success' |
+| data    | object | 数据（CommunityAnnouncementTag） | -         |
+
+`data` 字段结构（CommunityAnnouncementTag）：同上 `CommunityAnnouncementTag[]` 单项字段。
+
+## 95. 更新公告标签（管理端）（需登录）
+
+**接口标题**：更新公告标签
+
+**功能描述**：更新一条公告标签（仅 admin/moderator 可用；按 communityAnnouncementTagId 定位，支持部分字段更新）。
+
+**接口路由**：`POST /community-announcement-tags/update`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：至少传一个字段
+
+- `communityAnnouncementTagId`（string，必填）：标签业务 ID（格式：LD####AAAA）
+- `name`（string，可选）：标签名（1~50）
+- `description`（string，可选）：描述（0~5000）
+- `seq`（number，可选）：排序号
+- `isEnabled`（boolean，可选）：是否启用
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                             | 示例      |
+| ------- | ------ | -------------------------------- | --------- |
+| code    | string | 状态码                           | '0'       |
+| message | string | 状态描述                         | 'success' |
+| data    | object | 数据（CommunityAnnouncementTag） | -         |
+
+## 96. 删除公告标签（管理端）（需登录）
+
+**接口标题**：删除公告标签
+
+**功能描述**：删除一条公告标签（仅 admin/moderator 可用；软删除）。
+
+**接口路由**：`POST /community-announcement-tags/delete`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `communityAnnouncementTagId`（string，必填）：标签业务 ID（格式：LD####AAAA）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明     | 示例         |
+| ------- | ------ | -------- | ------------ |
+| code    | string | 状态码   | '0'          |
+| message | string | 状态描述 | 'success'    |
+| data    | object | 数据     | { ok: true } |
+
+## 97. 获取公告列表（管理端）（需登录）
+
+**接口标题**：公告列表
+
+**功能描述**：获取公告列表，支持分页与筛选。
+
+**接口路由**：`POST /community-announcements`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `page`（number，可选）：页码（从 1 开始，默认 1）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 1000）
+- `keyword`（string，可选）：关键词（对 title/summary 做模糊匹配）
+- `communityAnnouncementTagId`（string，可选）：标签业务 ID（格式：LD####AAAA）
+- `isEnabled`（boolean，可选）：是否启用（仅 admin/moderator 生效）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                                    | 示例      |
+| ------- | ------ | --------------------------------------- | --------- |
+| code    | string | 状态码                                  | '0'       |
+| message | string | 状态描述                                | 'success' |
+| data    | object | 数据（CommunityAnnouncementListResult） | -         |
+
+`data` 字段结构（CommunityAnnouncementListResult）：
+
+| 字段          | 类型   | 说明                            | 示例 |
+| ------------- | ------ | ------------------------------- | ---- |
+| data.list     | array  | 列表（CommunityAnnouncement[]） | -    |
+| data.page     | number | 当前页码                        | 1    |
+| data.pageSize | number | 每页条数                        | 10   |
+| data.total    | number | 总条数                          | 100  |
+
+`data.list` 字段结构（CommunityAnnouncement[]）：
+
+| 字段                                | 类型    | 说明                                   | 示例                |
+| ----------------------------------- | ------- | -------------------------------------- | ------------------- |
+| data.list[].communityAnnouncementId | string  | 公告业务 ID（格式：LD####AAAA）        | LD0000ABCD          |
+| data.list[].title                   | string  | 标题                                   | 社区维护通知        |
+| data.list[].summary                 | string  | 摘要                                   | -                   |
+| data.list[].contentBlocks           | array   | 内容块（ContentBlock[]）               | -                   |
+| data.list[].tagIds                  | array   | 标签业务 ID 列表                       | ['LD0000ABCD']      |
+| data.list[].tags                    | array   | 标签列表（CommunityAnnouncementTag[]） | -                   |
+| data.list[].seq                     | number  | 排序号                                 | 0                   |
+| data.list[].isEnabled               | boolean | 是否启用                               | true                |
+| data.list[].publishedAt             | string  | 发布时间（YYYY-MM-DD HH:mm:ss）        | 2026-02-03 12:00:00 |
+| data.list[].createdAt               | string  | 创建时间（YYYY-MM-DD HH:mm:ss）        | 2026-02-03 12:00:00 |
+| data.list[].updatedAt               | string  | 修改时间（YYYY-MM-DD HH:mm:ss）        | 2026-02-03 12:00:00 |
+
+`data.list[].contentBlocks` 字段结构（ContentBlock[]）：
+
+| 字段                                | 类型   | 说明   | 示例                     |
+| ----------------------------------- | ------ | ------ | ------------------------ |
+| data.list[].contentBlocks[].title   | string | 小标题 | 维护时间                 |
+| data.list[].contentBlocks[].content | string | 内容   | 本周六凌晨 2:00-6:00 ... |
+| data.list[].contentBlocks[].seq     | number | 排序号 | 0                        |
+
+## 98. 创建公告（管理端）（需登录）
+
+**接口标题**：创建公告
+
+**功能描述**：创建一条公告（仅 admin/moderator 可用）。
+
+**接口路由**：`POST /community-announcements/create`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `title`（string，必填）：标题（1~100）
+- `summary`（string，可选）：摘要（0~5000，默认 ''）
+- `tagIds`（array，可选）：标签业务 ID 列表（最多 50）
+- `contentBlocks`（array，可选）：内容块列表（最多 200）
+- `seq`（number，可选）：排序号（默认 0）
+- `isEnabled`（boolean，可选）：是否启用（默认 true）
+- `publishedAt`（string，可选）：发布时间（ISO8601，默认当前时间）
+
+**返回值（Success 201）**：对象
+
+| 字段    | 类型   | 说明                          | 示例      |
+| ------- | ------ | ----------------------------- | --------- |
+| code    | string | 状态码                        | '0'       |
+| message | string | 状态描述                      | 'success' |
+| data    | object | 数据（CommunityAnnouncement） | -         |
+
+`data` 字段结构（CommunityAnnouncement）：同上 `CommunityAnnouncement[]` 单项字段。
+
+## 99. 更新公告（管理端）（需登录）
+
+**接口标题**：更新公告
+
+**功能描述**：更新一条公告（仅 admin/moderator 可用；按 communityAnnouncementId 定位，支持部分字段更新）。
+
+**接口路由**：`POST /community-announcements/update`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：至少传一个字段
+
+- `communityAnnouncementId`（string，必填）：公告业务 ID（格式：LD####AAAA）
+- `title`（string，可选）：标题（1~100）
+- `summary`（string，可选）：摘要（0~5000）
+- `tagIds`（array，可选）：标签业务 ID 列表（最多 50）
+- `contentBlocks`（array，可选）：内容块列表（最多 200）
+- `seq`（number，可选）：排序号
+- `isEnabled`（boolean，可选）：是否启用
+- `publishedAt`（string，可选）：发布时间（ISO8601）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                          | 示例      |
+| ------- | ------ | ----------------------------- | --------- |
+| code    | string | 状态码                        | '0'       |
+| message | string | 状态描述                      | 'success' |
+| data    | object | 数据（CommunityAnnouncement） | -         |
+
+## 100. 删除公告（管理端）（需登录）
+
+**接口标题**：删除公告
+
+**功能描述**：删除一条公告（仅 admin/moderator 可用；软删除）。
+
+**接口路由**：`POST /community-announcements/delete`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `communityAnnouncementId`（string，必填）：公告业务 ID（格式：LD####AAAA）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明     | 示例         |
+| ------- | ------ | -------- | ------------ |
+| code    | string | 状态码   | '0'          |
+| message | string | 状态描述 | 'success'    |
+| data    | object | 数据     | { ok: true } |
+
+## 101. 用户行为心跳上报（需登录）
+
+**接口标题**：用户行为心跳上报
+
+**功能描述**：登录用户在使用过程中周期性上报一次；后端按“用户 + 当天”维度累计当日上报次数与估算在线时长，用于统计活跃与在线趋势。
+
+**接口路由**：`POST /user-activity/ping`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `clientTs`（string，可选）：客户端上报时间（ISO8601）；不传或非法时使用服务端当前时间
+- `scene`（string，可选）：场景标识（最长 100，可为空字符串；当前仅校验，不参与统计）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                           | 示例      |
+| ------- | ------ | ------------------------------ | --------- |
+| code    | string | 状态码                         | '0'       |
+| message | string | 状态描述                       | 'success' |
+| data    | object | 数据（UserActivityPingResult） | -         |
+
+`data` 字段结构（UserActivityPingResult）：
+
+| 字段               | 类型          | 说明                                | 示例                |
+| ------------------ | ------------- | ----------------------------------- | ------------------- |
+| data.day           | string        | 当天日期（YYYY-MM-DD）              | 2026-02-03          |
+| data.visitCount    | number        | 当天累计上报次数                    | 12                  |
+| data.onlineSeconds | number        | 当天累计在线秒数                    | 1800                |
+| data.lastPingAt    | string \ null | 最后上报时间（YYYY-MM-DD HH:mm:ss） | 2026-02-03 12:00:00 |
+| data.deltaSeconds  | number        | 本次计入的在线秒数增量              | 60                  |
+
+## 102. 全站用户活跃统计（管理端）（需登录）
+
+**接口标题**：全站用户活跃统计（管理端）
+
+**功能描述**：按日期范围聚合全站活跃与在线数据，返回区间汇总与按天趋势列表（用于数据中心图表）。仅 admin/moderator 可用。
+
+**接口路由**：`POST /user-activity/stats`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `page`（number，可选）：页码（从 1 开始，默认 1）
+- `pageSize`（number，可选）：每页条数（默认 30，最大 366）
+- `dateStart`（string，可选）：起始日期（ISO8601 / YYYY-MM-DD）；默认：dateEnd 往前 6 天
+- `dateEnd`（string，可选）：结束日期（ISO8601 / YYYY-MM-DD）；默认：当天
+- `userRole`（string，可选）：用户角色筛选（admin/moderator/user）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                            | 示例      |
+| ------- | ------ | ------------------------------- | --------- |
+| code    | string | 状态码                          | '0'       |
+| message | string | 状态描述                        | 'success' |
+| data    | object | 数据（UserActivityStatsResult） | -         |
+
+`data` 字段结构（UserActivityStatsResult）：
+
+| 字段                            | 类型   | 说明                           | 示例       |
+| ------------------------------- | ------ | ------------------------------ | ---------- |
+| data.summary                    | object | 区间汇总                       | -          |
+| data.summary.rangeStart         | string | 区间起始日期（YYYY-MM-DD）     | 2026-02-01 |
+| data.summary.rangeEnd           | string | 区间结束日期（YYYY-MM-DD）     | 2026-02-03 |
+| data.summary.activeUsers        | number | 区间内去重活跃用户数           | 120        |
+| data.summary.totalVisitCount    | number | 区间内上报次数总和             | 5600       |
+| data.summary.totalOnlineSeconds | number | 区间内在线秒数总和             | 180000     |
+| data.trend                      | object | 趋势列表（带分页）             | -          |
+| data.trend.list                 | array  | 按天列表（缺失日期会补齐为 0） | -          |
+| data.trend.list[].day           | string | 日期（YYYY-MM-DD）             | 2026-02-02 |
+| data.trend.list[].dau           | number | 当日去重活跃用户数             | 80         |
+| data.trend.list[].visitCount    | number | 当日上报次数总和               | 1200       |
+| data.trend.list[].onlineSeconds | number | 当日在线秒数总和               | 36000      |
+| data.trend.page                 | number | 当前页码                       | 1          |
+| data.trend.pageSize             | number | 每页条数                       | 30         |
+| data.trend.total                | number | 总条数（日期点数量）           | 7          |
+
 ## 通用错误响应
 
 ### 1) 业务/鉴权等错误（errorHandler 兜底）
