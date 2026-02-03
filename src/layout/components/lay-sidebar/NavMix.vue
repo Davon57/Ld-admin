@@ -3,10 +3,11 @@ import { isAllEmpty } from "@pureadmin/utils";
 import { useNav } from "@/layout/hooks/useNav";
 import LaySearch from "../lay-search/index.vue";
 import LayNotice from "../lay-notice/index.vue";
-import { ref, toRaw, watch, onMounted, nextTick } from "vue";
+import { ref, toRaw, watch, onMounted, nextTick, computed } from "vue";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import { getParentPaths, findRouteByPath } from "@/router/utils";
 import { usePermissionStoreHook } from "@/store/modules/permission";
+import type { menuType } from "@/layout/types";
 import LaySidebarExtraIcon from "../lay-sidebar/components/SidebarExtraIcon.vue";
 import LaySidebarFullScreen from "../lay-sidebar/components/SidebarFullScreen.vue";
 
@@ -27,6 +28,42 @@ const {
   getDivStyle,
   avatarsStyle
 } = useNav();
+
+function getDisplayTitle(menu: menuType): string {
+  const child = menu?.children?.length === 1 ? menu.children[0] : null;
+  if (child && child?.meta?.showParent !== true) {
+    return child?.meta?.title ?? menu?.meta?.title ?? "";
+  }
+  return menu?.meta?.title ?? "";
+}
+
+function sortTopMenus(menus: menuType[]): menuType[] {
+  const pinned = ["数据管理", "系统管理"];
+  return (Array.isArray(menus) ? menus : [])
+    .slice()
+    .map((menu, index) => {
+      const title = getDisplayTitle(menu);
+      const pinnedIndex = pinned.indexOf(title);
+      const group =
+        title === "首页" || menu?.name === "Home" || menu?.path === "/"
+          ? -1
+          : pinnedIndex >= 0
+            ? 0
+            : 1;
+      const order = group === 0 ? pinnedIndex : 0;
+      return { menu, index, group, order };
+    })
+    .sort((a, b) => {
+      if (a.group !== b.group) return a.group - b.group;
+      if (a.order !== b.order) return a.order - b.order;
+      return a.index - b.index;
+    })
+    .map(v => v.menu);
+}
+
+const topMenus = computed(() => {
+  return sortTopMenus(usePermissionStoreHook().wholeMenus as menuType[]);
+});
 
 function getDefaultActive(routePath) {
   const wholeMenus = usePermissionStoreHook().wholeMenus;
@@ -68,7 +105,7 @@ watch(
       :default-active="defaultActive"
     >
       <el-menu-item
-        v-for="route in usePermissionStoreHook().wholeMenus"
+        v-for="route in topMenus"
         :key="route.path"
         :index="resolvePath(route) || route.redirect"
       >

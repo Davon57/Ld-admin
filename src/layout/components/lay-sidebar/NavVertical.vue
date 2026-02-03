@@ -40,7 +40,14 @@ function getDisplayTitle(menu): string {
 }
 
 function sortSidebarMenus(menus) {
-  const pinned = ["系统管理", "公告管理", "社区QA", "文章管理", "社区问答"];
+  const pinned = [
+    "数据管理",
+    "系统管理",
+    "公告管理",
+    "社区QA",
+    "文章管理",
+    "社区问答"
+  ];
   return (Array.isArray(menus) ? menus : [])
     .slice()
     .map((menu, index) => {

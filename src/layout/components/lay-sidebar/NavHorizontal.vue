@@ -7,6 +7,7 @@ import { responsiveStorageNameSpace } from "@/config";
 import { ref, nextTick, computed, onMounted } from "vue";
 import { storageLocal, isAllEmpty } from "@pureadmin/utils";
 import { usePermissionStoreHook } from "@/store/modules/permission";
+import type { menuType } from "@/layout/types";
 import LaySidebarItem from "../lay-sidebar/components/SidebarItem.vue";
 import LaySidebarFullScreen from "../lay-sidebar/components/SidebarFullScreen.vue";
 
@@ -36,6 +37,42 @@ const defaultActive = computed(() =>
   !isAllEmpty(route.meta?.activePath) ? route.meta.activePath : route.path
 );
 
+function getDisplayTitle(menu: menuType): string {
+  const child = menu?.children?.length === 1 ? menu.children[0] : null;
+  if (child && child?.meta?.showParent !== true) {
+    return child?.meta?.title ?? menu?.meta?.title ?? "";
+  }
+  return menu?.meta?.title ?? "";
+}
+
+function sortTopMenus(menus: menuType[]): menuType[] {
+  const pinned = ["数据管理", "系统管理"];
+  return (Array.isArray(menus) ? menus : [])
+    .slice()
+    .map((menu, index) => {
+      const title = getDisplayTitle(menu);
+      const pinnedIndex = pinned.indexOf(title);
+      const group =
+        title === "首页" || menu?.name === "Home" || menu?.path === "/"
+          ? -1
+          : pinnedIndex >= 0
+            ? 0
+            : 1;
+      const order = group === 0 ? pinnedIndex : 0;
+      return { menu, index, group, order };
+    })
+    .sort((a, b) => {
+      if (a.group !== b.group) return a.group - b.group;
+      if (a.order !== b.order) return a.order - b.order;
+      return a.index - b.index;
+    })
+    .map(v => v.menu);
+}
+
+const topMenus = computed(() => {
+  return sortTopMenus(usePermissionStoreHook().wholeMenus as menuType[]);
+});
+
 nextTick(() => {
   menuRef.value?.handleResize();
 });
@@ -64,7 +101,7 @@ onMounted(() => {
       :default-active="defaultActive"
     >
       <LaySidebarItem
-        v-for="route in usePermissionStoreHook().wholeMenus"
+        v-for="route in topMenus"
         :key="route.path"
         :item="route"
         :base-path="route.path"
