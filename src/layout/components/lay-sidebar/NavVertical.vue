@@ -42,6 +42,7 @@ function getDisplayTitle(menu): string {
 function sortSidebarMenus(menus) {
   const pinned = [
     "数据管理",
+    "指南管理",
     "系统管理",
     "公告管理",
     "社区QA",

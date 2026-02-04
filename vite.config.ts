@@ -53,6 +53,7 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
           target: VITE_API_BASE,
           changeOrigin: true
         },
+        "/good-things": { target: VITE_API_BASE, changeOrigin: true },
         "/feedbacks": { target: VITE_API_BASE, changeOrigin: true },
         "/feedback-types": { target: VITE_API_BASE, changeOrigin: true }
       }

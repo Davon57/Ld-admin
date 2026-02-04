@@ -46,7 +46,7 @@ function getDisplayTitle(menu: menuType): string {
 }
 
 function sortTopMenus(menus: menuType[]): menuType[] {
-  const pinned = ["数据管理", "系统管理"];
+  const pinned = ["数据管理", "指南管理", "系统管理"];
   return (Array.isArray(menus) ? menus : [])
     .slice()
     .map((menu, index) => {
