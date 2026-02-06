@@ -21,6 +21,9 @@ import RiMedalLine from "~icons/ri/medal-line?raw";
 import RiBookOpenLine from "~icons/ri/book-open-line?raw";
 import RiLock2Line from "~icons/ri/lock-2-line?raw";
 import RiShoppingBag3Line from "~icons/ri/shopping-bag-3-line?raw";
+import RiImage2Line from "~icons/ri/image-2-line?raw";
+import RiHistoryLine from "~icons/ri/history-line?raw";
+import RiFileList3Line from "~icons/ri/file-list-3-line?raw";
 
 const icons = [
   // Element Plus Icon: https://github.com/element-plus/element-plus-icons
@@ -40,7 +43,10 @@ const icons = [
   ["ri/medal-line", RiMedalLine],
   ["ri/book-open-line", RiBookOpenLine],
   ["ri/lock-2-line", RiLock2Line],
-  ["ri/shopping-bag-3-line", RiShoppingBag3Line]
+  ["ri/shopping-bag-3-line", RiShoppingBag3Line],
+  ["ri/image-2-line", RiImage2Line],
+  ["ri/history-line", RiHistoryLine],
+  ["ri/file-list-3-line", RiFileList3Line]
 ];
 
 // 本地菜单图标，后端在路由的 icon 中返回对应的图标字符串并且前端在此处使用 addIcon 添加即可渲染菜单图标

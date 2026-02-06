@@ -42,6 +42,7 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
         "/article": { target: VITE_API_BASE, changeOrigin: true },
         "/activity": { target: VITE_API_BASE, changeOrigin: true },
         "/ota": { target: VITE_API_BASE, changeOrigin: true },
+        "/version-updates": { target: VITE_API_BASE, changeOrigin: true },
         "/vehicle": { target: VITE_API_BASE, changeOrigin: true },
         "/medal": { target: VITE_API_BASE, changeOrigin: true },
         "/notice": { target: VITE_API_BASE, changeOrigin: true },
