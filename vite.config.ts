@@ -30,6 +30,27 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
         "/avatars": { target: VITE_API_BASE, changeOrigin: true },
         "/cars": { target: VITE_API_BASE, changeOrigin: true },
         "/car-friends": { target: VITE_API_BASE, changeOrigin: true },
+        "/car-expense-categories": {
+          target: VITE_API_BASE,
+          changeOrigin: true
+        },
+        "/car-expense-category-templates": {
+          target: VITE_API_BASE,
+          changeOrigin: true
+        },
+        "/car-expense-records": { target: VITE_API_BASE, changeOrigin: true },
+        "/car-expense-budgets": { target: VITE_API_BASE, changeOrigin: true },
+        "/car-expense-reports": { target: VITE_API_BASE, changeOrigin: true },
+        "/car-income-categories": { target: VITE_API_BASE, changeOrigin: true },
+        "/car-income-category-templates": {
+          target: VITE_API_BASE,
+          changeOrigin: true
+        },
+        "/car-income-records": { target: VITE_API_BASE, changeOrigin: true },
+        "/car-income-reports": { target: VITE_API_BASE, changeOrigin: true },
+        "/car-cashflow-reports": { target: VITE_API_BASE, changeOrigin: true },
+        "/bill-logs": { target: VITE_API_BASE, changeOrigin: true },
+        "/admin": { target: VITE_API_BASE, changeOrigin: true },
         "/community-guides": { target: VITE_API_BASE, changeOrigin: true },
         "/community-qas": { target: VITE_API_BASE, changeOrigin: true },
         "/community-qa-categories": {

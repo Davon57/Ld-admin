@@ -2023,15 +2023,20 @@
 
 `data.list` 字段结构（MedalGrantLog[]）：
 
-| 字段                       | 类型          | 说明                            | 示例                                 |
-| -------------------------- | ------------- | ------------------------------- | ------------------------------------ |
-| data.list[].id             | string        | 主键 ID（UUID）                 | 550e8400-e29b-41d4-a716-446655440000 |
-| data.list[].userId         | string        | 用户业务 ID（格式：LD####AAAA） | LD0001ABCD                           |
-| data.list[].medalId        | string        | 勋章业务 ID（格式：LD####AAAA） | LD0007YZAB                           |
-| data.list[].operatorUserId | string \ null | 操作人用户业务 ID               | LD0002EFGH                           |
-| data.list[].sourceType     | string        | 来源类型                        | admin_manual                         |
-| data.list[].reason         | string        | 发放原因                        | 活动奖励                             |
-| data.list[].createdAt      | string        | 发放时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00                  |
+| 字段                         | 类型          | 说明                            | 示例                                 |
+| ---------------------------- | ------------- | ------------------------------- | ------------------------------------ |
+| data.list[].id               | string        | 主键 ID（UUID）                 | 550e8400-e29b-41d4-a716-446655440000 |
+| data.list[].userId           | string        | 用户业务 ID（格式：LD####AAAA） | LD0001ABCD                           |
+| data.list[].username         | string        | 用户名                          | blue_user                            |
+| data.list[].nickname         | string        | 昵称                            | 蓝电车友                             |
+| data.list[].medalId          | string        | 勋章业务 ID（格式：LD####AAAA） | LD0007YZAB                           |
+| data.list[].medalName        | string        | 勋章名称                        | 社区先锋                             |
+| data.list[].operatorUserId   | string \ null | 操作人用户业务 ID               | LD0002EFGH                           |
+| data.list[].operatorUsername | string        | 操作人用户名                    | admin_user                           |
+| data.list[].operatorNickname | string        | 操作人昵称                      | 管理员                               |
+| data.list[].sourceType       | string        | 来源类型                        | admin_manual                         |
+| data.list[].reason           | string        | 发放原因                        | 活动奖励                             |
+| data.list[].createdAt        | string        | 发放时间（YYYY-MM-DD HH:mm:ss） | 2026-01-14 12:00:00                  |
 
 ---
 
@@ -3073,7 +3078,10 @@
 | data.list[].id                    | string  | 主键 ID（UUID）                                | 550e8400-e29b-41d4-a716-446655440000 |
 | data.list[].articleId             | string  | 文章业务 ID（格式：LD####AAAA）                | LD0001ABCD                           |
 | data.list[].authorUserId          | string  | 作者用户业务 ID                                | LD0002EFGH                           |
+| data.list[].authorUsername        | string  | 作者用户名                                     | blue_user                            |
+| data.list[].authorNickname        | string  | 作者昵称                                       | 蓝电车友                             |
 | data.list[].articleCategoryId     | string  | 分类业务 ID                                    | LD0003IJKL                           |
+| data.list[].articleCategoryName   | string  | 分类名称                                       | 车友会动态                           |
 | data.list[].title                 | string  | 标题                                           | 标题示例                             |
 | data.list[].content               | string  | 正文（textarea 纯文本）                        | ...                                  |
 | data.list[].coverScreenshotBase64 | string  | 封面截图（base64/dataURL）                     | data:image/png;base64,...            |
@@ -4973,7 +4981,7 @@
 | data.pageSize | number | 每页条数            | 10   |
 | data.total    | number | 总条数              | 100  |
 
-列表项 `GoodThing`：同「103. 发布好物」的 `GoodThing` 字段。
+列表项 `GoodThing`：同「103. 发布好物」的 `GoodThing` 字段，并补充 `authorUsername`、`authorNickname`。
 
 ---
 
@@ -5577,7 +5585,7 @@
 
 - `versionName`（string，必填）：版本号展示（1~50）
 - `versionCode`（number \ null，可选）：版本数值（0~2000000000）
-- `releaseAt`（string，必填）：版本更新时间（用户手动设置；入参 ISO 8601 字符串）
+- `releaseAt`（string，必填）：版本更新时间（用户手动设置；入参支持 YYYY-MM-DD 或 ISO 8601）
 - `content`（string，必填）：更新内容（1~20000）
 - `seq`（number，可选）：排序号（默认 0）
 - `isEnabled`（boolean，可选）：是否启用（默认 true）
@@ -5611,7 +5619,7 @@
 - `versionUpdateId`（string，必填）：版本更新业务 ID（格式：LD####AAAA）
 - `versionName`（string，可选）：版本号展示（1~50）
 - `versionCode`（number \ null，可选）：版本数值
-- `releaseAt`（string，可选）：版本更新时间（用户手动设置；入参 ISO 8601 字符串）
+- `releaseAt`（string，可选）：版本更新时间（用户手动设置；入参支持 YYYY-MM-DD 或 ISO 8601）
 - `content`（string，可选）：更新内容（1~20000）
 - `seq`（number，可选）：排序号
 - `isEnabled`（boolean，可选）：是否启用
@@ -5657,6 +5665,1100 @@
 | 字段    | 类型    | 说明     | 示例 |
 | ------- | ------- | -------- | ---- |
 | data.ok | boolean | 是否成功 | true |
+
+---
+
+## 126. 获取用车费用分类列表（需登录）
+
+**接口标题**：用车费用分类列表
+
+**功能描述**：分页获取当前用户的用车费用分类列表，支持筛选。
+
+**接口路由**：`POST /car-expense-categories`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `page`（number，可选）：页码（从 1 开始，默认 1）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 1000）
+- `nameKeyword`（string，可选）：名称关键词（模糊匹配）
+- `isEnabled`（boolean，可选）：是否启用
+- `includeHidden`（boolean，可选）：是否包含已隐藏的系统默认分类（默认 false）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                       | 示例      |
+| ------- | ------ | -------------------------- | --------- |
+| code    | string | 状态码                     | '0'       |
+| message | string | 状态描述                   | 'success' |
+| data    | object | 数据（CategoryListResult） | -         |
+
+`data` 字段结构（CategoryListResult）：
+
+| 字段          | 类型   | 说明               | 示例 |
+| ------------- | ------ | ------------------ | ---- |
+| data.list     | array  | 列表（Category[]） | -    |
+| data.page     | number | 当前页码           | 1    |
+| data.pageSize | number | 每页条数           | 10   |
+| data.total    | number | 总条数             | 100  |
+
+`data.list` 字段结构（Category[]）：
+
+| 字段                     | 类型    | 说明                            | 示例                |
+| ------------------------ | ------- | ------------------------------- | ------------------- |
+| data.list[].id           | string  | UUID                            | 2b4b7f2f-...        |
+| data.list[].categoryId   | string  | 分类业务 ID                     | LD0001ABCD          |
+| data.list[].name         | string  | 分类名称                        | 加油                |
+| data.list[].seq          | number  | 排序号                          | 0                   |
+| data.list[].isEnabled    | boolean | 是否启用                        | true                |
+| data.list[].isHidden     | boolean | 是否隐藏（仅系统默认分类）      | false               |
+| data.list[].categoryType | string  | 分类类型（system/custom）       | system              |
+| data.list[].createdAt    | string  | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-02-10 12:00:00 |
+| data.list[].updatedAt    | string  | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-02-10 12:00:00 |
+
+---
+
+## 127. 新增用车费用分类（需登录）
+
+**接口标题**：新增用车费用分类
+
+**功能描述**：创建当前用户的用车费用分类。
+
+**接口路由**：`POST /car-expense-categories/create`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `name`（string，必填）：分类名称（1~50）
+- `seq`（number，可选）：排序号（默认 0）
+- `isEnabled`（boolean，可选）：是否启用（默认 true）
+
+**返回值（Success 201）**：对象
+
+| 字段    | 类型   | 说明             | 示例      |
+| ------- | ------ | ---------------- | --------- |
+| code    | string | 状态码           | '0'       |
+| message | string | 状态描述         | 'success' |
+| data    | object | 数据（Category） | -         |
+
+`data` 字段结构（Category）：同「126. 获取用车费用分类列表」中的 `Category[]` 单项字段。
+
+---
+
+## 128. 修改用车费用分类（需登录）
+
+**接口标题**：修改用车费用分类
+
+**功能描述**：更新当前用户的用车费用分类（支持部分字段更新）。当 `categoryId` 为系统默认分类时：`name` 表示别名（alias），`seq/isEnabled/isHidden` 为用户侧覆盖。
+
+**接口路由**：`POST /car-expense-categories/update`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：至少传一个字段
+
+- `categoryId`（string，必填）：分类业务 ID（格式：LD####AAAA）
+- `name`（string，可选）：分类名称（1~50）
+- `seq`（number，可选）：排序号
+- `isEnabled`（boolean，可选）：是否启用
+- `isHidden`（boolean，可选）：是否隐藏（仅系统默认分类；可用于恢复隐藏分类）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明             | 示例      |
+| ------- | ------ | ---------------- | --------- |
+| code    | string | 状态码           | '0'       |
+| message | string | 状态描述         | 'success' |
+| data    | object | 数据（Category） | -         |
+
+`data` 字段结构（Category）：同「126. 获取用车费用分类列表」中的 `Category[]` 单项字段。
+
+---
+
+## 129. 删除用车费用分类（需登录）
+
+**接口标题**：删除用车费用分类
+
+**功能描述**：
+
+- 若 `categoryId` 为用户自定义分类：软删除；若分类已被记账使用则禁止删除。
+- 若 `categoryId` 为系统默认分类：对当前用户做隐藏（不影响系统默认分类本身）。
+
+---
+
+## 129-1. 获取默认费用分类模板列表（需登录，管理员/版主）
+
+**接口标题**：默认费用分类模板列表
+
+**功能描述**：分页获取系统默认费用分类模板列表（全局数据）。
+
+**接口路由**：`POST /car-expense-category-templates`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `page`（number，可选）：页码（从 1 开始，默认 1）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 1000）
+- `nameKeyword`（string，可选）：名称关键词（模糊匹配）
+- `isEnabled`（boolean，可选）：是否启用
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                       | 示例      |
+| ------- | ------ | -------------------------- | --------- |
+| code    | string | 状态码                     | '0'       |
+| message | string | 状态描述                   | 'success' |
+| data    | object | 数据（TemplateListResult） | -         |
+
+`data` 字段结构（TemplateListResult）：
+
+| 字段          | 类型   | 说明               | 示例 |
+| ------------- | ------ | ------------------ | ---- |
+| data.list     | array  | 列表（Template[]） | -    |
+| data.page     | number | 当前页码           | 1    |
+| data.pageSize | number | 每页条数           | 10   |
+| data.total    | number | 总条数             | 100  |
+
+`data.list` 字段结构（Template[]）：
+
+| 字段                           | 类型    | 说明                            | 示例                |
+| ------------------------------ | ------- | ------------------------------- | ------------------- |
+| data.list[].id                 | string  | UUID                            | 2b4b7f2f-...        |
+| data.list[].templateCategoryId | string  | 模板分类业务 ID                 | LD0001ABCD          |
+| data.list[].name               | string  | 分类名称                        | 加油费              |
+| data.list[].seq                | number  | 排序号                          | 0                   |
+| data.list[].isEnabled          | boolean | 是否启用                        | true                |
+| data.list[].createdAt          | string  | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-02-10 12:00:00 |
+| data.list[].updatedAt          | string  | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-02-10 12:00:00 |
+
+---
+
+## 129-2. 新增默认费用分类模板（需登录，管理员/版主）
+
+**接口标题**：新增默认费用分类模板
+
+**功能描述**：创建一条系统默认费用分类模板。
+
+**接口路由**：`POST /car-expense-category-templates/create`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `name`（string，必填）：分类名称（1~50）
+- `seq`（number，可选）：排序号（默认 0）
+- `isEnabled`（boolean，可选）：是否启用（默认 true）
+
+**返回值（Success 201）**：对象
+
+| 字段    | 类型   | 说明             | 示例      |
+| ------- | ------ | ---------------- | --------- |
+| code    | string | 状态码           | '0'       |
+| message | string | 状态描述         | 'success' |
+| data    | object | 数据（Template） | -         |
+
+`data` 字段结构（Template）：同「129-1. 获取默认费用分类模板列表」中的 `Template[]` 单项字段。
+
+---
+
+## 129-3. 修改默认费用分类模板（需登录，管理员/版主）
+
+**接口标题**：修改默认费用分类模板
+
+**功能描述**：更新一条系统默认费用分类模板（支持部分字段更新）。
+
+**接口路由**：`POST /car-expense-category-templates/update`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：至少传一个字段
+
+- `templateCategoryId`（string，必填）：模板分类业务 ID（格式：LD####AAAA）
+- `name`（string，可选）：分类名称（1~50）
+- `seq`（number，可选）：排序号
+- `isEnabled`（boolean，可选）：是否启用
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明             | 示例      |
+| ------- | ------ | ---------------- | --------- |
+| code    | string | 状态码           | '0'       |
+| message | string | 状态描述         | 'success' |
+| data    | object | 数据（Template） | -         |
+
+`data` 字段结构（Template）：同「129-1. 获取默认费用分类模板列表」中的 `Template[]` 单项字段。
+
+---
+
+## 129-4. 删除默认费用分类模板（需登录，管理员/版主）
+
+**接口标题**：删除默认费用分类模板
+
+**功能描述**：删除一条系统默认费用分类模板（软删除）。
+
+**接口路由**：`POST /car-expense-category-templates/delete`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `templateCategoryId`（string，必填）：模板分类业务 ID（格式：LD####AAAA）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                 | 示例      |
+| ------- | ------ | -------------------- | --------- |
+| code    | string | 状态码               | '0'       |
+| message | string | 状态描述             | 'success' |
+| data    | object | 数据（DeleteResult） | -         |
+
+`data` 字段结构（DeleteResult）：同「129. 删除用车费用分类」中的 `DeleteResult`。
+
+**接口路由**：`POST /car-expense-categories/delete`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `categoryId`（string，必填）：分类业务 ID（格式：LD####AAAA）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                 | 示例      |
+| ------- | ------ | -------------------- | --------- |
+| code    | string | 状态码               | '0'       |
+| message | string | 状态描述             | 'success' |
+| data    | object | 数据（DeleteResult） | -         |
+
+`data` 字段结构（DeleteResult）：
+
+| 字段    | 类型    | 说明     | 示例 |
+| ------- | ------- | -------- | ---- |
+| data.ok | boolean | 是否成功 | true |
+
+---
+
+## 129-5. 按用户获取用车费用分类列表（需登录，管理员/版主）
+
+**接口标题**：按用户获取用车费用分类列表
+
+**功能描述**：分页获取指定用户的用车费用分类列表（合并系统默认分类 + 用户覆盖 + 用户自定义分类），支持筛选。
+
+**接口路由**：`POST /car-expense-categories/by-user`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `userId`（string，必填）：目标用户业务 ID（格式：LD####AAAA）
+- `page`（number，可选）：页码（从 1 开始，默认 1）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 1000）
+- `nameKeyword`（string，可选）：名称关键词（模糊匹配）
+- `isEnabled`（boolean，可选）：是否启用
+- `includeHidden`（boolean，可选）：是否包含已隐藏的系统默认分类（默认 false）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                       | 示例      |
+| ------- | ------ | -------------------------- | --------- |
+| code    | string | 状态码                     | '0'       |
+| message | string | 状态描述                   | 'success' |
+| data    | object | 数据（CategoryListResult） | -         |
+
+`data` 字段结构（CategoryListResult）：同「126. 获取用车费用分类列表」中的 `CategoryListResult`。
+
+---
+
+## 130. 获取用车费用记账列表（需登录）
+
+**接口标题**：用车费用记账列表
+
+**功能描述**：分页获取当前用户的用车费用记账列表，支持按月份/分类/关键词筛选。
+
+**接口路由**：`POST /car-expense-records`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `page`（number，可选）：页码（从 1 开始，默认 1）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 1000）
+- `month`（string，可选）：月份（YYYY-MM），传入则按当月筛选
+- `categoryId`（string，可选）：分类业务 ID（格式：LD####AAAA）
+- `keyword`（string，可选）：关键词（对 remark 做模糊匹配）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                     | 示例      |
+| ------- | ------ | ------------------------ | --------- |
+| code    | string | 状态码                   | '0'       |
+| message | string | 状态描述                 | 'success' |
+| data    | object | 数据（RecordListResult） | -         |
+
+`data` 字段结构（RecordListResult）：
+
+| 字段          | 类型   | 说明             | 示例 |
+| ------------- | ------ | ---------------- | ---- |
+| data.list     | array  | 列表（Record[]） | -    |
+| data.page     | number | 当前页码         | 1    |
+| data.pageSize | number | 每页条数         | 10   |
+| data.total    | number | 总条数           | 100  |
+
+`data.list` 字段结构（Record[]）：
+
+| 字段                     | 类型          | 说明                            | 示例                |
+| ------------------------ | ------------- | ------------------------------- | ------------------- |
+| data.list[].id           | string        | UUID                            | 2b4b7f2f-...        |
+| data.list[].recordId     | string        | 记账业务 ID                     | LD0002EFGH          |
+| data.list[].date         | string        | 记账日期（YYYY-MM-DD）          | 2026-02-10          |
+| data.list[].categoryId   | string        | 分类业务 ID                     | LD0001ABCD          |
+| data.list[].categoryName | string        | 分类名称                        | 燃油                |
+| data.list[].amount       | number        | 金额                            | 100.5               |
+| data.list[].remark       | string \ null | 备注                            | 加油                |
+| data.list[].createdAt    | string        | 创建时间（YYYY-MM-DD HH:mm:ss） | 2026-02-10 12:00:00 |
+| data.list[].updatedAt    | string        | 更新时间（YYYY-MM-DD HH:mm:ss） | 2026-02-10 12:00:00 |
+
+---
+
+## 131. 新增用车费用记账（需登录）
+
+**接口标题**：新增用车费用记账
+
+**功能描述**：创建一条记账记录（分类必须为用户自定义分类且启用，或为系统默认分类且未被当前用户隐藏/禁用）。
+
+**接口路由**：`POST /car-expense-records/create`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `date`（string，必填）：记账日期（ISO 8601 或 YYYY-MM-DD）
+- `categoryId`（string，必填）：分类业务 ID（格式：LD####AAAA）
+- `amount`（number，必填）：金额（>=0）
+- `remark`（string \ null，可选）：备注（<=500）
+
+**返回值（Success 201）**：对象
+
+| 字段    | 类型   | 说明           | 示例      |
+| ------- | ------ | -------------- | --------- |
+| code    | string | 状态码         | '0'       |
+| message | string | 状态描述       | 'success' |
+| data    | object | 数据（Record） | -         |
+
+`data` 字段结构（Record）：同「130. 获取用车费用记账列表」中的 `Record[]` 单项字段。
+
+---
+
+## 132. 修改用车费用记账（需登录）
+
+**接口标题**：修改用车费用记账
+
+**功能描述**：更新一条记账记录（支持部分字段更新）。
+
+**接口路由**：`POST /car-expense-records/update`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：至少传一个字段
+
+- `recordId`（string，必填）：记账业务 ID（格式：LD####AAAA）
+- `date`（string，可选）：记账日期
+- `categoryId`（string，可选）：分类业务 ID
+- `amount`（number，可选）：金额
+- `remark`（string \ null，可选）：备注
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明           | 示例      |
+| ------- | ------ | -------------- | --------- |
+| code    | string | 状态码         | '0'       |
+| message | string | 状态描述       | 'success' |
+| data    | object | 数据（Record） | -         |
+
+`data` 字段结构（Record）：同「130. 获取用车费用记账列表」中的 `Record[]` 单项字段。
+
+---
+
+## 133. 删除用车费用记账（需登录）
+
+**接口标题**：删除用车费用记账
+
+**功能描述**：删除一条记账记录（软删除）。
+
+**接口路由**：`POST /car-expense-records/delete`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `recordId`（string，必填）：记账业务 ID（格式：LD####AAAA）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                 | 示例      |
+| ------- | ------ | -------------------- | --------- |
+| code    | string | 状态码               | '0'       |
+| message | string | 状态描述             | 'success' |
+| data    | object | 数据（DeleteResult） | -         |
+
+`data` 字段结构（DeleteResult）：同「129. 删除用车费用分类」中的 `DeleteResult`。
+
+---
+
+## 134. 获取当月用车费用限额与结余（需登录）
+
+**接口标题**：获取用车费用限额与结余
+
+**功能描述**：获取某月限额、当月已花费与结余；month 不传则默认当前月。
+
+**接口路由**：`POST /car-expense-budgets/get`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `month`（string，可选）：月份（YYYY-MM），不传默认当前月
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                 | 示例      |
+| ------- | ------ | -------------------- | --------- |
+| code    | string | 状态码               | '0'       |
+| message | string | 状态描述             | 'success' |
+| data    | object | 数据（BudgetStatus） | -         |
+
+`data` 字段结构（BudgetStatus）：
+
+| 字段                 | 类型          | 说明                            | 示例    |
+| -------------------- | ------------- | ------------------------------- | ------- |
+| data.month           | string        | 月份（YYYY-MM）                 | 2026-02 |
+| data.limitAmount     | number \ null | 月度限额（未设置则为 null）     | 1000    |
+| data.spentAmount     | number        | 当月已花费                      | 260.5   |
+| data.remainingAmount | number \ null | 当月结余（未设置限额则为 null） | 739.5   |
+
+---
+
+## 135. 设置用车费用月度限额（需登录）
+
+**接口标题**：设置用车费用月度限额
+
+**功能描述**：为某月设置限额；若已存在则覆盖更新。
+
+**接口路由**：`POST /car-expense-budgets/set`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `month`（string，可选）：月份（YYYY-MM），不传默认当前月
+- `limitAmount`（number，必填）：月度限额（>=0）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明     | 示例                                    |
+| ------- | ------ | -------- | --------------------------------------- |
+| code    | string | 状态码   | '0'                                     |
+| message | string | 状态描述 | 'success'                               |
+| data    | object | 数据     | { month: '2026-02', limitAmount: 1000 } |
+
+---
+
+## 136. 获取某月分类账单（需登录）
+
+**接口标题**：某月分类账单
+
+**功能描述**：获取某月按分类聚合的账单，可返回每个分类占比。
+
+**接口路由**：`POST /car-expense-reports/monthly-by-category`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `month`（string，必填）：月份（YYYY-MM）
+- `includePercent`（boolean，可选）：是否包含 percent（默认 false）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                        | 示例      |
+| ------- | ------ | --------------------------- | --------- |
+| code    | string | 状态码                      | '0'       |
+| message | string | 状态描述                    | 'success' |
+| data    | object | 数据（MonthlyCategoryBill） | -         |
+
+`data` 字段结构（MonthlyCategoryBill）：
+
+| 字段             | 类型   | 说明                           | 示例    |
+| ---------------- | ------ | ------------------------------ | ------- |
+| data.month       | string | 月份                           | 2026-02 |
+| data.totalAmount | number | 总金额                         | 260.5   |
+| data.categories  | array  | 分类汇总（CategoryBillItem[]） | -       |
+
+`data.categories` 字段结构（CategoryBillItem[]）：
+
+| 字段                           | 类型   | 说明                                         | 示例       |
+| ------------------------------ | ------ | -------------------------------------------- | ---------- |
+| data.categories[].categoryId   | string | 分类业务 ID                                  | LD0001ABCD |
+| data.categories[].categoryName | string | 分类名称（若分类已被删除则可能为“未知分类”） | 加油       |
+| data.categories[].amount       | number | 金额                                         | 200.5      |
+| data.categories[].percent      | number | 占比（includePercent=true 时返回）           | 76.96      |
+
+---
+
+## 137. 获取某年分类账单（需登录）
+
+**接口标题**：某年分类账单
+
+**功能描述**：获取某年按分类聚合的账单，可返回每个分类占比。
+
+**接口路由**：`POST /car-expense-reports/yearly-by-category`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `year`（number，必填）：年份（2000~2100）
+- `includePercent`（boolean，可选）：是否包含 percent（默认 false）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                       | 示例      |
+| ------- | ------ | -------------------------- | --------- |
+| code    | string | 状态码                     | '0'       |
+| message | string | 状态描述                   | 'success' |
+| data    | object | 数据（YearlyCategoryBill） | -         |
+
+`data` 字段结构（YearlyCategoryBill）：
+
+| 字段             | 类型   | 说明                           | 示例 |
+| ---------------- | ------ | ------------------------------ | ---- |
+| data.year        | number | 年份                           | 2026 |
+| data.totalAmount | number | 总金额                         | 1200 |
+| data.categories  | array  | 分类汇总（CategoryBillItem[]） | -    |
+
+`data.categories` 字段结构（CategoryBillItem[]）：同「136. 获取某月分类账单」中的 `CategoryBillItem[]`。
+
+---
+
+## 138. 获取某月某分类记账明细（需登录）
+
+**接口标题**：某月某分类记账明细
+
+**功能描述**：分页获取某月某分类下的记账记录明细。
+
+**接口路由**：`POST /car-expense-reports/month-category-records`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `month`（string，必填）：月份（YYYY-MM）
+- `categoryId`（string，必填）：分类业务 ID（格式：LD####AAAA）
+- `page`（number，可选）：页码（从 1 开始，默认 1）
+- `pageSize`（number，可选）：每页条数（默认 10，最大 1000）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                     | 示例      |
+| ------- | ------ | ------------------------ | --------- |
+| code    | string | 状态码                   | '0'       |
+| message | string | 状态描述                 | 'success' |
+| data    | object | 数据（RecordListResult） | -         |
+
+`data` 字段结构（RecordListResult）：同「130. 获取用车费用记账列表」中的 `RecordListResult`。
+
+---
+
+## 139. 获取某年每月总账单（需登录）
+
+**接口标题**：某年每月总账单
+
+**功能描述**：获取某年每个月的总花费（12 条）。
+
+**接口路由**：`POST /car-expense-reports/monthly-summary`
+
+**请求头（Headers）**：
+
+- `Authorization: Bearer <token>`
+
+**参数（Body）**：
+
+- `year`（number，必填）：年份（2000~2100）
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                   | 示例      |
+| ------- | ------ | ---------------------- | --------- |
+| code    | string | 状态码                 | '0'       |
+| message | string | 状态描述               | 'success' |
+| data    | object | 数据（MonthlySummary） | -         |
+
+`data` 字段结构（MonthlySummary）：
+
+| 字段        | 类型   | 说明                           | 示例 |
+| ----------- | ------ | ------------------------------ | ---- |
+| data.year   | number | 年份                           | 2026 |
+| data.months | array  | 月份汇总（MonthSummaryItem[]） | -    |
+
+`data.months` 字段结构（MonthSummaryItem[]）：
+
+| 字段                      | 类型   | 说明            | 示例    |
+| ------------------------- | ------ | --------------- | ------- |
+| data.months[].month       | string | 月份（YYYY-MM） | 2026-02 |
+| data.months[].totalAmount | number | 总花费          | 260.5   |
+
+## 140. 用车收入分类（Car Income Categories）
+
+### 140-1. 获取收入分类列表
+
+**POST** `/car-income-categories/`
+
+说明：获取当前登录用户的用车收入分类列表（包含系统模板 + 用户覆盖 + 自定义分类）。
+
+**请求参数**：JSON
+
+| 参数          | 类型    | 必填 | 说明                     | 示例   |
+| ------------- | ------- | ---- | ------------------------ | ------ |
+| page          | number  | 否   | 页码，从 1 开始          | 1      |
+| pageSize      | number  | 否   | 每页条数                 | 10     |
+| nameKeyword   | string  | 否   | 分类名关键词             | 顺风车 |
+| isEnabled     | boolean | 否   | 是否启用                 | true   |
+| includeHidden | boolean | 否   | 是否包含已隐藏的系统分类 | false  |
+
+**返回值（Success 200）**：对象
+
+说明：`data` 结构与 [120-1](#120-1-获取费用分类列表) 一致（仅语义为收入分类）。
+
+### 140-2. 管理端：按用户获取收入分类列表
+
+**POST** `/car-income-categories/by-user`
+
+说明：管理员/版主按用户查看收入分类。
+
+**请求参数**：JSON
+
+| 参数          | 类型    | 必填 | 说明                     | 示例       |
+| ------------- | ------- | ---- | ------------------------ | ---------- |
+| userId        | string  | 是   | 用户ID（业务ID）         | LD0001ABCD |
+| page          | number  | 否   | 页码，从 1 开始          | 1          |
+| pageSize      | number  | 否   | 每页条数                 | 10         |
+| nameKeyword   | string  | 否   | 分类名关键词             | 红包       |
+| isEnabled     | boolean | 否   | 是否启用                 | true       |
+| includeHidden | boolean | 否   | 是否包含已隐藏的系统分类 | false      |
+
+**返回值（Success 200）**：对象
+
+说明：`data` 结构与 [120-1](#120-1-获取费用分类列表) 一致（仅语义为收入分类）。
+
+### 140-3. 新增收入自定义分类
+
+**POST** `/car-income-categories/create`
+
+**请求参数**：JSON
+
+| 参数      | 类型    | 必填 | 说明     | 示例   |
+| --------- | ------- | ---- | -------- | ------ |
+| name      | string  | 是   | 分类名称 | 顺风车 |
+| seq       | number  | 否   | 排序号   | 0      |
+| isEnabled | boolean | 否   | 是否启用 | true   |
+
+**返回值（Success 201）**：对象
+
+说明：`data` 结构与 [120-3](#120-3-新增费用自定义分类) 一致（仅语义为收入分类）。
+
+### 140-4. 更新收入分类（系统/自定义）
+
+**POST** `/car-income-categories/update`
+
+说明：当 `categoryId` 为系统模板分类时，会写入/更新用户覆盖（alias/seq/hidden/enabled）。当为自定义分类时，更新自定义分类。
+
+**请求参数**：JSON
+
+| 参数       | 类型    | 必填 | 说明                         | 示例       |
+| ---------- | ------- | ---- | ---------------------------- | ---------- |
+| categoryId | string  | 是   | 分类ID（业务ID）             | LD0001ABCD |
+| name       | string  | 否   | 分类名称（系统则为别名）     | 顺风车     |
+| seq        | number  | 否   | 排序号（系统则为覆盖排序）   | 0          |
+| isEnabled  | boolean | 否   | 是否启用（系统则为覆盖启用） | true       |
+| isHidden   | boolean | 否   | 是否隐藏（仅系统分类有效）   | false      |
+
+**返回值（Success 200）**：对象
+
+说明：`data` 结构与 [120-4](#120-4-更新费用分类系统自定义) 一致（仅语义为收入分类）。
+
+### 140-5. 删除/隐藏收入分类
+
+**POST** `/car-income-categories/delete`
+
+说明：系统分类执行隐藏，自定义分类执行删除（若分类已被收入记账使用则会阻止删除）。
+
+**请求参数**：JSON
+
+| 参数       | 类型   | 必填 | 说明             | 示例       |
+| ---------- | ------ | ---- | ---------------- | ---------- |
+| categoryId | string | 是   | 分类ID（业务ID） | LD0001ABCD |
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明     | 示例           |
+| ------- | ------ | -------- | -------------- |
+| code    | string | 状态码   | '0'            |
+| message | string | 状态描述 | 'success'      |
+| data    | object | 数据     | { "ok": true } |
+
+## 141. 用车收入分类模板（Car Income Category Templates）
+
+说明：仅管理员/版主可用。
+
+### 141-1. 获取收入分类模板列表
+
+**POST** `/car-income-category-templates/`
+
+**请求参数**：JSON
+
+| 参数        | 类型    | 必填 | 说明            | 示例 |
+| ----------- | ------- | ---- | --------------- | ---- |
+| page        | number  | 否   | 页码，从 1 开始 | 1    |
+| pageSize    | number  | 否   | 每页条数        | 10   |
+| nameKeyword | string  | 否   | 分类名关键词    | 补贴 |
+| isEnabled   | boolean | 否   | 是否启用        | true |
+
+**返回值（Success 200）**：对象
+
+说明：`data` 结构与 [121-1](#121-1-获取费用分类模板列表) 一致（仅语义为收入分类模板）。
+
+### 141-2. 新增收入分类模板
+
+**POST** `/car-income-category-templates/create`
+
+**请求参数**：JSON
+
+| 参数      | 类型    | 必填 | 说明     | 示例   |
+| --------- | ------- | ---- | -------- | ------ |
+| name      | string  | 是   | 分类名称 | 顺风车 |
+| seq       | number  | 否   | 排序号   | 0      |
+| isEnabled | boolean | 否   | 是否启用 | true   |
+
+**返回值（Success 201）**：对象
+
+说明：`data` 结构与 [121-2](#121-2-新增费用分类模板) 一致（仅语义为收入分类模板）。
+
+### 141-3. 更新收入分类模板
+
+**POST** `/car-income-category-templates/update`
+
+**请求参数**：JSON
+
+| 参数               | 类型    | 必填 | 说明                 | 示例       |
+| ------------------ | ------- | ---- | -------------------- | ---------- |
+| templateCategoryId | string  | 是   | 模板分类ID（业务ID） | LD0001ABCD |
+| name               | string  | 否   | 分类名称             | 顺风车     |
+| seq                | number  | 否   | 排序号               | 0          |
+| isEnabled          | boolean | 否   | 是否启用             | true       |
+
+**返回值（Success 200）**：对象
+
+说明：`data` 结构与 [121-3](#121-3-更新费用分类模板) 一致（仅语义为收入分类模板）。
+
+### 141-4. 删除收入分类模板
+
+**POST** `/car-income-category-templates/delete`
+
+**请求参数**：JSON
+
+| 参数               | 类型   | 必填 | 说明                 | 示例       |
+| ------------------ | ------ | ---- | -------------------- | ---------- |
+| templateCategoryId | string | 是   | 模板分类ID（业务ID） | LD0001ABCD |
+
+**返回值（Success 200）**：对象
+
+说明：`data` 结构与 [121-4](#121-4-删除费用分类模板) 一致（仅语义为收入分类模板）。
+
+## 142. 用车收入记账（Car Income Records）
+
+### 142-1. 获取收入记账列表
+
+**POST** `/car-income-records/`
+
+**请求参数**：JSON
+
+| 参数       | 类型   | 必填 | 说明             | 示例       |
+| ---------- | ------ | ---- | ---------------- | ---------- |
+| page       | number | 否   | 页码，从 1 开始  | 1          |
+| pageSize   | number | 否   | 每页条数         | 10         |
+| month      | string | 否   | 月份（YYYY-MM）  | 2026-02    |
+| categoryId | string | 否   | 分类ID（业务ID） | LD0001ABCD |
+| keyword    | string | 否   | 备注关键词       | 乘客       |
+
+**返回值（Success 200）**：对象
+
+说明：`data` 结构与 [123-1](#123-1-获取费用记账列表) 一致（仅语义为收入记账）。
+
+### 142-2. 新增收入记账
+
+**POST** `/car-income-records/create`
+
+**请求参数**：JSON
+
+| 参数       | 类型   | 必填 | 说明             | 示例       |
+| ---------- | ------ | ---- | ---------------- | ---------- |
+| date       | string | 是   | 日期（ISO）      | 2026-02-11 |
+| categoryId | string | 是   | 分类ID（业务ID） | LD0001ABCD |
+| amount     | number | 是   | 金额（>=0）      | 80.5       |
+| remark     | string | 否   | 备注             | 顺风车     |
+
+**返回值（Success 201）**：对象
+
+说明：`data` 结构与 [123-2](#123-2-新增费用记账) 一致（仅语义为收入记账）。
+
+### 142-3. 更新收入记账
+
+**POST** `/car-income-records/update`
+
+**请求参数**：JSON
+
+| 参数       | 类型   | 必填 | 说明             | 示例       |
+| ---------- | ------ | ---- | ---------------- | ---------- |
+| recordId   | string | 是   | 记账ID（业务ID） | LD0001ABCD |
+| date       | string | 否   | 日期（ISO）      | 2026-02-11 |
+| categoryId | string | 否   | 分类ID（业务ID） | LD0001ABCD |
+| amount     | number | 否   | 金额（>=0）      | 80.5       |
+| remark     | string | 否   | 备注             | 顺风车     |
+
+**返回值（Success 200）**：对象
+
+说明：`data` 结构与 [123-3](#123-3-更新费用记账) 一致（仅语义为收入记账）。
+
+### 142-4. 删除收入记账
+
+**POST** `/car-income-records/delete`
+
+**请求参数**：JSON
+
+| 参数     | 类型   | 必填 | 说明             | 示例       |
+| -------- | ------ | ---- | ---------------- | ---------- |
+| recordId | string | 是   | 记账ID（业务ID） | LD0001ABCD |
+
+**返回值（Success 200）**：对象
+
+说明：`data` 结构与 [123-4](#123-4-删除费用记账) 一致（仅语义为收入记账）。
+
+## 143. 用车收入报表（Car Income Reports）
+
+### 143-1. 月度收入按分类汇总
+
+**POST** `/car-income-reports/monthly-by-category`
+
+**请求参数**：JSON
+
+| 参数           | 类型    | 必填 | 说明            | 示例    |
+| -------------- | ------- | ---- | --------------- | ------- |
+| month          | string  | 是   | 月份（YYYY-MM） | 2026-02 |
+| includePercent | boolean | 否   | 是否返回占比    | true    |
+
+**返回值（Success 200）**：对象
+
+说明：`data` 结构与 [127-1](#127-1-月度费用按分类汇总) 一致（仅语义为收入报表）。
+
+### 143-2. 年度收入按分类汇总
+
+**POST** `/car-income-reports/yearly-by-category`
+
+**请求参数**：JSON
+
+| 参数           | 类型    | 必填 | 说明         | 示例 |
+| -------------- | ------- | ---- | ------------ | ---- |
+| year           | number  | 是   | 年份         | 2026 |
+| includePercent | boolean | 否   | 是否返回占比 | true |
+
+**返回值（Success 200）**：对象
+
+说明：`data` 结构与 [128-1](#128-1-年度费用按分类汇总) 一致（仅语义为收入报表）。
+
+### 143-3. 查询某月某分类的收入明细
+
+**POST** `/car-income-reports/month-category-records`
+
+**请求参数**：JSON
+
+| 参数       | 类型   | 必填 | 说明             | 示例       |
+| ---------- | ------ | ---- | ---------------- | ---------- |
+| month      | string | 是   | 月份（YYYY-MM）  | 2026-02    |
+| categoryId | string | 是   | 分类ID（业务ID） | LD0001ABCD |
+| page       | number | 否   | 页码             | 1          |
+| pageSize   | number | 否   | 每页条数         | 10         |
+
+**返回值（Success 200）**：对象
+
+说明：`data` 结构与 [129-1](#129-1-查询某月某分类的费用明细) 一致（仅语义为收入明细）。
+
+### 143-4. 年度每月收入汇总
+
+**POST** `/car-income-reports/monthly-summary`
+
+**请求参数**：JSON
+
+| 参数 | 类型   | 必填 | 说明 | 示例 |
+| ---- | ------ | ---- | ---- | ---- |
+| year | number | 是   | 年份 | 2026 |
+
+**返回值（Success 200）**：对象
+
+说明：`data` 结构与 [129-5](#129-5-年度每月费用汇总) 一致（仅语义为收入汇总）。
+
+## 144. 用车收支聚合（Car Cashflow Reports）
+
+### 144-1. 月度收支概览（收入/支出/净额）
+
+**POST** `/car-cashflow-reports/monthly-overview`
+
+说明：聚合返回某月的收入总额、支出总额、净额，并可选返回收入/支出按分类汇总。
+
+**请求参数**：JSON
+
+| 参数              | 类型    | 必填 | 说明             | 示例    |
+| ----------------- | ------- | ---- | ---------------- | ------- |
+| month             | string  | 是   | 月份（YYYY-MM）  | 2026-02 |
+| includeCategories | boolean | 否   | 是否返回分类汇总 | true    |
+| includePercent    | boolean | 否   | 分类是否包含占比 | false   |
+
+**返回值（Success 200）**：对象
+
+| 字段    | 类型   | 说明                            | 示例      |
+| ------- | ------ | ------------------------------- | --------- |
+| code    | string | 状态码                          | '0'       |
+| message | string | 状态描述                        | 'success' |
+| data    | object | 数据（MonthlyCashflowOverview） | -         |
+
+`data` 字段结构（MonthlyCashflowOverview）：
+
+| 字段                    | 类型   | 说明              | 示例    |
+| ----------------------- | ------ | ----------------- | ------- |
+| data.month              | string | 月份（YYYY-MM）   | 2026-02 |
+| data.incomeTotalAmount  | number | 收入总额          | 300.5   |
+| data.expenseTotalAmount | number | 支出总额          | 260.5   |
+| data.netAmount          | number | 净额（收入-支出） | 40      |
+| data.income             | object | 收入汇总          | -       |
+| data.expense            | object | 支出汇总          | -       |
+
+`data.income` / `data.expense` 字段结构：
+
+| 字段                    | 类型   | 说明                 | 示例  |
+| ----------------------- | ------ | -------------------- | ----- |
+| data.income.totalAmount | number | 总额                 | 300.5 |
+| data.income.categories  | array  | 按分类汇总（可为空） | -     |
+
+`categories` 的 item 结构与 [127-1](#127-1-月度费用按分类汇总) 的 `categories` 一致（仅语义分别为收入/支出）。
+
+## 143. 账单日志列表（管理端）
+
+### 接口描述
+
+用于管理端审计：查看所有用户的收入/支出记账操作日志（新增/修改/删除），仅管理员/版主可访问。
+
+### 请求信息
+
+- 请求方式：POST
+- 请求路径：`/bill-logs`
+- 认证方式：Bearer Token
+
+### 请求参数（Body JSON）
+
+| 字段     | 类型   | 必填 | 说明                                 | 示例       |
+| -------- | ------ | ---- | ------------------------------------ | ---------- |
+| page     | number | 否   | 页码（>=1）                          | 1          |
+| pageSize | number | 否   | 每页条数（1~1000）                   | 10         |
+| userId   | string | 否   | 筛选记账所属用户ID                   | LD0000AAAA |
+| month    | string | 否   | 筛选账单月份（YYYY-MM，按 billDate） | 2026-02    |
+| action   | string | 否   | 筛选操作类型（create/update/delete） | update     |
+
+### 成功响应
+
+| 字段    | 类型   | 说明     | 示例      |
+| ------- | ------ | -------- | --------- |
+| code    | string | 状态码   | '0'       |
+| message | string | 状态描述 | 'success' |
+| data    | object | 数据     | -         |
+
+`data` 字段结构：
+
+| 字段          | 类型   | 说明               | 示例 |
+| ------------- | ------ | ------------------ | ---- |
+| data.list     | array  | 日志列表（可为空） | -    |
+| data.page     | number | 当前页码           | 1    |
+| data.pageSize | number | 每页条数           | 10   |
+| data.total    | number | 总数               | 100  |
+
+`data.list` item 字段结构：
+
+| 字段             | 类型           | 说明                             | 示例                 |
+| ---------------- | -------------- | -------------------------------- | -------------------- |
+| billLogId        | string         | 日志业务ID                       | LD0001ABCD           |
+| userId           | string         | 记账所属用户ID                   | LD0000AAAA           |
+| username         | string         | 记账所属用户名                   | blue_user            |
+| nickname         | string         | 记账所属昵称                     | 蓝电车友             |
+| operatorUserId   | string         | 操作者用户ID                     | LD0000AAAA           |
+| operatorUsername | string         | 操作者用户名                     | admin_user           |
+| operatorNickname | string         | 操作者昵称                       | 管理员               |
+| recordType       | string         | 记账类型（income/expense）       | expense              |
+| action           | string         | 操作类型（create/update/delete） | update               |
+| recordId         | string         | 记账业务ID                       | LD0000BBBB           |
+| billDate         | string         | 账单日期（YYYY-MM-DD）           | 2026-02-11           |
+| categoryId       | string         | 分类ID                           | LD0000CCCC           |
+| categoryName     | string         | 分类名称                         | 燃油                 |
+| amount           | number         | 金额                             | 88.5                 |
+| remark           | string \| null | 备注                             | 加油                 |
+| changedFields    | array          | 修改字段列表（可为空）           | ["amount", "remark"] |
+| beforeSnapshot   | object \| null | 修改前快照（可为空）             | -                    |
+| afterSnapshot    | object \| null | 修改后快照（可为空）             | -                    |
+| createdAt        | string         | 操作时间（YYYY-MM-DD HH:mm:ss）  | 2026-02-11 10:00:00  |
+
+### 权限错误
+
+当非管理员/版主访问时，HTTP 403：
+
+```json
+{ "code": "403", "message": "仅管理员/版主可访问", "data": [] }
+```
 
 ## 通用错误响应
 
