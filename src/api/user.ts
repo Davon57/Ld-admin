@@ -200,6 +200,26 @@ export const deleteUser = async (data: {
   );
 };
 
+export type ResetUserPasswordPayload = {
+  userId: string;
+  password: string;
+};
+
+export type ResetUserPasswordResult = {
+  ok: true;
+};
+
+export const resetUserPassword = async (
+  data: ResetUserPasswordPayload
+): Promise<ResetUserPasswordResult> => {
+  return http.request<ResetUserPasswordResult>(
+    "post",
+    "/users/reset-password",
+    { data },
+    { showSuccessMessage: false }
+  );
+};
+
 export type BatchDeleteUsersResult = {
   failedCount: number;
 };

@@ -10,6 +10,9 @@ html.dark {
 
   /* 常用border-color 需要时可取用 */
   --pure-border-color: rgb(253 253 253 / 12%);
+  --pure-card-border-color: rgb(253 253 253 / 12%);
+  --pure-card-shadow: 0 10px 30px rgb(0 0 0 / 35%);
+  --pure-card-shadow-hover: 0 14px 44px rgb(0 0 0 / 45%);
 
   /* switch关闭状态下的color 需要时可取用 */
   --pure-switch-off-color: #ffffff3f;

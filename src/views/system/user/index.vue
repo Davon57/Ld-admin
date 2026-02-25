@@ -4,6 +4,7 @@ import type { FormInstance, FormRules, CascaderOption } from "element-plus";
 import { addDialog } from "@/components/ReDialog";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { message } from "@/utils/message";
+import { copyTextToClipboard } from "@pureadmin/utils";
 import {
   DEFAULT_PAGE_SIZES,
   exportToXlsx,
@@ -18,7 +19,8 @@ import {
   getUserList,
   createUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  resetUserPassword
 } from "@/api/user";
 import { type AvatarItem, getAvatarList } from "@/api/avatar";
 import { getRoleList, type RoleItem } from "@/api/role";
@@ -29,6 +31,7 @@ defineOptions({
 
 type RoleOption = { label: string; value: UserRole };
 type StatusOption = { label: string; value: UserStatus };
+type ResetPasswordMode = "fixed" | "random";
 
 const roleLoading = ref(false);
 const roleList = ref<RoleItem[]>([]);
@@ -841,6 +844,126 @@ function openUserDialog(mode: UserFormMode, row?: UserItem): void {
   });
 }
 
+function createRandomSixDigits(): string {
+  return Math.floor(Math.random() * 1_000_000)
+    .toString()
+    .padStart(6, "0");
+}
+
+function openResetPasswordDialog(row: UserItem): void {
+  const mode = ref<ResetPasswordMode>("fixed");
+
+  const ResetPasswordDialog = defineComponent({
+    name: "ResetPasswordDialog",
+    setup() {
+      const previewPassword = computed((): string => {
+        return mode.value === "fixed" ? "123456" : "六位随机数";
+      });
+
+      return () => (
+        <div class="space-y-3">
+          <el-alert
+            title="重置后用户需要使用新密码重新登录"
+            type="warning"
+            closable={false}
+            show-icon
+          />
+
+          <el-form label-width="90px">
+            <el-form-item label="重置方式">
+              <el-radio-group v-model={mode.value}>
+                <el-radio label="fixed">统一密码</el-radio>
+                <el-radio label="random">随机密码</el-radio>
+              </el-radio-group>
+            </el-form-item>
+            <el-form-item label="重置为">
+              <el-input modelValue={previewPassword.value} readonly />
+            </el-form-item>
+          </el-form>
+        </div>
+      );
+    }
+  });
+
+  addDialog({
+    title: `重置密码：${row.username || row.userId}`,
+    width: "460px",
+    closeOnClickModal: false,
+    sureBtnLoading: true,
+    contentRenderer: () => h(ResetPasswordDialog),
+    beforeSure: async (done, { closeLoading }) => {
+      try {
+        if (!row.userId) {
+          message("用户信息异常", { type: "error" });
+          closeLoading();
+          return;
+        }
+
+        const password =
+          mode.value === "fixed" ? "123456" : createRandomSixDigits();
+        await resetUserPassword({ userId: row.userId, password });
+        done();
+
+        const ResetPasswordResultDialog = defineComponent({
+          name: "ResetPasswordResultDialog",
+          emits: ["close"],
+          setup(_props, { emit }) {
+            const onCopy = (): void => {
+              const ok = copyTextToClipboard(password);
+              ok
+                ? message("复制成功", { type: "success" })
+                : message("复制失败", { type: "error" });
+            };
+
+            return () => (
+              <div class="space-y-4">
+                <el-alert
+                  title="密码已重置"
+                  type="success"
+                  closable={false}
+                  show-icon
+                />
+
+                <div class="rounded-lg border border-[var(--el-border-color)] bg-[var(--el-fill-color-light)] p-4">
+                  <div class="text-[13px] text-[var(--el-text-color-secondary)]">
+                    新密码
+                  </div>
+                  <div class="mt-2 flex items-center gap-3">
+                    <el-input modelValue={password} readonly class="flex-1" />
+                    <el-button type="primary" onClick={onCopy}>
+                      复制
+                    </el-button>
+                  </div>
+                </div>
+
+                <div class="flex justify-end">
+                  <el-button
+                    onClick={() => {
+                      emit("close", { command: "close" });
+                    }}
+                  >
+                    我知道了
+                  </el-button>
+                </div>
+              </div>
+            );
+          }
+        });
+
+        addDialog({
+          title: "重置密码成功",
+          width: "520px",
+          closeOnClickModal: false,
+          hideFooter: true,
+          contentRenderer: () => h(ResetPasswordResultDialog)
+        });
+      } catch {
+        closeLoading();
+      }
+    }
+  });
+}
+
 async function onDeleteRow(row: UserItem): Promise<void> {
   try {
     await deleteUser({ userId: row.userId });
@@ -1027,9 +1150,16 @@ fetchUsers();
         </el-table-column>
         <el-table-column prop="createdAt" label="创建时间" min-width="170" />
         <el-table-column prop="updatedAt" label="修改时间" min-width="170" />
-        <el-table-column label="操作" fixed="right" width="160">
+        <el-table-column label="操作" fixed="right" width="220">
           <template #default="{ row }">
             <el-space>
+              <el-button
+                link
+                type="warning"
+                @click="openResetPasswordDialog(row)"
+              >
+                重置密码
+              </el-button>
               <el-button
                 link
                 type="primary"

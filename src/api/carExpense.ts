@@ -649,6 +649,13 @@ export type MonthlyCashflowOverview = {
   expense: CashflowCategorySummary;
 };
 
+export type AlltimeCashflowOverview = {
+  participantUserCount: number;
+  incomeTotalAmount: number;
+  expenseTotalAmount: number;
+  netAmount: number;
+};
+
 export const getCarCashflowMonthlyOverview = (data: {
   month: string;
   includeCategories?: boolean;
@@ -658,6 +665,14 @@ export const getCarCashflowMonthlyOverview = (data: {
     "post",
     "/car-cashflow-reports/monthly-overview",
     { data }
+  );
+};
+
+export const getCarCashflowAlltimeOverview = () => {
+  return http.request<AlltimeCashflowOverview>(
+    "post",
+    "/car-cashflow-reports/alltime-overview",
+    { data: {} }
   );
 };
 

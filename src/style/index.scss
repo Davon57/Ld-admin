@@ -10,7 +10,12 @@
   --pure-transition-duration: 0.3s;
 
   /* 常用border-color 需要时可取用 */
-  --pure-border-color: rgb(5 5 5 / 6%);
+  --pure-border-color: rgb(2 6 23 / 12%);
+  --pure-card-border-color: rgb(2 6 23 / 14%);
+  --pure-card-shadow:
+    0 2px 8px rgb(2 6 23 / 10%), 0 18px 48px rgb(2 6 23 / 16%);
+  --pure-card-shadow-hover:
+    0 4px 14px rgb(2 6 23 / 14%), 0 26px 70px rgb(2 6 23 / 22%);
 
   /* switch关闭状态下的color 需要时可取用 */
   --pure-switch-off-color: #a6a6a6;
