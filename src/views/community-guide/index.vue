@@ -259,10 +259,14 @@ async function onInitGuide(): Promise<void> {
   if (loading.value || saving.value || deleting.value || initializing.value)
     return;
 
-  initializing.value = true;
   try {
     await formRef.value?.validate();
+  } catch {
+    return;
+  }
 
+  initializing.value = true;
+  try {
     const title = replaceOfficialQa(model.title.trim());
     const summary = replaceOfficialQa(model.summary.trim());
     const tags = normalizeTags(model.tags).map(replaceOfficialQa);
