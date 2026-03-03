@@ -278,6 +278,14 @@ const tableData = computed((): UserItem[] => {
 
 const exporting = ref(false);
 
+const initAvatarLoading = ref(false);
+const initAvatarProgress = reactive({
+  total: 0,
+  done: 0,
+  success: 0,
+  failed: 0
+});
+
 const exportColumns: CsvColumn<UserItem>[] = [
   { label: "编码", key: "userId" },
   { label: "头像", key: "avatar" },
@@ -378,6 +386,206 @@ async function onExportList(): Promise<void> {
   } finally {
     exporting.value = false;
   }
+}
+
+async function fetchAllUsersForAvatarInit(): Promise<UserItem[]> {
+  const pageSize = 100;
+  const first = await getUserList({ page: 1, pageSize });
+  if (!isPageData<UserItem>(first)) return first;
+
+  const total = Math.max(0, Number(first.total || 0));
+  const maxPage = Math.max(1, Math.ceil(total / pageSize));
+  const all: UserItem[] = [...first.list];
+
+  for (let page = 2; page <= maxPage; page += 1) {
+    const res = await getUserList({ page, pageSize });
+    if (isPageData<UserItem>(res)) all.push(...res.list);
+  }
+
+  return all;
+}
+
+async function fetchAllEnabledAvatarsForInit(): Promise<AvatarItem[]> {
+  const pageSize = 100;
+  const first = await getAvatarList({ page: 1, pageSize, isEnabled: true });
+  const total = Math.max(0, Number(first.total || 0));
+  const maxPage = Math.max(1, Math.ceil(total / pageSize));
+  const all: AvatarItem[] = [...first.list];
+
+  for (let page = 2; page <= maxPage; page += 1) {
+    const res = await getAvatarList({ page, pageSize, isEnabled: true });
+    all.push(...res.list);
+  }
+
+  return all
+    .map(item => ({
+      ...item,
+      avatarId: String(item.avatarId ?? "").trim(),
+      imageBase64: String(item.imageBase64 ?? "").trim()
+    }))
+    .filter(item => item.avatarId && item.imageBase64);
+}
+
+function pickRandomAvatarId(avatarIds: string[]): string {
+  return avatarIds[Math.floor(Math.random() * avatarIds.length)] ?? "";
+}
+
+async function initMissingUserAvatars(): Promise<void> {
+  if (initAvatarLoading.value) return;
+  initAvatarLoading.value = true;
+  initAvatarProgress.total = 0;
+  initAvatarProgress.done = 0;
+  initAvatarProgress.success = 0;
+  initAvatarProgress.failed = 0;
+
+  try {
+    const all = await fetchAllUsersForAvatarInit();
+    const missing = all.filter(u => !String(u.avatar ?? "").trim());
+    initAvatarProgress.total = missing.length;
+
+    if (missing.length === 0) {
+      message("没有需要初始化头像的用户", { type: "success" });
+      return;
+    }
+
+    const avatars = await fetchAllEnabledAvatarsForInit();
+    const avatarIds = avatars.map(a => a.avatarId);
+
+    if (avatarIds.length === 0) {
+      message("没有可用头像（启用头像库为空）", { type: "warning" });
+      return;
+    }
+
+    const concurrency = 5;
+    let cursor = 0;
+    const workerCount = Math.min(concurrency, missing.length);
+
+    const workers = Array.from({ length: workerCount }).map(async () => {
+      while (cursor < missing.length) {
+        const currentIndex = cursor;
+        cursor += 1;
+        const row = missing[currentIndex];
+        const userId = String(row.userId ?? "").trim();
+        if (!userId) {
+          initAvatarProgress.failed += 1;
+          initAvatarProgress.done += 1;
+          continue;
+        }
+
+        const avatar = pickRandomAvatarId(avatarIds);
+        if (!avatar) {
+          initAvatarProgress.failed += 1;
+          initAvatarProgress.done += 1;
+          continue;
+        }
+
+        try {
+          await updateUser({ userId, avatar });
+          initAvatarProgress.success += 1;
+        } catch {
+          initAvatarProgress.failed += 1;
+        } finally {
+          initAvatarProgress.done += 1;
+        }
+      }
+    });
+
+    await Promise.all(workers);
+    fetchUsers();
+
+    const fail = initAvatarProgress.failed;
+    message(
+      `初始化头像完成：成功 ${initAvatarProgress.success}，失败 ${fail}`,
+      { type: fail > 0 ? "warning" : "success" }
+    );
+  } finally {
+    initAvatarLoading.value = false;
+  }
+}
+
+function openInitAvatarDialog(): void {
+  const InitAvatarDialog = defineComponent({
+    name: "InitAvatarDialog",
+    setup() {
+      const percent = computed((): number => {
+        if (initAvatarProgress.total <= 0) return 0;
+        return Math.min(
+          100,
+          Math.round((initAvatarProgress.done / initAvatarProgress.total) * 100)
+        );
+      });
+
+      return () => (
+        <div class="space-y-4">
+          <el-alert
+            title="对全部用户生效，仅处理未设置头像的用户，头像来源为启用头像库"
+            type="warning"
+            closable={false}
+            show-icon
+          />
+
+          <div class="rounded-lg border border-[var(--el-border-color)] bg-[var(--el-fill-color-light)] p-4">
+            <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-[13px] text-[var(--el-text-color-secondary)]">
+              <div>
+                总计：
+                <span class="text-[var(--el-text-color-primary)]">
+                  {initAvatarProgress.total}
+                </span>
+              </div>
+              <div>
+                已处理：
+                <span class="text-[var(--el-text-color-primary)]">
+                  {initAvatarProgress.done}
+                </span>
+              </div>
+              <div>
+                成功：
+                <span class="text-[var(--el-text-color-primary)]">
+                  {initAvatarProgress.success}
+                </span>
+              </div>
+              <div>
+                失败：
+                <span class="text-[var(--el-text-color-primary)]">
+                  {initAvatarProgress.failed}
+                </span>
+              </div>
+            </div>
+
+            <div class="pt-3">
+              <el-progress
+                percentage={percent.value}
+                striped
+                stripedFlow={initAvatarLoading.value}
+                status={
+                  initAvatarProgress.failed > 0 && !initAvatarLoading.value
+                    ? "warning"
+                    : undefined
+                }
+              />
+            </div>
+          </div>
+        </div>
+      );
+    }
+  });
+
+  addDialog({
+    title: "初始化头像",
+    width: "520px",
+    closeOnClickModal: false,
+    sureBtnLoading: true,
+    contentRenderer: () => h(InitAvatarDialog),
+    beforeSure: async (done, { closeLoading }) => {
+      try {
+        await initMissingUserAvatars();
+        done();
+      } catch {
+        message("初始化失败", { type: "error" });
+        closeLoading();
+      }
+    }
+  });
 }
 
 type UserFormMode = "create" | "edit";
@@ -1106,6 +1314,14 @@ onMounted(() => {
             @click="onExportList"
           >
             导出列表
+          </el-button>
+          <el-button
+            type="warning"
+            plain
+            :loading="initAvatarLoading"
+            @click="openInitAvatarDialog"
+          >
+            初始化头像
           </el-button>
         </el-space>
       </template>
