@@ -1,5 +1,13 @@
 <script setup lang="tsx">
-import { h, reactive, ref, computed, nextTick, defineComponent } from "vue";
+import {
+  h,
+  reactive,
+  ref,
+  computed,
+  nextTick,
+  defineComponent,
+  onMounted
+} from "vue";
 import type { FormInstance, FormRules, CascaderOption } from "element-plus";
 import { addDialog } from "@/components/ReDialog";
 import { PureTableBar } from "@/components/RePureTableBar";
@@ -150,8 +158,66 @@ function toImageDataUrl(base64: string): string {
 const avatarLoading = ref(false);
 const avatarList = ref<AvatarItem[]>([]);
 
+type AvatarCachePayload = {
+  version: 1;
+  updatedAt: number;
+  items: Array<Pick<AvatarItem, "avatarId" | "imageBase64">>;
+};
+
+const AVATAR_CACHE_KEY = "pure-admin:system-user:avatar-cache:v1";
+const AVATAR_CACHE_TTL_MS = 6 * 60 * 60 * 1000;
+
+function readAvatarCache(): AvatarItem[] | null {
+  try {
+    const raw = sessionStorage.getItem(AVATAR_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<AvatarCachePayload>;
+    if (parsed.version !== 1) return null;
+    const updatedAt = Number(parsed.updatedAt ?? 0);
+    if (!Number.isFinite(updatedAt) || updatedAt <= 0) return null;
+    if (Date.now() - updatedAt > AVATAR_CACHE_TTL_MS) return null;
+    const items = Array.isArray(parsed.items) ? parsed.items : [];
+    return items
+      .map(item => ({
+        avatarId: String(item.avatarId ?? "").trim(),
+        imageBase64: String(item.imageBase64 ?? "").trim(),
+        description: "",
+        isEnabled: true,
+        createdAt: "",
+        updatedAt: ""
+      }))
+      .filter(item => item.avatarId && item.imageBase64);
+  } catch {
+    return null;
+  }
+}
+
+function writeAvatarCache(list: AvatarItem[]): void {
+  try {
+    const items: AvatarCachePayload["items"] = list
+      .map(item => ({
+        avatarId: String(item.avatarId ?? "").trim(),
+        imageBase64: String(item.imageBase64 ?? "").trim()
+      }))
+      .filter(item => item.avatarId && item.imageBase64);
+    const payload: AvatarCachePayload = {
+      version: 1,
+      updatedAt: Date.now(),
+      items
+    };
+    const json = JSON.stringify(payload);
+    sessionStorage.setItem(AVATAR_CACHE_KEY, json);
+  } catch {}
+}
+
 async function fetchAllAvatars(): Promise<void> {
   if (avatarLoading.value) return;
+  if (avatarList.value.length > 0) return;
+  const cached = readAvatarCache();
+  if (cached && cached.length > 0) {
+    avatarList.value = cached;
+    return;
+  }
   avatarLoading.value = true;
   try {
     const pageSize = 100;
@@ -174,6 +240,7 @@ async function fetchAllAvatars(): Promise<void> {
     }
 
     avatarList.value = all;
+    writeAvatarCache(all);
   } catch {
     avatarList.value = [];
   } finally {
@@ -979,6 +1046,9 @@ async function onDeleteRow(row: UserItem): Promise<void> {
 }
 
 fetchUsers();
+onMounted(() => {
+  void fetchAllAvatars();
+});
 </script>
 
 <template>
