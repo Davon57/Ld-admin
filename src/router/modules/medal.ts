@@ -4,6 +4,7 @@ export default {
   meta: {
     icon: "ri/medal-line",
     title: "勋章管理",
+    showLink: false,
     rank: 3
   },
   children: [

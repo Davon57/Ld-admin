@@ -4,6 +4,7 @@ export default {
   meta: {
     icon: "ri/pulse-line",
     title: "活动管理",
+    showLink: false,
     rank: 1
   },
   children: [

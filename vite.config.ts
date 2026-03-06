@@ -19,7 +19,7 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
     VITE_API_BASE
   } = wrapperEnv(loadEnv(mode, root));
 
-  const proxy = VITE_API_BASE
+  const apiProxy = VITE_API_BASE
     ? {
         "/auth": { target: VITE_API_BASE, changeOrigin: true },
         "/system": { target: VITE_API_BASE, changeOrigin: true },
@@ -81,6 +81,14 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
         "/feedback-types": { target: VITE_API_BASE, changeOrigin: true }
       }
     : {};
+  const proxy = {
+    ...apiProxy,
+    "/__60sapi__": {
+      target: "https://60s.viki.moe",
+      changeOrigin: true,
+      rewrite: (path: string) => path.replace(/^\/__60sapi__/, "")
+    }
+  };
   return {
     base: VITE_PUBLIC_PATH,
     root,
